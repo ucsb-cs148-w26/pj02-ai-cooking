@@ -1,0 +1,1 @@
+My name is Krisha and I am excited to create an AI cooking app to help people with recipes and using all the ingredients in their kitchens.
