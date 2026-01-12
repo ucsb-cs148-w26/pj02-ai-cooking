@@ -1,30 +1,14 @@
-Title
-Brief title of your project.
+AI Cooking App
 
 Description
 
-If your project has a counterpart, add 2 sentences describing how your project differs from the other one. 
+Our ideal users are people who don't know how to cook or need help thinking of ideas for what to cook.
 
-Audience
-Who are your ideal users?
+An AI cooking app would only have one kind of user: those seeking assistance with cooking.
 
-How many different kinds of users are there, and what are their roles?
+Users will be able to upload what ingredients they have and when they bought them, as well as what cuisine they want to make or if they have any allergies/restrictions. They will recieve recipes based on their ingredients and updates about when ingredients are about to expire.
 
-Examples:
-
-A ride-share app MVP has two kinds of users: those looking for rides and those offering rides.
-A third kind of user role you might need is site admins, users who can have the power to delete anyone’s posting.
-A game app might have only one kind of user: a game player
-A Recipe sharer app might have two kinds:
-Users who look up recipes, but can’t add new data to the system
-Admins who can upload new data to the system
-Later, you might also allow user-contributed content; in that case, you might want admins to have the ability to delete inappropriate content.
-
-What will each different kind of user be able to do in your app?
-
-What are their goals in using their app?
-How does your app allow them to accomplish their goal?
-
+They goals could be to eat healthier and learn how to cook and our app helps them accomplish this by giving them recipies tailored to their individual preferences and ingredients.
 
 Framework
 
