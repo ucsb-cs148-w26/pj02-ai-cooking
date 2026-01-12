@@ -4,6 +4,8 @@ Mentor: Self Mentored
 
 Meeting Time: lect 02
 
+Type of Meeting: Daily Scrum
+
 Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
 
 Scribed Discussion:
