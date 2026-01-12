@@ -1,16 +1,14 @@
 AI Cooking App
 
-Description
+Description:
+This app helps people who do not know how to cook, feel stuck on what to make, or want to eat healthier using the ingredients they already have.
 
-Our ideal users are people who don't know how to cook or need help thinking of ideas for what to cook.
+Audience:
+-The primary user is someone seeking personalized cooking support. They may be a beginner, busy student, or anyone trying to reduce food waste and build confidence in the kitchen. 
+-An AI cooking app would only have one kind of user: those seeking assistance with cooking.
+-Users will be able to upload what ingredients they have, when they bought them, preferences they have like cuisine type, and if they have any allergies/restrictions. The app will then recommend recipes that match what they already own, prioritize ingredients that are closest to expiring, and send reminders when items are about to go bad.
+-Their goals could be to learn how to cook and reduce food waste and our app supports this by generating recipes tailored to the user’s exact pantry, preferences, and skill level, plus step by step guidance while they cook.
 
-An AI cooking app would only have one kind of user: those seeking assistance with cooking.
-
-Users will be able to upload what ingredients they have and when they bought them, as well as what cuisine they want to make or if they have any allergies/restrictions. They will recieve recipes based on their ingredients and updates about when ingredients are about to expire.
-
-They goals could be to eat healthier and learn how to cook and our app helps them accomplish this by giving them recipies tailored to their individual preferences and ingredients.
-
-Framework
-
-What technologies did you decide to use for your implementation? 
-Why?
+Framework:
+-Next.js for frontend because it lets us build a fast, responsive web app with built in routing and server features in one codebase, making it easy to ship the UI and backend logic together.
+-Supabase for backend because it provides an integrated backend with Postgres, authentication, storage, and security rules, so we can store pantry data and manage user accounts without building our own backend from scratch.
