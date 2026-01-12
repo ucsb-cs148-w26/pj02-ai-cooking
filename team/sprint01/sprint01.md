@@ -16,7 +16,7 @@ Andy is unable to come to class so he joined via Discord
 
 Daniel and Yuxi were having merge conflicts with their .md files that they are currently working on. 
 
-Everyone is working on lab1 still to get ready for the Friday submission
+Everyone is still working on lab1 and getting ready for the Friday submission
 
 
 
