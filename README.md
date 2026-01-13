@@ -8,7 +8,7 @@ This app helps people who do not know how to cook, feel stuck on what to make, o
 
 <span style="color:blue">Andy Wang @a-Fat-Cat</span><br>
 <span style="color:blue">Daniel Du @DanielDu-735</span><br> 
-<span style="color:blue">Mahima Chaudhary @Amahimac2006</span><br>
+<span style="color:blue">Mahima Chaudhary @mahimac2006</span><br>
 <span style="color:blue">Krisha Soneji @krishasone</span><br>
 <span style="color:blue">Yuxi Ji @Yuxi-Ji</span>
 
