@@ -1,3 +1,6 @@
+Team Members: (in alphabetical order)
+Andy Wang, Daniel Du, Mahima Chaudhary, Krisha Soneji, Yuxi Ji
+
 Absences: 
 Let team members know in advance if you will be absent for any reason
 Team will do their best to update absent member on what they discussed
