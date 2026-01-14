@@ -2,7 +2,7 @@
 
 **Description:**
 
-This app helps people who do not know how to cook, feel stuck on what to make, or want to eat healthier using the ingredients they already have; it also keeps track of the date of food stored in and provides advise of recipies that will prioritize the food in order to finish them before decaying.
+This app helps people who do not know how to cook, feel stuck on what to make, or want to eat healthier using the ingredients they already have. It does this by keeping track of the user's inventory of food and provides recipies that will prioritize food about to go bad in order to finish them before decaying.
 
 **Group Members:**
 
