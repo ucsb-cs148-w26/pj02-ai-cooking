@@ -12,5 +12,5 @@ Built with Next.js for CS148 Lab01.
 3. Open http://localhost:3000
 
 ## Deployment
-Deployed to Vercel at: https://<your-vercel-url>.vercel.app
+Can be done via Vercel but due to technological issue we will demonstrate locally for this lab.
 
