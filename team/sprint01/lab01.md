@@ -12,4 +12,4 @@ Scribed Discussion:
 
 Each member made a pull request on github to add our individual files for lab01.
 
-
+Each member will continue working on lab01.
