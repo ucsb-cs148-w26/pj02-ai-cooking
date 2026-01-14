@@ -1,6 +1,6 @@
 #Problem Scenario
 
-#Personas:
+##Personas:
 
 John Jones, 19. John can't eat gluten and wants to learn how to cook meals that still taste good. John uses our product and enters in his dietary restrictions as well as inventory of food that he owns. He is then given several recipes that he can cook using food in his kitchen.
 
