@@ -26,6 +26,8 @@ This app helps people who do not know how to cook, feel stuck on what to make, o
 
 **Framework:**
 
--Next.js for frontend because it lets us build a fast, responsive web app with built in routing and server features in one codebase, making it easy to ship the UI and backend logic together.
+- We chose Next.js for its seamless combination of React, server-side rendering, and API routes, allowing us to build a fast, scalable full-stack application with minimal overhead.
 
--Supabase for backend because it provides an integrated backend with Postgres, authentication, storage, and security rules, so we can store pantry data and manage user accounts without building our own backend from scratch.
+- We chose Vercel for its native support of Next.js, zero-config deployments, and automatic scaling, which lets us iterate quickly without managing infrastructure.
+
+- We chose Firebase for its authentication, real-time database, and serverless backend services, enabling rapid development while maintaining security and reliability.
