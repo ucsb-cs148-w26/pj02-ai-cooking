@@ -1,6 +1,6 @@
-lab01 Meeting Leader: Daniel   
-lab02 Meeting Leader: Krisha  
-lec02 Meeting Leader: Andy  
-lec03 Meeting Leader: Yuxi  
-Retro Leader lab03: Mahima   
+lab01 Meeting Leader: Daniel<br>
+lab02 Meeting Leader: Krisha<br>  
+lec02 Meeting Leader: Andy<br> 
+lec03 Meeting Leader: Yuxi<br> 
+Retro Leader lab03: Mahima<br>  
  
