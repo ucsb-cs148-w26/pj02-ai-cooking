@@ -32,3 +32,10 @@ This app helps people who do not know how to cook, feel stuck on what to make, o
 
 **Permissions:**
 Anyone can use our app with a valid email address.
+**Framework:**
+
+- We chose Next.js for its seamless combination of React, server-side rendering, and API routes, allowing us to build a fast, scalable full-stack application with minimal overhead.
+
+- We chose Vercel for its native support of Next.js, zero-config deployments, and automatic scaling, which lets us iterate quickly without managing infrastructure.
+
+- We chose Firebase for its authentication, real-time database, and serverless backend services, enabling rapid development while maintaining security and reliability.
