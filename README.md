@@ -22,15 +22,16 @@ This app helps people who do not know how to cook, feel stuck on what to make, o
 
 **User Roles:**
 
--The primary user is someone seeking personalized cooking support. They may be a beginner, busy student, or anyone trying to reduce food waste and build confidence in the kitchen. 
+- The primary user is someone seeking personalized cooking support. They may be a beginner, busy student, or anyone trying to reduce food waste and build confidence in the kitchen. 
 
--There are two kinds of users: one is the people directly uses that app for suggestion on cooking and reduce food waste, and the other is businesses or developers using the app's data, AI, or features to build their own products or services.
+- There are two kinds of users: one is the people directly uses that app for suggestion on cooking and reduce food waste, and the other is businesses or developers using the app's data, AI, or features to build their own products or services.
 
--Users will be able to upload what ingredients they have, when they bought them, preferences they have like cuisine type, and if they have any allergies/restrictions. The app will then recommend recipes that match what they already own, prioritize ingredients that are closest to expiring, and send reminders when items are about to go bad.
+- Users will be able to upload what ingredients they have, when they bought them, preferences they have like cuisine type, and if they have any allergies/restrictions. The app will then recommend recipes that match what they already own, prioritize ingredients that are closest to expiring, and send reminders when items are about to go bad.
 
--Their goals could be to learn how to cook and reduce food waste and our app supports this by generating recipes tailored to the user’s exact pantry, preferences, and skill level, plus step by step guidance while they cook.
+- Their goals could be to learn how to cook and reduce food waste and our app supports this by generating recipes tailored to the user’s exact pantry, preferences, and skill level, plus step by step guidance while they cook.
 
--Our app provides mainly two features, AI recipe suggestions and prioritization based on item freshness, to allow them to accomplish their goal.
+- Our app provides mainly two features, AI recipe suggestions and prioritization based on item freshness, to allow them to accomplish their goal.
 
 **Permissions:**
-Anyone can use our app with a valid email address.
+
+- Anyone can use our app with a valid email address.
