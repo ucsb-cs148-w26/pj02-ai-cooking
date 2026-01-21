@@ -12,7 +12,13 @@ This app helps people who do not know how to cook, feel stuck on what to make, o
 <span style="color:blue">Krisha Soneji @krishasone</span><br>
 <span style="color:blue">Yuxi Ji @Yuxi-Ji</span>
 
-**Audience:**
+**Tech Stack:**
+
+-Next.js for frontend because it lets us build a fast, responsive web app with built in routing and server features in one codebase, making it easy to ship the UI and backend logic together.
+
+-Supabase for backend because it provides an integrated backend with Postgres, authentication, storage, and security rules, so we can store pantry data and manage user accounts without building our own backend from scratch.
+
+**User Roles:**
 
 -The primary user is someone seeking personalized cooking support. They may be a beginner, busy student, or anyone trying to reduce food waste and build confidence in the kitchen. 
 
@@ -24,8 +30,5 @@ This app helps people who do not know how to cook, feel stuck on what to make, o
 
 -Our app provides mainly two features, AI recipe suggestions and prioritization based on item freshness, to allow them to accomplish their goal.
 
-**Framework:**
-
--Next.js for frontend because it lets us build a fast, responsive web app with built in routing and server features in one codebase, making it easy to ship the UI and backend logic together.
-
--Supabase for backend because it provides an integrated backend with Postgres, authentication, storage, and security rules, so we can store pantry data and manage user accounts without building our own backend from scratch.
+**Permissions:**
+Anyone can use our app with a valid email address.
