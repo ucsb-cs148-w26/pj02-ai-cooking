@@ -20,4 +20,3 @@ Krisha added each user story to the Kanban board
 
 Mahima, Yuxi, Krisha, Daniel and Andy discussed subissues that could be added to each user story.
 
-Each member will work on their assigned task for the MVP.
