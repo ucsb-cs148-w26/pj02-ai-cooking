@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { ChefHat, ShoppingBag, Utensils, History, User, Sparkles } from 'lucide-react';
 
