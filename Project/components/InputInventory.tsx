@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 
 export default function AddFood() {
@@ -14,170 +16,145 @@ export default function AddFood() {
     setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' });
   };
 
-  const update = (field, value) => setFood({ ...food, [field]: value });
+  const update = (field: string, value: string) => setFood({ ...food, [field]: value });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-yellow-100 p-4 md:p-8">
-      {/* Animated Background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-400 to-purple-500 opacity-20 rounded-full blur-3xl animate-pulse" />
+    <div className="max-w-4xl mx-auto">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold mb-3">
+          <span className="text-green-600">Add Food to your Pantry!</span>
+        </h1>
+        <p className="text-gray-700">Track your food and expiration dates</p>
       </div>
 
-      {/* Header */}
-      <header className="bg-gradient-to-r from-indigo-600 to-pink-600 text-white px-6 py-4 rounded-2xl shadow-xl mb-8">
-        <div className="flex items-center justify-between max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 font-bold text-xl">
-            <span>🍳</span>
-            <span>Smart Cooking Helper</span>
-          </div>
-          <nav className="hidden md:flex gap-4">
-            <button className="px-4 py-2 rounded-full hover:bg-white/20">Scan</button>
-            <button className="px-4 py-2 rounded-full bg-green-400 font-bold">Pantry</button>
-            <button className="px-4 py-2 rounded-full hover:bg-white/20">Recipes</button>
-          </nav>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">
-            <span className="text-green-600">Add Food to your Pantry! </span>
+      {/* Form */}
+      <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-green-200 space-y-5">
         
-          </h1>
-          <p className="text-gray-700">Track your food and expiration dates</p>
+        {/* Food Name */}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Food Name *</label>
+          <input 
+            type="text" 
+            value={food.name}
+            onChange={(e) => update('name', e.target.value)}
+            placeholder="e.g., Milk, Chicken, Tomatoes"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
+          />
         </div>
 
-        {/* Form */}
-        <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-green-200 space-y-5">
-          
-          {/* Food Name */}
+        {/* Category */}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Category *</label>
+          <select 
+            value={food.category}
+            onChange={(e) => update('category', e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
+          >
+            <option value="">Select category</option>
+            <option value="dairy">🥛 Dairy & Eggs</option>
+            <option value="meat">🍗 Meat & Poultry</option>
+            <option value="fruits">🍎 Fruits</option>
+            <option value="vegetables">🥕 Vegetables</option>
+            <option value="grains">🌾 Grains & Bread</option>
+            <option value="frozen">❄️ Frozen Foods</option>
+            <option value="other">📦 Other</option>
+          </select>
+        </div>
+
+        {/* Quantity & Unit */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">Food Name *</label>
+            <label className="block text-gray-700 font-semibold mb-2">Quantity</label>
             <input 
-              type="text" 
-              value={food.name}
-              onChange={(e) => update('name', e.target.value)}
-              placeholder="e.g., Milk, Chicken, Tomatoes"
+              type="number" 
+              value={food.quantity}
+              onChange={(e) => update('quantity', e.target.value)}
+              placeholder="1, 2, 5..."
               className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
             />
           </div>
-
-          {/* Category */}
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">Category *</label>
+            <label className="block text-gray-700 font-semibold mb-2">Unit</label>
             <select 
-              value={food.category}
-              onChange={(e) => update('category', e.target.value)}
+              value={food.unit}
+              onChange={(e) => update('unit', e.target.value)}
               className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
             >
-              <option value="">Select category</option>
-              <option value="dairy">🥛 Dairy & Eggs</option>
-              <option value="meat">🍗 Meat & Poultry</option>
-              <option value="fruits">🍎 Fruits</option>
-              <option value="vegetables">🥕 Vegetables</option>
-              <option value="grains">🌾 Grains & Bread</option>
-              <option value="frozen">❄️ Frozen Foods</option>
-              <option value="other">📦 Other</option>
+              <option value="">Select unit</option>
+              <option value="piece">Piece(s)</option>
+              <option value="lb">Pounds</option>
+              <option value="kg">Kilograms</option>
+              <option value="cup">Cups</option>
+              <option value="box">Box(es)</option>
             </select>
           </div>
-
-          {/* Quantity & Unit */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Quantity</label>
-              <input 
-                type="number" 
-                value={food.quantity}
-                onChange={(e) => update('quantity', e.target.value)}
-                placeholder="1, 2, 5..."
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Unit</label>
-              <select 
-                value={food.unit}
-                onChange={(e) => update('unit', e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
-              >
-                <option value="">Select unit</option>
-                <option value="piece">Piece(s)</option>
-                <option value="lb">Pounds</option>
-                <option value="kg">Kilograms</option>
-                <option value="cup">Cups</option>
-                <option value="box">Box(es)</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Expiration Date */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Expiration Date *</label>
-            <input 
-              type="date" 
-              value={food.expiration}
-              onChange={(e) => update('expiration', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none"
-            />
-          </div>
-
-          {/* Storage Location */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Storage Location *</label>
-            <select 
-              value={food.storage}
-              onChange={(e) => update('storage', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
-            >
-              <option value="">Select location</option>
-              <option value="fridge">🧊 Refrigerator</option>
-              <option value="freezer">❄️ Freezer</option>
-              <option value="pantry">🗄️ Pantry</option>
-              <option value="counter">🏠 Counter</option>
-            </select>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-gray-700 font-semibold mb-2">Notes</label>
-            <textarea 
-              value={food.notes}
-              onChange={(e) => update('notes', e.target.value)}
-              placeholder="Additional notes..."
-              rows={2}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none resize-none"
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="flex gap-4 pt-4">
-            <button 
-              onClick={handleSubmit}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all"
-            >
-              ➕ Add to Pantry
-            </button>
-            <button 
-              onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
-              className="flex-1 px-6 py-4 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all"
-            >
-              🗑️ Clear
-            </button>
-          </div>
         </div>
 
-        {/* Tips */}
-        <div className="mt-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 shadow-lg">
-          <h3 className="text-xl font-bold text-blue-900 mb-3">💡 Quick Tips</h3>
-          <ul className="space-y-1 text-gray-700">
-            <li>• Check packaging for "Best By" dates</li>
-            <li>• Store items properly to maximize freshness</li>
-            <li>• Get reminders before food expires!</li>
-          </ul>
+        {/* Expiration Date */}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Expiration Date *</label>
+          <input 
+            type="date" 
+            value={food.expiration}
+            onChange={(e) => update('expiration', e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none"
+          />
         </div>
-      </main>
+
+        {/* Storage Location */}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Storage Location *</label>
+          <select 
+            value={food.storage}
+            onChange={(e) => update('storage', e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
+          >
+            <option value="">Select location</option>
+            <option value="fridge">🧊 Refrigerator</option>
+            <option value="freezer">❄️ Freezer</option>
+            <option value="pantry">🗄️ Pantry</option>
+            <option value="counter">🏠 Counter</option>
+          </select>
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Notes</label>
+          <textarea 
+            value={food.notes}
+            onChange={(e) => update('notes', e.target.value)}
+            placeholder="Additional notes..."
+            rows={2}
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none resize-none"
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex gap-4 pt-4">
+          <button 
+            onClick={handleSubmit}
+            className="flex-1 px-6 py-4 bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all"
+          >
+            ➕ Add to Pantry
+          </button>
+          <button 
+            onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
+            className="flex-1 px-6 py-4 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all"
+          >
+            🗑️ Clear
+          </button>
+        </div>
+      </div>
+
+      {/* Tips */}
+      <div className="mt-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 shadow-lg">
+        <h3 className="text-xl font-bold text-blue-900 mb-3">💡 Quick Tips</h3>
+        <ul className="space-y-1 text-gray-700">
+          <li>• Check packaging for "Best By" dates</li>
+          <li>• Store items properly to maximize freshness</li>
+          <li>• Get reminders before food expires!</li>
+        </ul>
+      </div>
     </div>
   );
 }
