@@ -20,6 +20,13 @@ export async function generateExpirationDate(
   request: ExpirationDateRequest
 ): Promise<ExpirationDateResponse> {
   try {
+    // Get API key from environment variable
+    const apiKey = process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
+    
+    if (!apiKey) {
+      throw new Error('Anthropic API key not configured. Please add NEXT_PUBLIC_ANTHROPIC_API_KEY to your .env.local file');
+    }
+
     const purchaseDate = request.purchaseDate || new Date().toISOString().split('T')[0];
     
     const prompt = `You are a food safety expert. Given the following information, estimate when this food item will expire:
@@ -44,6 +51,8 @@ Respond ONLY with a JSON object (no markdown formatting) in this exact format:
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
@@ -58,7 +67,8 @@ Respond ONLY with a JSON object (no markdown formatting) in this exact format:
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`API request failed: ${response.statusText}. ${errorData.error?.message || ''}`);
     }
 
     const data = await response.json();
@@ -81,6 +91,9 @@ Respond ONLY with a JSON object (no markdown formatting) in this exact format:
     return result;
   } catch (error) {
     console.error("Error generating expiration date:", error);
+    if (error instanceof Error) {
+      throw error;
+    }
     throw new Error("Failed to generate expiration date. Please try again.");
   }
 }
