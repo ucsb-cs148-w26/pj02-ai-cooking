@@ -1,8 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import type { Ingredient } from '../types';
 
-export default function AddFood() {
+type AddFoodProps = {
+  onAddFood?: (item: Ingredient) => void;
+};
+
+export default function AddFood({ onAddFood }: AddFoodProps) {
   const [food, setFood] = useState({
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
@@ -12,6 +17,14 @@ export default function AddFood() {
       alert('Please fill in all required fields');
       return;
     }
+    const quantityLabel = [food.quantity, food.unit].filter(Boolean).join(' ');
+    const expiryEstimate = food.expiration ? `Expires ${food.expiration}` : undefined;
+    onAddFood?.({
+      name: food.name,
+      quantity: quantityLabel || undefined,
+      category: food.category || undefined,
+      expiryEstimate
+    });
     alert(`✅ ${food.name} added to pantry!`);
     setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' });
   };

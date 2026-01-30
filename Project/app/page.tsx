@@ -1,12 +1,23 @@
 'use client';
 
 import { useState } from 'react';
-import { Layout } from '../components/Layout';
-import AddFood from '../components/InputInventory';
-import ScanAnalyzer from '../components/ScanAnalyzer';
+import { Layout } from '@/components/Layout';
+import AddFood from '@/components/InputInventory';
+import ScanAnalyzer from '@/components/ScanAnalyzer';
+import RecipeGenerator from '@/components/RecipeGenerator';
+import type { Ingredient } from '@/types';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('pantry');
+  const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
+
+  const handleAddFood = (item: Ingredient) => {
+    setPantryItems((prev) => [...prev, item]);
+  };
+
+  const handleAddScanItems = (items: Ingredient[]) => {
+    setPantryItems((prev) => [...prev, ...items]);
+  };
 
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
@@ -16,16 +27,19 @@ export default function Home() {
             <h1 className="text-3xl font-bold mb-2">Scan Items</h1>
             <p className="text-gray-700">Upload a receipt or fridge photo to analyze.</p>
           </div>
-          <ScanAnalyzer />
+          <ScanAnalyzer onAddItems={handleAddScanItems} />
         </div>
       )}
       
-      {activeTab === 'pantry' && <AddFood />}
+      {activeTab === 'pantry' && <AddFood onAddFood={handleAddFood} />}
       
       {activeTab === 'recipes' && (
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
-          <h1 className="text-3xl font-bold mb-4">Recipe History</h1>
-          <p>Your saved recipes will appear here...</p>
+        <div className="space-y-6">
+          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
+            <h1 className="text-3xl font-bold mb-2">Recipes</h1>
+            <p className="text-gray-700">Generate recipes from your pantry items.</p>
+          </div>
+          <RecipeGenerator ingredients={pantryItems} />
         </div>
       )}
     </Layout>

@@ -11,7 +11,11 @@ const formatIngredient = (item: Ingredient) => {
   return details ? `${item.name} (${details})` : item.name;
 };
 
-export default function ScanAnalyzer() {
+type ScanAnalyzerProps = {
+  onAddItems?: (items: Ingredient[]) => void;
+};
+
+export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
   const [apiKeyInput, setApiKeyInput] = useState(getApiKey() ?? '');
   const [hasKey, setHasKey] = useState(hasValidApiKey());
   const [mode, setMode] = useState<ScanMode>('food');
@@ -63,6 +67,9 @@ export default function ScanAnalyzer() {
     try {
       const result = await analyzeImage(imageData, mode);
       setItems(result);
+      if (result.length > 0) {
+        onAddItems?.(result);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed.');
     } finally {
