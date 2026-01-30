@@ -1,11 +1,51 @@
 'use client';
 
 import React, { useState } from 'react';
+import { generateExpirationDate } from '../services/expirationDateService';
 
 export default function AddFood() {
   const [food, setFood] = useState({
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
+  
+  const [isGeneratingExpiration, setIsGeneratingExpiration] = useState(false);
+  const [expirationError, setExpirationError] = useState('');
+  const [aiSuggestion, setAiSuggestion] = useState<{
+    date: string;
+    confidence: string;
+    tips: string;
+  } | null>(null);
+
+  const handleAutoGenerateExpiration = async () => {
+    if (!food.name) {
+      setExpirationError('Please enter a food name first');
+      return;
+    }
+
+    setIsGeneratingExpiration(true);
+    setExpirationError('');
+    
+    try {
+      const result = await generateExpirationDate({
+        foodName: food.name,
+        category: food.category,
+        storage: food.storage,
+        purchaseDate: new Date().toISOString().split('T')[0]
+      });
+
+      setFood({ ...food, expiration: result.estimatedExpirationDate });
+      setAiSuggestion({
+        date: result.estimatedExpirationDate,
+        confidence: result.confidence,
+        tips: result.storageTips || ''
+      });
+    } catch (error) {
+      console.error('Error generating expiration date:', error);
+      setExpirationError('Failed to generate expiration date. Please enter manually.');
+    } finally {
+      setIsGeneratingExpiration(false);
+    }
+  };
 
   const handleSubmit = () => {
     if (!food.name || !food.category || !food.expiration || !food.storage) {
@@ -14,9 +54,15 @@ export default function AddFood() {
     }
     alert(`✅ ${food.name} added to pantry!`);
     setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' });
+    setAiSuggestion(null);
   };
 
-  const update = (field: string, value: string) => setFood({ ...food, [field]: value });
+  const update = (field: string, value: string) => {
+    setFood({ ...food, [field]: value });
+    if (field === 'name' || field === 'category' || field === 'storage') {
+      setAiSuggestion(null);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -90,17 +136,6 @@ export default function AddFood() {
           </div>
         </div>
 
-        {/* Expiration Date */}
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">Expiration Date *</label>
-          <input 
-            type="date" 
-            value={food.expiration}
-            onChange={(e) => update('expiration', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none"
-          />
-        </div>
-
         {/* Storage Location */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Storage Location *</label>
@@ -115,6 +150,47 @@ export default function AddFood() {
             <option value="pantry">🗄️ Pantry</option>
             <option value="counter">🏠 Counter</option>
           </select>
+        </div>
+
+        {/* Expiration Date with AI Auto-Generate */}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">Expiration Date *</label>
+          <div className="flex gap-2">
+            <input 
+              type="date" 
+              value={food.expiration}
+              onChange={(e) => update('expiration', e.target.value)}
+              className="flex-1 px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={handleAutoGenerateExpiration}
+              disabled={isGeneratingExpiration || !food.name}
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            >
+              {isGeneratingExpiration ? '🤖 Generating...' : '🤖 AI Auto-Fill'}
+            </button>
+          </div>
+          
+          {expirationError && (
+            <p className="text-red-600 text-sm mt-2">{expirationError}</p>
+          )}
+          
+          {aiSuggestion && (
+            <div className="mt-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
+              <p className="text-sm font-semibold text-blue-900 mb-1">
+                🤖 AI Suggestion (Confidence: {aiSuggestion.confidence})
+              </p>
+              <p className="text-sm text-blue-800">
+                Expires: {aiSuggestion.date}
+              </p>
+              {aiSuggestion.tips && (
+                <p className="text-sm text-blue-700 mt-1">
+                  💡 Tip: {aiSuggestion.tips}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Notes */}
@@ -138,7 +214,11 @@ export default function AddFood() {
             ➕ Add to Pantry
           </button>
           <button 
-            onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
+            onClick={() => {
+              setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' });
+              setAiSuggestion(null);
+              setExpirationError('');
+            }}
             className="flex-1 px-6 py-4 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all"
           >
             🗑️ Clear
@@ -150,6 +230,7 @@ export default function AddFood() {
       <div className="mt-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 shadow-lg">
         <h3 className="text-xl font-bold text-blue-900 mb-3">💡 Quick Tips</h3>
         <ul className="space-y-1 text-gray-700">
+          <li>• Use the AI Auto-Fill button to get smart expiration date suggestions</li>
           <li>• Check packaging for "Best By" dates</li>
           <li>• Store items properly to maximize freshness</li>
           <li>• Get reminders before food expires!</li>
