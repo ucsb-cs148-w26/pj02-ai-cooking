@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Layout } from '../components/Layout';
 import AddFood from '../components/InputInventory';
+import ScanAnalyzer from '../components/ScanAnalyzer';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('pantry');
@@ -10,9 +11,12 @@ export default function Home() {
   return (
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === 'scan' && (
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
-          <h1 className="text-3xl font-bold mb-4">Scan Items</h1>
-          <p>Camera/scan functionality will go here...</p>
+        <div className="space-y-6">
+          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
+            <h1 className="text-3xl font-bold mb-2">Scan Items</h1>
+            <p className="text-gray-700">Upload a receipt or fridge photo to analyze.</p>
+          </div>
+          <ScanAnalyzer />
         </div>
       )}
       

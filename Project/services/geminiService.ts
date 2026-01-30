@@ -3,16 +3,27 @@ import { Ingredient, Recipe, ScanMode, UserPreferences } from "../types";
 
 const LOCAL_STORAGE_KEY = 'gemini_api_key';
 
+const getStorage = (): Storage | null => {
+  if (typeof window === 'undefined') return null;
+  return window.localStorage ?? null;
+};
+
 export const getApiKey = (): string | undefined => {
-  return localStorage.getItem(LOCAL_STORAGE_KEY) || undefined;
+  const storage = getStorage();
+  if (!storage) return undefined;
+  return storage.getItem(LOCAL_STORAGE_KEY) || undefined;
 };
 
 export const setStoredApiKey = (key: string) => {
-  localStorage.setItem(LOCAL_STORAGE_KEY, key);
+  const storage = getStorage();
+  if (!storage) return;
+  storage.setItem(LOCAL_STORAGE_KEY, key);
 };
 
 export const removeStoredApiKey = () => {
-  localStorage.removeItem(LOCAL_STORAGE_KEY);
+  const storage = getStorage();
+  if (!storage) return;
+  storage.removeItem(LOCAL_STORAGE_KEY);
 };
 
 export const hasValidApiKey = (): boolean => {
@@ -20,6 +31,9 @@ export const hasValidApiKey = (): boolean => {
 };
 
 const getAIClient = () => {
+  if (typeof window === 'undefined') {
+    throw new Error("Gemini client is only available in the browser.");
+  }
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error("API Key is missing via getAIClient");
@@ -105,7 +119,9 @@ const generateRecipeImage = async (title: string): Promise<string> => {
     });
 
     // Extract raw base64 from inlineData
-    const part = response.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
+    const part = response.candidates?.[0]?.content?.parts?.find(
+      (p: { inlineData?: { data?: string } }) => p.inlineData
+    );
     if (part?.inlineData?.data) {
       return `data:image/png;base64,${part.inlineData.data}`;
     }
