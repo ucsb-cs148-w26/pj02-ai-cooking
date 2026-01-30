@@ -30,7 +30,17 @@ export interface ScanResult {
   rawAnalysis?: any;
 }
 
+// Enhanced UserPreferences interface for onboarding
 export interface UserPreferences {
-  cuisine: string;
-  restrictions: string;
+  // New detailed fields
+  name: string;
+  allergies: string[];
+  dietType: string;
+  cuisinePreferences: string[];
+  cookingSkillLevel: string;
+  onboardingComplete: boolean;
+  
+  // Legacy fields for backwards compatibility with existing code
+  cuisine?: string;
+  restrictions?: string;
 }
