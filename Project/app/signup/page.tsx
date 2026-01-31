@@ -63,9 +63,7 @@ export default function SignupPageNoFirebase() {
         
         {/* Header */}
         <div className="flex flex-col items-center text-center mb-6 w-full">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-            Join PantryPal!
-          </h2>
+          <h2 className="text-center text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent"> Join PantryPal! </h2>
           <p className="mt-2 text-gray-600">Create your account to get started</p>
         </div>
 
