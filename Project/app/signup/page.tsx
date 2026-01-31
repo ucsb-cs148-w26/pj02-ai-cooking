@@ -62,14 +62,14 @@ export default function SignupPageNoFirebase() {
       </div>
 
       {/* Signup Card */}
-      <div className="max-w-md w-full relative z-10">
-        <div className="text-center mb-8">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-            Join PantryPal!
-          </h2>
-          <p className="mt-2 text-gray-600">Create your account to get started</p>
-        </div>
-        
+      <div className="max-w-md w-full space-y-8 relative z-10">
+        <div className="flex flex-col items-center">
+          <h2 className="text-center text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+            Join PantryPal!
+          </h2>
+          <p className="mt-2 text-center text-gray-600">Create your account to get started</p>
+        </div>
+        
         <form onSubmit={handleSignup} className="mt-8 space-y-6 bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-2 border-pink-200">
           {error && (
             <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-xl">
