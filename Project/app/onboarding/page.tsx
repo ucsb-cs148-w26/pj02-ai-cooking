@@ -1,12 +1,8 @@
-'use client';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { saveUserPreferences, markOnboardingComplete } from '@/services/userPreferencesService';
 import { UserPreferences } from '@/types';
-
-interface OnboardingFormProps {
-  onComplete: () => void;
-}
+import { useAuth } from '@/lib/firebase';
+import { useRouter } from 'next/navigation';
 
 const COMMON_ALLERGENS = [
   'Peanuts',
@@ -43,7 +39,7 @@ const CUISINE_TYPES = [
   'Korean',
 ];
 
-export default function OnboardingForm({ onComplete }: OnboardingFormProps) {
+export default function OnboardingPage() {
   const [step, setStep] = useState(1);
   const [preferences, setPreferences] = useState<Partial<UserPreferences>>({
     name: '',
@@ -53,6 +49,14 @@ export default function OnboardingForm({ onComplete }: OnboardingFormProps) {
     cuisinePreferences: [],
     cookingSkillLevel: 'Intermediate',
   });
+  const currentUser = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (currentUser && preferences.onboardingComplete) {
+      router.push('/');
+    }
+  }, [currentUser, preferences.onboardingComplete, router]);
 
   const handleNext = () => {
     if (step < 3) {
@@ -68,13 +72,19 @@ export default function OnboardingForm({ onComplete }: OnboardingFormProps) {
     }
   };
 
-  const handleSkip = () => {
-    markOnboardingComplete();
-    onComplete();
+  const handleSkip = async () => {
+    if (currentUser?.uid) {
+      await markOnboardingComplete(currentUser.uid);
+      router.push('/');
+    }
   };
 
-  const handleSubmit = () => {
-    // Combine common allergies and custom allergies
+  const handleSubmit = async () => {
+    if (!currentUser?.uid) {
+      console.error("User not authenticated.");
+      return;
+    }
+
     const allAllergies = [
       ...(preferences.allergies || []),
       ...(preferences.customAllergies ? preferences.customAllergies.split(',').map(a => a.trim()) : []),
@@ -89,9 +99,9 @@ export default function OnboardingForm({ onComplete }: OnboardingFormProps) {
       onboardingComplete: true,
     };
 
-    saveUserPreferences(finalPreferences);
-    markOnboardingComplete();
-    onComplete();
+    await saveUserPreferences(currentUser.uid, finalPreferences);
+    await markOnboardingComplete(currentUser.uid);
+    router.push('/');
   };
 
   const toggleAllergy = (allergen: string) => {
