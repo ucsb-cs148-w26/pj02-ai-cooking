@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import { saveUserPreferences, markOnboardingComplete } from '@/services/userPreferencesService';
 import { UserPreferences } from '@/types';
