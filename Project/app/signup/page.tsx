@@ -2,15 +2,17 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import Link from 'next/link';
 
-export default function SignupPageNoFirebase() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
+export default function SignupPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,18 +36,22 @@ export default function SignupPageNoFirebase() {
     setError("");
 
     try {
-      console.log("Signup attempt:", email);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      localStorage.setItem('user', JSON.stringify({ email }));
-      alert("Account created successfully!");
+      await createUserWithEmailAndPassword(auth, email, password);
       router.push("/");
     } catch (err: any) {
       console.error("Signup error:", err);
-      setError("Signup failed. Please try again.");
+      const message = err.code === "auth/email-already-in-use"
+        ? "This email is already registered. Try signing in."
+        : err.code === "auth/weak-password"
+          ? "Password is too weak. Use at least 6 characters."
+          : err.code === "auth/invalid-email"
+            ? "Please enter a valid email address."
+            : err.message || "Signup failed. Please try again.";
+      setError(message);
     } finally {
       setLoading(false);
     }
-  };
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 relative overflow-hidden px-4">
