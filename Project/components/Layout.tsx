@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ChefHat, ShoppingBag, Utensils, History, User, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ChefHat, ShoppingBag, Utensils, History, Sparkles } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,16 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
+  const router = useRouter();
+
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
+  const handleSignUp = () => {
+    router.push('/signup');
+  };
+
   return (
     <div className="min-h-screen pb-20 md:pb-0 md:pt-16 bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 relative overflow-hidden">
       {/* Animated Colorful Background Elements */}
@@ -77,15 +88,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
         </nav>
       
         {/* Auth Buttons - Colorful */}
-        <div className="relative flex items-center gap-4">
+        <div className="relative flex items-center gap-4">    
           <button 
-            onClick={() => console.log('Log In clicked')}
+            onClick={handleLogin}
             className="px-5 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-all duration-300 hover:scale-105 border-2 border-white/30 rounded-full hover:border-yellow-300/60 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(253,224,71,0.5)]"
           >
             Log In
           </button>
           <button 
-            onClick={() => console.log('Sign Up clicked')}
+            onClick={handleSignUp}
             className="relative px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white rounded-full hover:shadow-[0_0_30px_rgba(251,191,36,0.8)] transition-all duration-300 hover:scale-110 transform"
           >
             <span className="relative z-10">Sign Up</span>
@@ -150,14 +161,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
             )}
           </div>
           <span className={`text-[10px] font-bold ${activeTab === 'recipes' ? 'text-pink-300 drop-shadow-[0_0_4px_rgba(249,168,212,0.8)]' : 'text-white'}`}>RECIPES</span>
-        </button>
-        
-        <button 
-          onClick={() => console.log('Account clicked')}
-          className="flex flex-col items-center gap-1 text-white/70 hover:text-white transition-all duration-300 hover:scale-110"
-        >
-          <User size={24} />
-          <span className="text-[10px] font-bold">ACCOUNT</span>
         </button>
       </nav>
     </div>

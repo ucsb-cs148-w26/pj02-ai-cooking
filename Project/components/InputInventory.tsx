@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import { collection, addDoc } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 import type { Ingredient } from '../types';
+
 
 type AddFoodProps = {
   onAddFood?: (item: Ingredient) => void;
@@ -11,22 +14,58 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   const [food, setFood] = useState({
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!food.name || !food.category || !food.expiration || !food.storage) {
       alert('Please fill in all required fields');
       return;
     }
-    const quantityLabel = [food.quantity, food.unit].filter(Boolean).join(' ');
-    const expiryEstimate = food.expiration ? `Expires ${food.expiration}` : undefined;
-    onAddFood?.({
-      name: food.name,
-      quantity: quantityLabel || undefined,
-      category: food.category || undefined,
-      expiryEstimate
-    });
-    alert(`✅ ${food.name} added to pantry!`);
-    setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' });
+    
+    const user = auth.currentUser;
+    if (!user) {
+      alert('Please log in first!');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const quantityLabel = [food.quantity, food.unit].filter(Boolean).join(' ');
+      const expiryEstimate = food.expiration ? `Expires ${food.expiration}` : undefined;
+
+      const docRef = await addDoc(collection(db, 'pantryItems'), {
+        name: food.name,
+        category: food.category,
+        quantity: food.quantity,
+        unit: food.unit,
+        expiration: food.expiration,
+        storage: food.storage,
+        notes: food.notes,
+        userId: user.uid,
+        userEmail: user.email,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
+      console.log('Document written with ID:', docRef.id);
+
+      setFood({ 
+        name: '', 
+        category: '', 
+        quantity: '', 
+        unit: '', 
+        expiration: '', 
+        storage: '', 
+        notes: '' 
+      });
+
+    } catch (error) {
+      console.error('Error adding food to Firestore:', error);
+      alert('Failed to add food. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const update = (field: string, value: string) => setFood({ ...food, [field]: value });
