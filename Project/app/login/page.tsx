@@ -30,7 +30,6 @@ export default function LoginPage() {
     } catch (err: any) {
       console.error("Login error:", err);
       
-      // Provide user-friendly error messages based on Firebase error codes
       const message = err.code === "auth/user-not-found"
         ? "No account found with this email. Please sign up first."
         : err.code === "auth/wrong-password"
