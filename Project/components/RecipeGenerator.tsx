@@ -49,7 +49,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     setLoading(true);
     setError(null);
     try {
-      const preferences: UserPreferences = {
+      const preferences: Partial<UserPreferences> = {
         cuisine: cuisine.trim(),
         restrictions: restrictions.trim()
       };
