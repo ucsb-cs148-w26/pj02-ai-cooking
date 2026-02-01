@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { collection, addDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { collection, addDoc, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import type { Ingredient } from '../types';
 
@@ -10,11 +10,46 @@ type AddFoodProps = {
   onAddFood?: (item: Ingredient) => void;
 };
 
+type PantryItem = {
+  id: string;
+  name: string;
+  category: string;
+  quantity: string;
+  unit: string;
+  expiration: string;
+  storage: string;
+  notes: string;
+  createdAt: string;
+};
+
 export default function AddFood({ onAddFood }: AddFoodProps) {
   const [food, setFood] = useState({
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
   const [loading, setLoading] = useState(false);
+  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const q = query(
+      collection(db, 'pantryItems'),
+      where('userId', '==', user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items: PantryItem[] = [];
+      snapshot.forEach((doc) => {
+        items.push({ id: doc.id, ...doc.data() } as PantryItem);
+      });
+      items.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
+      setPantryItems(items);
+    });
+
+    return () => unsubscribe();
+  }, []);
+  
 
   const handleSubmit = async () => {
     if (!food.name || !food.category || !food.expiration || !food.storage) {
@@ -68,7 +103,56 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     }
   };
 
+  const handleDelete = async (itemId: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+
+    try {
+      await deleteDoc(doc(db, 'pantryItems', itemId));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert('Failed to delete item.');
+    }
+  };
+
   const update = (field: string, value: string) => setFood({ ...food, [field]: value });
+
+  const getCategoryEmoji = (category: string) => {
+    const emojis: { [key: string]: string } = {
+      dairy: '🥛',
+      meat: '🍗',
+      fruits: '🍎',
+      vegetables: '🥕',
+      grains: '🌾',
+      frozen: '❄️',
+      other: '📦'
+    };
+    return emojis[category] || '📦';
+  };
+
+  const getStorageEmoji = (storage: string) => {
+    const emojis: { [key: string]: string } = {
+      fridge: '🧊',
+      freezer: '❄️',
+      pantry: '🗄️',
+      counter: '🏠'
+    };
+    return emojis[storage] || '📦';
+  };
+
+  const getDaysUntilExpiration = (expirationDate: string) => {
+    const today = new Date();
+    const expiry = new Date(expirationDate);
+    const diffTime = expiry.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const getExpirationColor = (days: number) => {
+    if (days < 0) return 'bg-red-100 border-red-300 text-red-700';
+    if (days <= 3) return 'bg-orange-100 border-orange-300 text-orange-700';
+    if (days <= 7) return 'bg-yellow-100 border-yellow-300 text-yellow-700';
+    return 'bg-green-100 border-green-300 text-green-700';
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -185,9 +269,10 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         <div className="flex gap-4 pt-4">
           <button 
             onClick={handleSubmit}
-            className="flex-1 px-6 py-4 bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all"
+            disabled={loading}
+            className="flex-1 px-6 py-4 bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
           >
-            ➕ Add to Pantry
+            {loading ? '⏳ Adding...' : '➕ Add to Pantry'}
           </button>
           <button 
             onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
@@ -206,6 +291,84 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           <li>• Store items properly to maximize freshness</li>
           <li>• Get reminders before food expires!</li>
         </ul>
+      </div>
+
+      {/* Pantry Section */}
+      <div className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-3xl font-bold text-gray-800">
+            🗄️ Your Pantry
+          </h2>
+          <span className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full">
+            {pantryItems.length} item{pantryItems.length !== 1 ? 's' : ''}
+          </span>
+        </div>
+
+        {pantryItems.length === 0 ? (
+          <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-12 text-center shadow-lg border-2 border-gray-200">
+            <div className="text-6xl mb-4">🍽️</div>
+            <p className="text-gray-600 text-lg">Your pantry is empty!</p>
+            <p className="text-gray-500 mt-2">Add items above to start tracking your food.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {pantryItems.map((item) => {
+              const daysUntilExpiration = getDaysUntilExpiration(item.expiration);
+              const expirationColorClass = getExpirationColor(daysUntilExpiration);
+
+              return (
+                <div 
+                  key={item.id}
+                  className={`bg-white rounded-2xl p-5 shadow-lg border-2 ${expirationColorClass} transition-all hover:shadow-xl`}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{getCategoryEmoji(item.category)}</span>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-800">{item.name}</h3>
+                        {item.quantity && item.unit && (
+                          <p className="text-sm text-gray-600">{item.quantity} {item.unit}</p>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(item.id)}
+                      className="text-red-500 hover:text-red-700 transition-colors p-1"
+                      title="Delete item"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span>{getStorageEmoji(item.storage)}</span>
+                      <span className="text-gray-700 capitalize">{item.storage}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span>📅</span>
+                      <span className="font-semibold">
+                        {daysUntilExpiration < 0 
+                          ? `Expired ${Math.abs(daysUntilExpiration)} day${Math.abs(daysUntilExpiration) !== 1 ? 's' : ''} ago`
+                          : daysUntilExpiration === 0
+                          ? 'Expires today!'
+                          : `Expires in ${daysUntilExpiration} day${daysUntilExpiration !== 1 ? 's' : ''}`
+                        }
+                      </span>
+                    </div>
+
+                    {item.notes && (
+                      <div className="mt-3 pt-3 border-t border-gray-200">
+                        <p className="text-gray-600 italic">"{item.notes}"</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

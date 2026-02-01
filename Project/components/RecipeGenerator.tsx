@@ -1,12 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
 import { generateRecipes, getApiKey, hasValidApiKey, setStoredApiKey } from '../services/geminiService';
-
-type RecipeGeneratorProps = {
-  ingredients: Ingredient[];
-};
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../lib/firebase';
 
 const formatIngredient = (item: Ingredient) => {
   const details = [item.quantity, item.category, item.expiryEstimate]
@@ -15,7 +13,7 @@ const formatIngredient = (item: Ingredient) => {
   return details ? `${item.name} (${details})` : item.name;
 };
 
-export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
+export default function RecipeGenerator() {
   const [apiKeyInput, setApiKeyInput] = useState(getApiKey() ?? '');
   const [hasKey, setHasKey] = useState(hasValidApiKey());
   const [cuisine, setCuisine] = useState('');
@@ -23,11 +21,41 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
 
-  const pantrySummary = useMemo(
-    () => ingredients.map(formatIngredient),
-    [ingredients]
-  );
+
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) {
+      setPantryItems([]);
+      return;
+    }
+
+    const q = query(
+      collection(db, 'pantryItems'),
+      where('userId', '==', user.uid)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items: Ingredient[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        
+        // Convert Firestore data to Ingredient format
+        items.push({
+          name: data.name,
+          quantity: data.quantity ? `${data.quantity} ${data.unit || ''}`.trim() : undefined,
+          category: data.category,
+          expiryEstimate: data.expiration ? `Expires ${data.expiration}` : undefined
+        });
+      });
+      
+      setPantryItems(items);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const saveKey = () => {
     const trimmed = apiKeyInput.trim();
@@ -41,8 +69,8 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       setError('Please save a Gemini API key first.');
       return;
     }
-    if (ingredients.length === 0) {
-      setError('Add at least one pantry item first.');
+    if (pantryItems.length === 0) {
+      setError('Add at least one pantry item first. Go to the Add Food page to add items.');
       return;
     }
 
@@ -53,7 +81,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         cuisine: cuisine.trim(),
         restrictions: restrictions.trim()
       };
-      const result = await generateRecipes(ingredients, preferences);
+      const result = await generateRecipes(pantryItems, preferences);
       setRecipes(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Recipe generation failed.');
@@ -82,19 +110,6 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
           </button>
         </div>
         <p className="text-sm text-gray-600">Status: {hasKey ? 'Key saved' : 'No key saved'}</p>
-      </div>
-
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 className="text-2xl font-bold">Pantry Items</h2>
-        {pantrySummary.length === 0 ? (
-          <p className="text-gray-600">No pantry items yet.</p>
-        ) : (
-          <ul className="list-disc list-inside text-gray-700">
-            {pantrySummary.map((item, idx) => (
-              <li key={`${item}-${idx}`}>{item}</li>
-            ))}
-          </ul>
-        )}
       </div>
 
       <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
