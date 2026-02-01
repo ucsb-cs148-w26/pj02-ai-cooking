@@ -37,7 +37,7 @@ export default function SignupPage() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push("/");
+      router.push("/onboarding");
     } catch (err: any) {
       console.error("Signup error:", err);
       const message = err.code === "auth/email-already-in-use"
