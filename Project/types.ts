@@ -31,6 +31,13 @@ export interface ScanResult {
 }
 
 export interface UserPreferences {
-  cuisine: string;
-  restrictions: string;
+  name: string;
+  allergies: string[];
+  customAllergies?: string;
+  dietType: string;
+  cuisinePreferences: string[];
+  cookingSkillLevel: string;
+  onboardingComplete: boolean;
+  cuisine?: string;
+  restrictions?: string;
 }

@@ -131,7 +131,10 @@ const generateRecipeImage = async (title: string): Promise<string> => {
   return "";
 };
 
-export const generateRecipes = async (ingredients: Ingredient[], preferences: UserPreferences): Promise<Recipe[]> => {
+export const generateRecipes = async (
+  ingredients: Ingredient[],
+  preferences: Partial<UserPreferences>
+): Promise<Recipe[]> => {
   const ai = getAIClient();
   
   const ingredientList = ingredients
