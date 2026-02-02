@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
-import { generateRecipes, getApiKey, hasValidApiKey, setStoredApiKey } from '../services/geminiService';
+import { generateRecipes } from '../services/geminiService';
 
 type RecipeGeneratorProps = {
   ingredients: Ingredient[];
@@ -16,8 +16,6 @@ const formatIngredient = (item: Ingredient) => {
 };
 
 export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
-  const [apiKeyInput, setApiKeyInput] = useState(getApiKey() ?? '');
-  const [hasKey, setHasKey] = useState(hasValidApiKey());
   const [cuisine, setCuisine] = useState('');
   const [restrictions, setRestrictions] = useState('');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -29,18 +27,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     [ingredients]
   );
 
-  const saveKey = () => {
-    const trimmed = apiKeyInput.trim();
-    setStoredApiKey(trimmed);
-    setHasKey(Boolean(trimmed));
-    setError(null);
-  };
-
   const handleGenerate = async () => {
-    if (!hasValidApiKey()) {
-      setError('Please save a Gemini API key first.');
-      return;
-    }
     if (ingredients.length === 0) {
       setError('Add at least one pantry item first.');
       return;
@@ -64,26 +51,6 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 className="text-2xl font-bold">Gemini API Key</h2>
-        <div className="flex flex-col md:flex-row gap-3">
-          <input
-            type="password"
-            value={apiKeyInput}
-            onChange={(e) => setApiKeyInput(e.target.value)}
-            placeholder="Paste your Gemini API key"
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none"
-          />
-          <button
-            onClick={saveKey}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
-          >
-            Save Key
-          </button>
-        </div>
-        <p className="text-sm text-gray-600">Status: {hasKey ? 'Key saved' : 'No key saved'}</p>
-      </div>
-
       <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
         <h2 className="text-2xl font-bold">Pantry Items</h2>
         {pantrySummary.length === 0 ? (

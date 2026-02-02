@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { Ingredient, ScanMode } from '../types';
-import { analyzeImage, getApiKey, hasValidApiKey, setStoredApiKey } from '../services/geminiService';
+import { analyzeImage } from '../services/geminiService';
 
 const formatIngredient = (item: Ingredient) => {
   const details = [item.quantity, item.category, item.expiryEstimate]
@@ -16,22 +16,11 @@ type ScanAnalyzerProps = {
 };
 
 export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
-  const [apiKeyInput, setApiKeyInput] = useState(getApiKey() ?? '');
-  const [hasKey, setHasKey] = useState(hasValidApiKey());
   const [mode, setMode] = useState<ScanMode>('food');
   const [imageData, setImageData] = useState<string>('');
   const [items, setItems] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const status = hasKey ? 'Key saved' : 'No key saved';
-
-  const saveKey = () => {
-    const trimmed = apiKeyInput.trim();
-    setStoredApiKey(trimmed);
-    setHasKey(Boolean(trimmed));
-    setError(null);
-  };
 
   const handleFile = (file: File | null) => {
     if (!file) return;
@@ -53,10 +42,6 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
   };
 
   const handleAnalyze = async () => {
-    if (!hasValidApiKey()) {
-      setError('Please save a Gemini API key first.');
-      return;
-    }
     if (!imageData) {
       setError('Upload an image first.');
       return;
@@ -79,26 +64,6 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 className="text-2xl font-bold">Gemini API Key</h2>
-        <div className="flex flex-col md:flex-row gap-3">
-          <input
-            type="password"
-            value={apiKeyInput}
-            onChange={(e) => setApiKeyInput(e.target.value)}
-            placeholder="Paste your Gemini API key"
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none"
-          />
-          <button
-            onClick={saveKey}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
-          >
-            Save Key
-          </button>
-        </div>
-        <p className="text-sm text-gray-600">Status: {status}</p>
-      </div>
-
       <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
         <h2 className="text-2xl font-bold">Scan Image</h2>
         <div className="flex flex-wrap gap-3">
