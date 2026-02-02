@@ -18,6 +18,8 @@ Krisha has been working on the pantry and finished the Input Inventory form.
 
 Daniel finished creating the automated expiration date aspect.
 
-Andy has been working on 
+Yuxi has finished the onboarding form.
+
+Andy has been working on finishing the image scanner aspect and recipe generation.
 
 Everyone will continue working on their tasks for the MVP.
