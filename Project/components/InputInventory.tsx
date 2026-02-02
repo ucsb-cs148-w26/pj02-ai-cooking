@@ -42,7 +42,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       where('userId', '==', user.uid)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribeFirestore = onSnapshot(q, (snapshot) => {
       const items: PantryItem[] = [];
       snapshot.forEach((doc) => {
         items.push({ id: doc.id, ...doc.data() } as PantryItem);
@@ -51,9 +51,13 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       setPantryItems(items);
     });
 
-    return () => unsubscribe();
-  }, []);
-    return () => unsubscribeAuth();
+    return () => {
+        unsubscribeFirestore();
+      };
+    });
+    return () => {
+      unsubscribeAuth();
+    };
   }, []);
   
 
