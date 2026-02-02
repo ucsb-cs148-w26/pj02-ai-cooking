@@ -1,93 +1,56 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { collection, addDoc, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import React, { useState } from 'react';
+import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import type { Ingredient } from '../types';
-
+import type { PantryItem } from '../types';
 
 type AddFoodProps = {
-  onAddFood?: (item: Ingredient) => void;
-};
-
-type PantryItem = {
-  id: string;
-  name: string;
-  category: string;
-  quantity: string;
-  unit: string;
-  expiration: string;
-  storage: string;
-  notes: string;
-  createdAt: string;
+  onAddFood?: (item: PantryItem) => void;
 };
 
 export default function AddFood({ onAddFood }: AddFoodProps) {
-
-  const [loading, setLoading] = useState(false);
-  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
-  const [user, setUser] = useState<any>(null);
-
   const [food, setFood] = useState({
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
+  const [isLoadingItems, setIsLoadingItems] = useState(false);
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
+  // Function to fetch pantry items
+  const fetchPantryItems = async () => {
+    const user = auth.currentUser;
     if (!user) {
-      console.log('No user logged in, clearing pantry items');
-      setPantryItems([]);
+      alert('Please log in first!');
       return;
     }
 
-    console.log('Setting up Firestore listener for user:', user.uid);
-
-    const q = query(
-      collection(db, 'pantryItems'),
-      where('userId', '==', user.uid)
-    );
-
-    const unsubscribeFirestore = onSnapshot(
-      q,
-      (snapshot) => {
-        console.log('Firestore snapshot received:', snapshot.size, 'items');
-        const items: PantryItem[] = [];
-        snapshot.forEach((doc) => {
-          items.push({ id: doc.id, ...doc.data() } as PantryItem);
-        });
-        items.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
-        setPantryItems(items);
-        console.log('Pantry items updated:', items.length);
-      },
-      (error: { code?: string; message?: string }) => {
-        console.error('Firestore listener error:', error);
-        // If there's a permission error, the user might need to re-authenticate
-        if (error.code === 'permission-denied') {
-          console.error('Permission denied - user may need to log in again');
-        }
-      }
-    );
-
-    return () => {
-      console.log('Cleaning up Firestore listener');
-      unsubscribeFirestore();
+    setIsLoadingItems(true);
+    try {
+      const q = query(
+        collection(db, 'pantryItems'),
+        where('userId', '==', user.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      const items: PantryItem[] = [];
+      querySnapshot.forEach((doc) => {
+        items.push({ id: doc.id, ...doc.data() } as PantryItem);
+      });
+      setPantryItems(items);
+    } catch (error) {
+      console.error('Error fetching pantry items:', error);
+      alert('Failed to load pantry items');
+    } finally {
+      setIsLoadingItems(false);
     }
-  }, [user]);
-
+  };
 
   const handleSubmit = async () => {
     if (!food.name || !food.category || !food.expiration || !food.storage) {
       alert('Please fill in all required fields');
       return;
     }
-
+    
     const user = auth.currentUser;
     if (!user) {
       alert('Please log in first!');
@@ -97,9 +60,6 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     setLoading(true);
 
     try {
-      const quantityLabel = [food.quantity, food.unit].filter(Boolean).join(' ');
-      const expiryEstimate = food.expiration ? `Expires ${food.expiration}` : undefined;
-
       const docRef = await addDoc(collection(db, 'pantryItems'), {
         name: food.name,
         category: food.category,
@@ -116,15 +76,19 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
       console.log('Document written with ID:', docRef.id);
 
-      setFood({
-        name: '',
-        category: '',
-        quantity: '',
-        unit: '',
-        expiration: '',
-        storage: '',
-        notes: ''
+      // Clear form
+      setFood({ 
+        name: '', 
+        category: '', 
+        quantity: '', 
+        unit: '', 
+        expiration: '', 
+        storage: '', 
+        notes: '' 
       });
+
+      // Show success message
+      alert('Food item added successfully! Click "Refresh Pantry" to see it.');
 
     } catch (error) {
       console.error('Error adding food to Firestore:', error);
@@ -134,56 +98,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     }
   };
 
-  const handleDelete = async (itemId: string) => {
-    if (!confirm('Are you sure you want to delete this item?')) return;
-
-    try {
-      await deleteDoc(doc(db, 'pantryItems', itemId));
-    } catch (error) {
-      console.error('Error deleting item:', error);
-      alert('Failed to delete item.');
-    }
-  };
-
   const update = (field: string, value: string) => setFood({ ...food, [field]: value });
-
-  const getCategoryEmoji = (category: string) => {
-    const emojis: { [key: string]: string } = {
-      dairy: '🥛',
-      meat: '🍗',
-      fruits: '🍎',
-      vegetables: '🥕',
-      grains: '🌾',
-      frozen: '❄️',
-      other: '📦'
-    };
-    return emojis[category] || '📦';
-  };
-
-  const getStorageEmoji = (storage: string) => {
-    const emojis: { [key: string]: string } = {
-      fridge: '🧊',
-      freezer: '❄️',
-      pantry: '🗄️',
-      counter: '🏠'
-    };
-    return emojis[storage] || '📦';
-  };
-
-  const getDaysUntilExpiration = (expirationDate: string) => {
-    const today = new Date();
-    const expiry = new Date(expirationDate);
-    const diffTime = expiry.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  const getExpirationColor = (days: number) => {
-    if (days < 0) return 'bg-red-100 border-red-300 text-red-700';
-    if (days <= 3) return 'bg-orange-100 border-orange-300 text-orange-700';
-    if (days <= 7) return 'bg-yellow-100 border-yellow-300 text-yellow-700';
-    return 'bg-green-100 border-green-300 text-green-700';
-  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -195,27 +110,27 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       </div>
 
       {/* Form */}
-      <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-green-200 space-y-5">
-
+      <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-green-200 space-y-5 mb-8">
+        
         {/* Food Name */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Food Name *</label>
-          <input
-            type="text"
+          <input 
+            type="text" 
             value={food.name}
             onChange={(e) => update('name', e.target.value)}
             placeholder="e.g., Milk, Chicken, Tomatoes"
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-black"
           />
         </div>
 
         {/* Category */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Category *</label>
-          <select
+          <select 
             value={food.category}
             onChange={(e) => update('category', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-black"
           >
             <option value="">Select category</option>
             <option value="dairy">🥛 Dairy & Eggs</option>
@@ -232,20 +147,20 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Quantity</label>
-            <input
-              type="number"
+            <input 
+              type="number" 
               value={food.quantity}
               onChange={(e) => update('quantity', e.target.value)}
               placeholder="1, 2, 5..."
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-black"
             />
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Unit</label>
-            <select
+            <select 
               value={food.unit}
               onChange={(e) => update('unit', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-black"
             >
               <option value="">Select unit</option>
               <option value="piece">Piece(s)</option>
@@ -260,21 +175,21 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         {/* Expiration Date */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Expiration Date *</label>
-          <input
-            type="date"
+          <input 
+            type="date" 
             value={food.expiration}
             onChange={(e) => update('expiration', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none"
+            className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none text-black"
           />
         </div>
 
         {/* Storage Location */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Storage Location *</label>
-          <select
+          <select 
             value={food.storage}
             onChange={(e) => update('storage', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-black"
           >
             <option value="">Select location</option>
             <option value="fridge">🧊 Refrigerator</option>
@@ -287,31 +202,80 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         {/* Notes */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Notes</label>
-          <textarea
+          <textarea 
             value={food.notes}
             onChange={(e) => update('notes', e.target.value)}
             placeholder="Additional notes..."
             rows={2}
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none resize-none"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none resize-none text-black"
           />
         </div>
 
-        {/* Buttons */}
+        {/* Form Buttons */}
         <div className="flex gap-4 pt-4">
-          <button
+          <button 
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 px-6 py-4 bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+            className="flex-1 px-6 py-4 bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? '⏳ Adding...' : '➕ Add to Pantry'}
+            {loading ? 'Adding...' : '➕ Add to Pantry'}
           </button>
-          <button
+          <button 
             onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
             className="flex-1 px-6 py-4 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all"
           >
             🗑️ Clear
           </button>
         </div>
+      </div>
+
+      {/* Refresh Button */}
+      <div className="text-center mb-8">
+        <button
+          onClick={fetchPantryItems}
+          disabled={isLoadingItems}
+          className="px-8 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoadingItems ? 'Loading...' : '🔄 Refresh Pantry Display'}
+        </button>
+      </div>
+
+      {/* Pantry Display */}
+      <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-blue-200">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Pantry Items</h2>
+          <div className="text-gray-600">
+            {pantryItems.length} item{pantryItems.length !== 1 ? 's' : ''}
+          </div>
+        </div>
+
+        {pantryItems.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600">No items yet. Add food above, then click "Refresh Pantry"!</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {pantryItems.map((item) => (
+              <div 
+                key={item.id} 
+                className="p-4 bg-white rounded-xl border-2 border-gray-100 hover:border-green-200 transition-all"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-800">{item.name}</h3>
+                    <div className="text-gray-600 mt-1">
+                      <p>Category: {item.category}</p>
+                      <p>Quantity: {item.quantity} {item.unit}</p>
+                      <p>Storage: {item.storage}</p>
+                      <p>Expires: {item.expiration}</p>
+                      {item.notes && <p className="mt-2 text-sm">📝 {item.notes}</p>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Tips */}
@@ -321,85 +285,8 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           <li>• Check packaging for "Best By" dates</li>
           <li>• Store items properly to maximize freshness</li>
           <li>• Get reminders before food expires!</li>
+          <li>• Click "Refresh Pantry" to see your latest items</li>
         </ul>
-      </div>
-
-      {/* Pantry Section */}
-      <div className="mt-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-3xl font-bold text-gray-800">
-            🗄️ Your Pantry
-          </h2>
-          <span className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full">
-            {pantryItems.length} item{pantryItems.length !== 1 ? 's' : ''}
-          </span>
-        </div>
-
-        {pantryItems.length === 0 ? (
-          <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-12 text-center shadow-lg border-2 border-gray-200">
-            <div className="text-6xl mb-4">🍽️</div>
-            <p className="text-gray-600 text-lg">Your pantry is empty!</p>
-            <p className="text-gray-500 mt-2">Add items above to start tracking your food.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {pantryItems.map((item) => {
-              const daysUntilExpiration = getDaysUntilExpiration(item.expiration);
-              const expirationColorClass = getExpirationColor(daysUntilExpiration);
-
-              return (
-                <div
-                  key={item.id}
-                  className={`bg-white rounded-2xl p-5 shadow-lg border-2 ${expirationColorClass} transition-all hover:shadow-xl`}
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{getCategoryEmoji(item.category)}</span>
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-800">{item.name}</h3>
-                        {item.quantity && item.unit && (
-                          <p className="text-sm text-gray-600">{item.quantity} {item.unit}</p>
-                        )}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-500 hover:text-red-700 transition-colors p-1"
-                      title="Delete item"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span>{getStorageEmoji(item.storage)}</span>
-                      <span className="text-gray-700 capitalize">{item.storage}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span>📅</span>
-                      <span className="font-semibold">
-                        {daysUntilExpiration < 0
-                          ? `Expired ${Math.abs(daysUntilExpiration)} day${Math.abs(daysUntilExpiration) !== 1 ? 's' : ''} ago`
-                          : daysUntilExpiration === 0
-                            ? 'Expires today!'
-                            : `Expires in ${daysUntilExpiration} day${daysUntilExpiration !== 1 ? 's' : ''}`
-                        }
-                      </span>
-                    </div>
-
-                    {item.notes && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <p className="text-gray-600 italic">"{item.notes}"</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
     </div>
   );
