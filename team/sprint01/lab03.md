@@ -18,3 +18,4 @@ And we worked on some part of that and analyzed the work together.
 
 Daniel shared about the home page design and the API idea of the expiration date.
 
+Krisha shared that her task of the creating the pantry section was almost complete.
