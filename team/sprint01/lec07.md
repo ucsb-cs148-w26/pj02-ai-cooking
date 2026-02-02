@@ -10,14 +10,14 @@ Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
 
 Scribed Discussion:
 
+Krisha finished making the inputted pantry items visible in the pantry. However, the items dissapear once the page reloads.
+
+Mahima implemented the database for user authentication,inventory items, and onboarding data. She also fixed navigation for the sign up, log in, and onboarding forms.
+
+Andy finished implementing the image scanner and recipe generator. However, the scanned items don't get inputted into the inventory yet.
+
 We discussed our future tasks for the app.
 
 We updated the Kanban Board with future tasks and everyone assigned themselves a task.
 
-Yuxi made the onboarding form.
-
-Krisha worked on making the inputted pantry items visible in the pantry.
-
-Mahima implemented the backend for authentication for inventory items, log in and onboarding data. She also fixed navigation for the sign up, log in, and onboarding forms.
-
-Everyone will continue working on their assigned sub-issues.
+Everyone will continue working on their assigned tasks.
