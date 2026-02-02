@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db, useAuth } from '@/lib/firebase';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
 import { generateRecipes } from '../services/geminiService';
 
@@ -16,6 +18,7 @@ const formatIngredient = (item: Ingredient) => {
 };
 
 export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
+  const user = useAuth();
   const [cuisine, setCuisine] = useState('');
   const [restrictions, setRestrictions] = useState('');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -23,6 +26,9 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   const [error, setError] = useState<string | null>(null);
   const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
   const [pantryLoading, setPantryLoading] = useState(true);
+
+  const itemsForRecipes = pantryItems.length > 0 ? pantryItems : ingredients;
+  const pantrySummary = itemsForRecipes.map(formatIngredient);
 
   useEffect(() => {
     if (user === null) {
@@ -63,7 +69,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   }, [user]);
 
   const handleGenerate = async () => {
-    if (ingredients.length === 0) {
+    if (itemsForRecipes.length === 0) {
       setError('Add at least one pantry item first.');
       return;
     }
@@ -75,7 +81,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         cuisine: cuisine.trim(),
         restrictions: restrictions.trim()
       };
-      const result = await generateRecipes(pantryItems, preferences);
+      const result = await generateRecipes(itemsForRecipes, preferences);
       setRecipes(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Recipe generation failed.');
@@ -88,7 +94,9 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     <div className="space-y-6">
       <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
         <h2 className="text-2xl font-bold">Pantry Items</h2>
-        {pantrySummary.length === 0 ? (
+        {pantryLoading ? (
+          <p className="text-gray-600">Loading pantry items...</p>
+        ) : pantrySummary.length === 0 ? (
           <p className="text-gray-600">No pantry items yet.</p>
         ) : (
           <ul className="list-disc list-inside text-gray-700">
