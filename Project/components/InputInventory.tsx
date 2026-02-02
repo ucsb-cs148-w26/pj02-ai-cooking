@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import type { Ingredient } from '../types';
 
 
@@ -30,8 +31,11 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      setPantryItems([]);
+      return;
+    }
 
     const q = query(
       collection(db, 'pantryItems'),
