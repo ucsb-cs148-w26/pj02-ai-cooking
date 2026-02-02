@@ -14,3 +14,4 @@ We discussed our MVP
 
 And everyone contributed their ideas.
 
+Daniel contributed the idea of the flow of video recording.
