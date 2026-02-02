@@ -14,7 +14,7 @@ We discussed our MVP, and everyone contributed their ideas.
 
 Mahima has been working on creating the Firebase database for the app.
 
-Krisha has been working on the pantry and finished the Input Inventory form.
+Krisha has been working on making pantry items visible and finished the Input Inventory form.
 
 Daniel finished creating the automated expiration date aspect.
 
