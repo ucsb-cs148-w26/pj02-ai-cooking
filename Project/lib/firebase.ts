@@ -1,7 +1,7 @@
 'use client';
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, initializeAuth, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged, User } from 'firebase/auth';
@@ -22,7 +22,15 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+// Use localStorage persistence so the user stays signed in after page reload
+let auth: ReturnType<typeof getAuth>;
+try {
+  auth = initializeAuth(app, { persistence: browserLocalPersistence });
+} catch (e) {
+  // Already initialized (e.g. hot reload)
+  auth = getAuth(app);
+}
+export { auth };
 export const db = getFirestore(app);
 
 export function useAuth() {

@@ -78,16 +78,16 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 className="text-2xl font-bold">Gemini API Key</h2>
+    <div className="space-y-6 text-gray-900">
+      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4 text-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900">Gemini API Key</h2>
         <div className="flex flex-col md:flex-row gap-3">
           <input
             type="password"
             value={apiKeyInput}
             onChange={(e) => setApiKeyInput(e.target.value)}
             placeholder="Paste your Gemini API key"
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none"
+            className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
           />
           <button
             onClick={saveKey}
@@ -96,18 +96,18 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
             Save Key
           </button>
         </div>
-        <p className="text-sm text-gray-600">Status: {status}</p>
+        <p className="text-sm text-gray-700">Status: {status}</p>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 className="text-2xl font-bold">Scan Image</h2>
+      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4 text-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900">Scan Image</h2>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setMode('food')}
             className={`px-4 py-2 rounded-full border-2 ${
               mode === 'food'
                 ? 'bg-green-500 text-white border-green-500'
-                : 'bg-white text-gray-700 border-gray-200'
+                : 'bg-white text-gray-900 border-gray-200'
             }`}
           >
             Fridge / Food Items
@@ -117,7 +117,7 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
             className={`px-4 py-2 rounded-full border-2 ${
               mode === 'receipt'
                 ? 'bg-orange-500 text-white border-orange-500'
-                : 'bg-white text-gray-700 border-gray-200'
+                : 'bg-white text-gray-900 border-gray-200'
             }`}
           >
             Receipt
@@ -127,7 +127,7 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
           type="file"
           accept="image/*"
           onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
-          className="w-full"
+          className="w-full text-gray-900"
         />
         {imageData && (
           <img src={imageData} alt="Uploaded preview" className="w-full rounded-xl" />
@@ -142,12 +142,12 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
         </button>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-3">
-        <h3 className="text-xl font-bold">Detected Items</h3>
+      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-3 text-gray-900">
+        <h3 className="text-xl font-bold text-gray-900">Detected Items</h3>
         {items.length === 0 ? (
-          <p className="text-gray-600">No results yet.</p>
+          <p className="text-gray-700">No results yet.</p>
         ) : (
-          <ul className="list-disc list-inside text-gray-700">
+          <ul className="list-disc list-inside text-gray-800">
             {items.map((item, idx) => (
               <li key={`${item.name}-${idx}`}>{formatIngredient(item)}</li>
             ))}
