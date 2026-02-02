@@ -1,19 +1,13 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
 import { generateRecipes, getApiKey, hasValidApiKey, setStoredApiKey } from '../services/geminiService';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { auth, db } from '../lib/firebase';
-
-const formatIngredient = (item: Ingredient) => {
-  const details = [item.quantity, item.category, item.expiryEstimate]
-    .filter(Boolean)
-    .join(' · ');
-  return details ? `${item.name} (${details})` : item.name;
-};
+import { db, useAuth } from '../lib/firebase';
 
 export default function RecipeGenerator() {
+  const user = useAuth();
   const [apiKeyInput, setApiKeyInput] = useState(getApiKey() ?? '');
   const [hasKey, setHasKey] = useState(hasValidApiKey());
   const [cuisine, setCuisine] = useState('');
@@ -22,13 +16,16 @@ export default function RecipeGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
-
-
+  const [pantryLoading, setPantryLoading] = useState(true);
 
   useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) {
+    if (user === null) {
       setPantryItems([]);
+      setPantryLoading(false);
+      return;
+    }
+    if (!user) {
+      setPantryLoading(true);
       return;
     }
 
@@ -37,12 +34,11 @@ export default function RecipeGenerator() {
       where('userId', '==', user.uid)
     );
 
+    setPantryLoading(true);
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items: Ingredient[] = [];
       snapshot.forEach((doc) => {
         const data = doc.data();
-        
-        // Convert Firestore data to Ingredient format
         items.push({
           name: data.name,
           quantity: data.quantity ? `${data.quantity} ${data.unit || ''}`.trim() : undefined,
@@ -50,12 +46,15 @@ export default function RecipeGenerator() {
           expiryEstimate: data.expiration ? `Expires ${data.expiration}` : undefined
         });
       });
-      
       setPantryItems(items);
+      setPantryLoading(false);
+    }, (err) => {
+      console.error('Pantry snapshot error:', err);
+      setPantryLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   const saveKey = () => {
     const trimmed = apiKeyInput.trim();
