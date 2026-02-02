@@ -2,14 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
-import { generateRecipes, getApiKey, hasValidApiKey, setStoredApiKey } from '../services/geminiService';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { db, useAuth } from '../lib/firebase';
+import { generateRecipes } from '../services/geminiService';
 
-export default function RecipeGenerator() {
-  const user = useAuth();
-  const [apiKeyInput, setApiKeyInput] = useState(getApiKey() ?? '');
-  const [hasKey, setHasKey] = useState(hasValidApiKey());
+type RecipeGeneratorProps = {
+  ingredients: Ingredient[];
+};
+
+const formatIngredient = (item: Ingredient) => {
+  const details = [item.quantity, item.category, item.expiryEstimate]
+    .filter(Boolean)
+    .join(' · ');
+  return details ? `${item.name} (${details})` : item.name;
+};
+
+export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   const [cuisine, setCuisine] = useState('');
   const [restrictions, setRestrictions] = useState('');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -56,20 +62,9 @@ export default function RecipeGenerator() {
     return () => unsubscribe();
   }, [user]);
 
-  const saveKey = () => {
-    const trimmed = apiKeyInput.trim();
-    setStoredApiKey(trimmed);
-    setHasKey(Boolean(trimmed));
-    setError(null);
-  };
-
   const handleGenerate = async () => {
-    if (!hasValidApiKey()) {
-      setError('Please save a Gemini API key first.');
-      return;
-    }
-    if (pantryItems.length === 0) {
-      setError('Add at least one pantry item first. Go to the Add Food page to add items.');
+    if (ingredients.length === 0) {
+      setError('Add at least one pantry item first.');
       return;
     }
 
@@ -90,25 +85,18 @@ export default function RecipeGenerator() {
   };
 
   return (
-    <div className="space-y-6 text-gray-900">
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4 text-gray-900">
-        <h2 className="text-2xl font-bold text-gray-900">Gemini API Key</h2>
-        <div className="flex flex-col md:flex-row gap-3">
-          <input
-            type="password"
-            value={apiKeyInput}
-            onChange={(e) => setApiKeyInput(e.target.value)}
-            placeholder="Paste your Gemini API key"
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
-          />
-          <button
-            onClick={saveKey}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
-          >
-            Save Key
-          </button>
-        </div>
-        <p className="text-sm text-gray-700">Status: {hasKey ? 'Key saved' : 'No key saved'}</p>
+    <div className="space-y-6">
+      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
+        <h2 className="text-2xl font-bold">Pantry Items</h2>
+        {pantrySummary.length === 0 ? (
+          <p className="text-gray-600">No pantry items yet.</p>
+        ) : (
+          <ul className="list-disc list-inside text-gray-700">
+            {pantrySummary.map((item, idx) => (
+              <li key={`${item}-${idx}`}>{item}</li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4 text-gray-900">
