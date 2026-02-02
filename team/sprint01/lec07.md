@@ -12,10 +12,12 @@ Scribed Discussion:
 
 We discussed our future tasks for the app.
 
-We edited the Kanban Board by updating the future tasks with description and assigned to everyone.
+We updated the Kanban Board with future tasks and everyone assigned themselves a task.
 
-Daniel made up an idea of replace the log in/sign up buttons with a new account button which would show the user's information after clicking onto it.
+Yuxi made the onboarding form.
 
-Krisha made the pantry items visiible in the pantry and will begin to work on making the pantry items persist after reloading the page.
+Krisha worked on making the inputted pantry items visible in the pantry.
 
-Mahima implemented the backend for authentication for inventory items, log in and onboarding data.
+Mahima implemented the backend for authentication for inventory items, log in and onboarding data. She also fixed navigation for the sign up, log in, and onboarding forms.
+
+Everyone will continue working on their assigned sub-issues.
