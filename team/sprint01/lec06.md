@@ -16,4 +16,8 @@ Mahima has been working on creating the Firebase database for the app.
 
 Krisha has been working on the pantry and finished the Input Inventory form.
 
+Daniel finished creating the automated expiration date aspect.
+
+Andy has been working on 
+
 Everyone will continue working on their tasks for the MVP.
