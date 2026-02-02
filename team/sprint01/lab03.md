@@ -16,3 +16,5 @@ Today we discussed the last minute fix before the recording of the MVP video.
 
 And we worked on some part of that and analyzed the work together.
 
+Daniel shared about the home page design and the API idea of the expiration date.
+
