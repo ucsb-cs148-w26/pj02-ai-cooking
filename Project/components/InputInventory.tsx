@@ -31,7 +31,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
     if (!user) {
       setPantryItems([]);
       return;
@@ -52,6 +52,8 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     });
 
     return () => unsubscribe();
+  }, []);
+    return () => unsubscribeAuth();
   }, []);
   
 
