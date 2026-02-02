@@ -12,10 +12,16 @@ Scribed Discussion:
 
 *Andy joined via phone call because he was recovering from a surgery.
 
-Today we discussed the last minute fix before the recording of the MVP video.
+We finalized what we need to get done before the MVP video is due. 
 
-And we worked on some part of that and analyzed the work together.
+Krisha needs to finish the Pantry form and updating the pantry with ingredients.
 
-Daniel shared about the home page design and the API idea of the expiration date.
+Mahima needs to finish implementing the database through Firebase.
 
-Krisha shared that her task of the creating the pantry section was almost complete.
+Daniel needs to finish creating the automated expiration dates for produce.
+
+Yuxi needs to finish the onboarding form.
+
+Andy needs to finsih the image scanner aspect and recipe generation.
+
+We will all continue working on these tasks for the MVP.
