@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import type { PantryItem } from '../types';
+import type { Ingredient } from '../types';
 
 type AddFoodProps = {
-  onAddFood?: (item: PantryItem) => void;
+  onAddFood?: (item: Ingredient) => void;
 };
 
 export default function AddFood({ onAddFood }: AddFoodProps) {
