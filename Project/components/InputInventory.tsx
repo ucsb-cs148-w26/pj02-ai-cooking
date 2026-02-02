@@ -24,7 +24,7 @@ type PantryItem = {
 };
 
 export default function AddFood({ onAddFood }: AddFoodProps) {
-  
+
   const [loading, setLoading] = useState(false);
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [user, setUser] = useState<any>(null);
@@ -39,39 +39,55 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     });
     return () => unsub();
   }, []);
-  
+
   useEffect(() => {
     if (!user) {
+      console.log('No user logged in, clearing pantry items');
       setPantryItems([]);
       return;
     }
+
+    console.log('Setting up Firestore listener for user:', user.uid);
 
     const q = query(
       collection(db, 'pantryItems'),
       where('userId', '==', user.uid)
     );
 
-    const unsubscribeFirestore = onSnapshot(q, (snapshot) => {
-      const items: PantryItem[] = [];
-      snapshot.forEach((doc) => {
-        items.push({ id: doc.id, ...doc.data() } as PantryItem);
-      });
-      items.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
-      setPantryItems(items);
-    });
+    const unsubscribeFirestore = onSnapshot(
+      q,
+      (snapshot) => {
+        console.log('Firestore snapshot received:', snapshot.size, 'items');
+        const items: PantryItem[] = [];
+        snapshot.forEach((doc) => {
+          items.push({ id: doc.id, ...doc.data() } as PantryItem);
+        });
+        items.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
+        setPantryItems(items);
+        console.log('Pantry items updated:', items.length);
+      },
+      (error: { code?: string; message?: string }) => {
+        console.error('Firestore listener error:', error);
+        // If there's a permission error, the user might need to re-authenticate
+        if (error.code === 'permission-denied') {
+          console.error('Permission denied - user may need to log in again');
+        }
+      }
+    );
 
     return () => {
+      console.log('Cleaning up Firestore listener');
       unsubscribeFirestore();
     }
   }, [user]);
-  
+
 
   const handleSubmit = async () => {
     if (!food.name || !food.category || !food.expiration || !food.storage) {
       alert('Please fill in all required fields');
       return;
     }
-    
+
     const user = auth.currentUser;
     if (!user) {
       alert('Please log in first!');
@@ -100,14 +116,14 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
       console.log('Document written with ID:', docRef.id);
 
-      setFood({ 
-        name: '', 
-        category: '', 
-        quantity: '', 
-        unit: '', 
-        expiration: '', 
-        storage: '', 
-        notes: '' 
+      setFood({
+        name: '',
+        category: '',
+        quantity: '',
+        unit: '',
+        expiration: '',
+        storage: '',
+        notes: ''
       });
 
     } catch (error) {
@@ -180,12 +196,12 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
       {/* Form */}
       <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-green-200 space-y-5">
-        
+
         {/* Food Name */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Food Name *</label>
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={food.name}
             onChange={(e) => update('name', e.target.value)}
             placeholder="e.g., Milk, Chicken, Tomatoes"
@@ -196,7 +212,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         {/* Category */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Category *</label>
-          <select 
+          <select
             value={food.category}
             onChange={(e) => update('category', e.target.value)}
             className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
@@ -216,8 +232,8 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Quantity</label>
-            <input 
-              type="number" 
+            <input
+              type="number"
               value={food.quantity}
               onChange={(e) => update('quantity', e.target.value)}
               placeholder="1, 2, 5..."
@@ -226,7 +242,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           </div>
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Unit</label>
-            <select 
+            <select
               value={food.unit}
               onChange={(e) => update('unit', e.target.value)}
               className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
@@ -244,8 +260,8 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         {/* Expiration Date */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Expiration Date *</label>
-          <input 
-            type="date" 
+          <input
+            type="date"
             value={food.expiration}
             onChange={(e) => update('expiration', e.target.value)}
             className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none"
@@ -255,7 +271,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         {/* Storage Location */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Storage Location *</label>
-          <select 
+          <select
             value={food.storage}
             onChange={(e) => update('storage', e.target.value)}
             className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none"
@@ -271,7 +287,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         {/* Notes */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">Notes</label>
-          <textarea 
+          <textarea
             value={food.notes}
             onChange={(e) => update('notes', e.target.value)}
             placeholder="Additional notes..."
@@ -282,14 +298,14 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
         {/* Buttons */}
         <div className="flex gap-4 pt-4">
-          <button 
+          <button
             onClick={handleSubmit}
             disabled={loading}
             className="flex-1 px-6 py-4 bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
           >
             {loading ? '⏳ Adding...' : '➕ Add to Pantry'}
           </button>
-          <button 
+          <button
             onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
             className="flex-1 px-6 py-4 bg-white text-gray-700 font-semibold rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all"
           >
@@ -332,7 +348,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
               const expirationColorClass = getExpirationColor(daysUntilExpiration);
 
               return (
-                <div 
+                <div
                   key={item.id}
                   className={`bg-white rounded-2xl p-5 shadow-lg border-2 ${expirationColorClass} transition-all hover:shadow-xl`}
                 >
@@ -364,11 +380,11 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
                     <div className="flex items-center gap-2">
                       <span>📅</span>
                       <span className="font-semibold">
-                        {daysUntilExpiration < 0 
+                        {daysUntilExpiration < 0
                           ? `Expired ${Math.abs(daysUntilExpiration)} day${Math.abs(daysUntilExpiration) !== 1 ? 's' : ''} ago`
                           : daysUntilExpiration === 0
-                          ? 'Expires today!'
-                          : `Expires in ${daysUntilExpiration} day${daysUntilExpiration !== 1 ? 's' : ''}`
+                            ? 'Expires today!'
+                            : `Expires in ${daysUntilExpiration} day${daysUntilExpiration !== 1 ? 's' : ''}`
                         }
                       </span>
                     </div>
