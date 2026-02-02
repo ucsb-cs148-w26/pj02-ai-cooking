@@ -23,9 +23,9 @@ export default function Home() {
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === 'scan' && (
         <div className="space-y-6">
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
-            <h1 className="text-3xl font-bold mb-2">Scan Items</h1>
-            <p className="text-gray-700">Upload a receipt or fridge photo to analyze.</p>
+          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl text-gray-900">
+            <h1 className="text-3xl font-bold mb-2 text-gray-900">Scan Items</h1>
+            <p className="text-gray-800">Upload a receipt or fridge photo to analyze.</p>
           </div>
           <ScanAnalyzer onAddItems={handleAddScanItems} />
         </div>
@@ -35,11 +35,11 @@ export default function Home() {
       
       {activeTab === 'recipes' && (
         <div className="space-y-6">
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl">
-            <h1 className="text-3xl font-bold mb-2">Recipes</h1>
-            <p className="text-gray-700">Generate recipes from your pantry items.</p>
+          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl text-gray-900">
+            <h1 className="text-3xl font-bold mb-2 text-gray-900">Recipes</h1>
+            <p className="text-gray-800">Generate recipes from your pantry items.</p>
           </div>
-          <RecipeGenerator ingredients={pantryItems} />
+          <RecipeGenerator />
         </div>
       )}
     </Layout>
