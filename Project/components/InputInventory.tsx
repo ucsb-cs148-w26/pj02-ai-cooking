@@ -14,7 +14,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
   const [loading, setLoading] = useState(false);
-  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
+  const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
   const [isLoadingItems, setIsLoadingItems] = useState(false);
 
   // Function to fetch pantry items
@@ -32,9 +32,9 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         where('userId', '==', user.uid)
       );
       const querySnapshot = await getDocs(q);
-      const items: PantryItem[] = [];
+      const items: Ingredient[] = [];
       querySnapshot.forEach((doc) => {
-        items.push({ id: doc.id, ...doc.data() } as PantryItem);
+        items.push({ id: doc.id, ...doc.data() } as Ingredient);
       });
       setPantryItems(items);
     } catch (error) {
