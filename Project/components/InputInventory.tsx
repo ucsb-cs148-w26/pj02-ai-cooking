@@ -74,7 +74,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         storage: food.storage,
         notes: food.notes,
         userId: user.uid,
-        userEmail: user.email,
+        userEmail: user.email ?? undefined,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       });
@@ -90,7 +90,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         storage: food.storage,
         notes: food.notes,
         userId: user.uid,
-        userEmail: user.email,
+        userEmail: user.email ?? undefined,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
