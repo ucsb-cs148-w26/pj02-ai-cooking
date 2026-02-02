@@ -24,14 +24,23 @@ type PantryItem = {
 };
 
 export default function AddFood({ onAddFood }: AddFoodProps) {
+  
+  const [loading, setLoading] = useState(false);
+  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
+  const [user, setUser] = useState<any>(null);
+
   const [food, setFood] = useState({
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
 
   useEffect(() => {
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+    return () => unsub();
+  }, []);
+  
+  useEffect(() => {
     if (!user) {
       setPantryItems([]);
       return;
@@ -52,13 +61,9 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     });
 
     return () => {
-        unsubscribeFirestore();
-      };
-    });
-    return () => {
-      unsubscribeAuth();
-    };
-  }, []);
+      unsubscribeFirestore();
+    }
+  }, [user]);
   
 
   const handleSubmit = async () => {
