@@ -10,10 +10,10 @@ Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
 
 Scribed Discussion:
 
-We discussed our MVP
+We discussed our MVP, and everyone contributed their ideas.
 
-And everyone contributed their ideas.
+Mahima has been working on creating the Firebase database for the app.
 
-Daniel contributed the idea of the flow of video recording.
+Krisha has been working on the pantry and finished the Input Inventory form.
 
-Krisha talked about how she was almost done with her assigned tasks.
+Everyone will continue working on their tasks for the MVP.
