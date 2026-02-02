@@ -39,7 +39,7 @@ export default function Home() {
             <h1 className="text-3xl font-bold mb-2 text-gray-900">Recipes</h1>
             <p className="text-gray-800">Generate recipes from your pantry items.</p>
           </div>
-          <RecipeGenerator />
+          <RecipeGenerator ingredients={pantryItems} />
         </div>
       )}
     </Layout>
