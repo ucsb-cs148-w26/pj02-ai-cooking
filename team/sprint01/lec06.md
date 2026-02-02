@@ -15,3 +15,5 @@ We discussed our MVP
 And everyone contributed their ideas.
 
 Daniel contributed the idea of the flow of video recording.
+
+Krisha talked about how she was almost done with her assigned tasks.
