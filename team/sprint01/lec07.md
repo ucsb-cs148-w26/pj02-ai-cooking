@@ -16,6 +16,10 @@ Mahima implemented the database for user authentication,inventory items, and onb
 
 Andy finished implementing the image scanner and recipe generator. However, the scanned items don't get inputted into the inventory yet.
 
+Daniel made suggestions on the upcoming features of the app that's going to be implemented.
+
+Yuxi added the thought of adding a reminder of expiration.
+
 We discussed our future tasks for the app.
 
 We updated the Kanban Board with future tasks and everyone assigned themselves a task.
