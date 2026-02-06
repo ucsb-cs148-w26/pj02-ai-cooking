@@ -1,6 +1,7 @@
 export type ScanMode = 'food' | 'receipt';
 
 export interface Ingredient {
+  id?: string;
   name: string;
   quantity?: string;
   category?: string;
