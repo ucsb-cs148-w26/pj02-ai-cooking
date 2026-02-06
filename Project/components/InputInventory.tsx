@@ -48,7 +48,14 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         updatedAt: new Date().toISOString()
       });
 
-      console.log('Document written with ID:', docRef.id);
+      const newItem: Ingredient = {
+        id: docRef.id,
+        name: food.name,
+        category: food.category,
+        quantity: quantityLabel || food.quantity,
+        expiryEstimate,
+      };
+      onAddFood?.(newItem);
 
       setFood({ 
         name: '', 

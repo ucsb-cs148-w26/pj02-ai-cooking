@@ -12,10 +12,12 @@ import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
 export default function Home() {
   const [activeTab, setActiveTab] = useState('pantry');
   const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
-  const currentUser = useAuth();
+  const { user: currentUser, loading: authLoading } = useAuth();
   const [loadingPantry, setLoadingPantry] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
+
     const fetchPantryItems = async () => {
       if (currentUser?.uid) {
         setLoadingPantry(true);
@@ -27,7 +29,14 @@ export default function Home() {
           const querySnapshot = await getDocs(q);
           const items: Ingredient[] = [];
           querySnapshot.forEach((doc) => {
-            items.push({ id: doc.id, ...doc.data() } as unknown as Ingredient);
+            const data = doc.data();
+            items.push({
+              id: doc.id,
+              name: data.name ?? '',
+              quantity: data.quantity,
+              category: data.category,
+              expiryEstimate: data.expiration ? `Expires ${data.expiration}` : data.expiryEstimate,
+            } as Ingredient);
           });
           setPantryItems(items);
         } catch (error) {
@@ -36,13 +45,13 @@ export default function Home() {
           setLoadingPantry(false);
         }
       } else {
-        setPantryItems([]); // Clear pantry items if no user is logged in
+        setPantryItems([]);
         setLoadingPantry(false);
       }
     };
 
     fetchPantryItems();
-  }, [currentUser]);
+  }, [currentUser?.uid, authLoading]);
 
   const handleAddFood = (item: Ingredient) => {
     setPantryItems((prev) => [...prev, item]);
@@ -80,7 +89,7 @@ export default function Home() {
       
       {activeTab === 'pantry' && (
         <>
-          {loadingPantry ? (
+          {authLoading || loadingPantry ? (
             <p className="text-center text-gray-600">Loading pantry...</p>
           ) : (
             <AddFood onAddFood={handleAddFood} />
