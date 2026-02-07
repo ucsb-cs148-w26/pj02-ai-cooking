@@ -108,13 +108,27 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       </div>
 
       <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4 text-gray-900">
-        <h2 className="text-2xl font-bold text-gray-900">What kind of food do you want today?</h2>
-        <textarea
-          value={cuisine}
-          onChange={(e) => setCuisine(e.target.value)}
-          placeholder="Describe what you're craving... (e.g. something spicy and Asian, comfort food, healthy salad, vegetarian Italian)"
-          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-pink-400 focus:outline-none text-gray-900 placeholder:text-gray-500 min-h-[100px] resize-y"
-        />
+        <h2 className="text-2xl font-bold text-gray-900">What kind of food do you want?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-gray-900 font-semibold mb-2">Cuisine</label>
+            <input
+              value={cuisine}
+              onChange={(e) => setCuisine(e.target.value)}
+              placeholder="e.g. Italian"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-pink-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-900 font-semibold mb-2">Restrictions</label>
+            <input
+              value={restrictions}
+              onChange={(e) => setRestrictions(e.target.value)}
+              placeholder="e.g. vegetarian, no nuts"
+              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-pink-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
+            />
+          </div>
+        </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <button
           onClick={handleGenerate}
