@@ -33,15 +33,17 @@ try {
 export { auth };
 export const db = getFirestore(app);
 
-export function useAuth() {
+export function useAuth(): { user: User | null; loading: boolean } {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
       setCurrentUser(user);
+      setLoading(false);
     });
     return unsubscribe;
   }, []);
 
-  return currentUser;
+  return { user: currentUser, loading };
 }

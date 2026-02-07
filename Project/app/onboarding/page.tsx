@@ -50,7 +50,7 @@ export default function OnboardingPage() {
     cuisinePreferences: [],
     cookingSkillLevel: 'Intermediate',
   });
-  const currentUser = useAuth();
+  const { user: currentUser } = useAuth();
   const router = useRouter();
 
   useEffect(() => {

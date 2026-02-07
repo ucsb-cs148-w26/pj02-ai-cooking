@@ -79,21 +79,14 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         updatedAt: new Date().toISOString()
       });
 
-      // Create new item object with the ID
-      const newItem: PantryItem = {
+      const newItem: Ingredient = {
         id: docRef.id,
         name: food.name,
         category: food.category,
-        quantity: food.quantity,
-        unit: food.unit,
-        expiration: food.expiration,
-        storage: food.storage,
-        notes: food.notes,
-        userId: user.uid,
-        userEmail: user.email ?? undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        quantity: quantityLabel || food.quantity,
+        expiryEstimate,
       };
+      onAddFood?.(newItem);
 
       // Update local state
       setPantryItems(prev => {
