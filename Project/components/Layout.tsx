@@ -31,10 +31,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
         <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-gradient-to-br from-green-300 to-teal-400 opacity-15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
       </div>
 
-      {/* Desktop Header - Vibrant Gradient */}
-      <header className="hidden md:flex fixed top-0 w-full h-16 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 backdrop-blur-xl border-b border-white/30 px-8 items-center justify-between z-50 text-white shadow-2xl">
-        {/* Rainbow glow effect behind header */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 via-pink-500 to-orange-500 opacity-90"></div>
+      {/* Desktop Header - Solid Blue */}
+      <header className="hidden md:flex fixed top-0 w-full h-16 bg-blue-600 backdrop-blur-xl border-b border-white/30 px-8 items-center justify-between z-50 text-white shadow-2xl">
         
         <div className="relative flex items-center gap-3 font-bold text-xl tracking-tight group">
           <div className="relative">
@@ -42,7 +40,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
             <Sparkles size={16} className="absolute -top-1 -right-1 text-yellow-300 animate-pulse" />
           </div>
           <span className="bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent drop-shadow-lg">
-            Smart<span className="text-yellow-300 drop-shadow-[0_0_15px_rgba(253,224,71,0.9)]"> Cooking & Storing </span> Helper
+            PantryPal
           </span>
         </div>
         
