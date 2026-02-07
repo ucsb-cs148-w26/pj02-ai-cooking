@@ -12,10 +12,11 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Keep content text dark for readability on gradient/light cards */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #171717;
   }
 }
 
