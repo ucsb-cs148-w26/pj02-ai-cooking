@@ -8,6 +8,21 @@ export interface Ingredient {
   expiryEstimate?: string;
 }
 
+export interface PantryItem {
+  id: string;
+  name: string;
+  category: string;
+  quantity?: string;
+  unit?: string;
+  expiration: string;
+  storage: string;
+  notes?: string;
+  userId: string;
+  userEmail?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ReceiptItem {
   name: string;
   price?: number;

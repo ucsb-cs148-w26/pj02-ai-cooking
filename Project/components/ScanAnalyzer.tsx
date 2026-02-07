@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import type { Ingredient, ScanMode } from '../types';
-import { analyzeImage, getApiKey, hasValidApiKey, setStoredApiKey } from '../services/geminiService';
+import { analyzeImage } from '../services/geminiService';
 
 const formatIngredient = (item: Ingredient) => {
   const details = [item.quantity, item.category, item.expiryEstimate]
@@ -16,22 +16,11 @@ type ScanAnalyzerProps = {
 };
 
 export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
-  const [apiKeyInput, setApiKeyInput] = useState(getApiKey() ?? '');
-  const [hasKey, setHasKey] = useState(hasValidApiKey());
   const [mode, setMode] = useState<ScanMode>('food');
   const [imageData, setImageData] = useState<string>('');
   const [items, setItems] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const status = hasKey ? 'Key saved' : 'No key saved';
-
-  const saveKey = () => {
-    const trimmed = apiKeyInput.trim();
-    setStoredApiKey(trimmed);
-    setHasKey(Boolean(trimmed));
-    setError(null);
-  };
 
   const handleFile = (file: File | null) => {
     if (!file) return;
@@ -53,10 +42,6 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
   };
 
   const handleAnalyze = async () => {
-    if (!hasValidApiKey()) {
-      setError('Please save a Gemini API key first.');
-      return;
-    }
     if (!imageData) {
       setError('Upload an image first.');
       return;
@@ -80,26 +65,6 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
   return (
     <div className="space-y-6">
       <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 className="text-2xl font-bold">Gemini API Key</h2>
-        <div className="flex flex-col md:flex-row gap-3">
-          <input
-            type="password"
-            value={apiKeyInput}
-            onChange={(e) => setApiKeyInput(e.target.value)}
-            placeholder="Paste your Gemini API key"
-            className="flex-1 px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none"
-          />
-          <button
-            onClick={saveKey}
-            className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
-          >
-            Save Key
-          </button>
-        </div>
-        <p className="text-sm text-gray-600">Status: {status}</p>
-      </div>
-
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
         <h2 className="text-2xl font-bold">Scan Image</h2>
         <div className="flex flex-wrap gap-3">
           <button
@@ -107,7 +72,7 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
             className={`px-4 py-2 rounded-full border-2 ${
               mode === 'food'
                 ? 'bg-green-500 text-white border-green-500'
-                : 'bg-white text-gray-700 border-gray-200'
+                : 'bg-white text-gray-900 border-gray-200'
             }`}
           >
             Fridge / Food Items
@@ -117,7 +82,7 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
             className={`px-4 py-2 rounded-full border-2 ${
               mode === 'receipt'
                 ? 'bg-orange-500 text-white border-orange-500'
-                : 'bg-white text-gray-700 border-gray-200'
+                : 'bg-white text-gray-900 border-gray-200'
             }`}
           >
             Receipt
@@ -127,7 +92,7 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
           type="file"
           accept="image/*"
           onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
-          className="w-full"
+          className="w-full text-gray-900"
         />
         {imageData && (
           <img src={imageData} alt="Uploaded preview" className="w-full rounded-xl" />
@@ -142,12 +107,12 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
         </button>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-3">
-        <h3 className="text-xl font-bold">Detected Items</h3>
+      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-3 text-gray-900">
+        <h3 className="text-xl font-bold text-gray-900">Detected Items</h3>
         {items.length === 0 ? (
-          <p className="text-gray-600">No results yet.</p>
+          <p className="text-gray-700">No results yet.</p>
         ) : (
-          <ul className="list-disc list-inside text-gray-700">
+          <ul className="list-disc list-inside text-gray-800">
             {items.map((item, idx) => (
               <li key={`${item.name}-${idx}`}>{formatIngredient(item)}</li>
             ))}
