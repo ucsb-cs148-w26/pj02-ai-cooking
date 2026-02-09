@@ -10,7 +10,7 @@ type AddFoodProps = {
 };
 
 export default function AddFood({ onAddFood }: AddFoodProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [food, setFood] = useState({
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
@@ -20,13 +20,13 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
   // Listen to pantry items in real time (only when user is signed in)
   useEffect(() => {
+    if (authLoading) {
+      setIsLoadingItems(true);
+      return;
+    }
     if (user === null) {
       setPantryItems([]);
       setIsLoadingItems(false);
-      return;
-    }
-    if (!user) {
-      setIsLoadingItems(true);
       return;
     }
 
@@ -50,7 +50,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, authLoading]);
 
   const handleSubmit = async () => {
     if (!food.name || !food.category || !food.expiration || !food.storage) {
@@ -315,7 +315,12 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           </div>
         </div>
 
-        {!user ? (
+        {authLoading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+            <p className="mt-4 text-gray-800">Checking sign-in...</p>
+          </div>
+        ) : !user ? (
           <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-12 text-center border-2 border-gray-200">
             <p className="text-gray-800">Sign in to see and add pantry items.</p>
           </div>
