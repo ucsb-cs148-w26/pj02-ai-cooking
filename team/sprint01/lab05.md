@@ -21,4 +21,3 @@ Mahima communicated via text that she is working on making pantry items persist 
 
 Andy communicated via text that he is helping with implementing unit testing
 
-Everyone will continue working on their sub-issues
