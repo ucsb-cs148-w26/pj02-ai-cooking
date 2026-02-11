@@ -11,6 +11,7 @@ Team: Krisha[ ], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
 Scribed Discussion:
 
 We further discussed the feedback other teams provided for our MVP, and we decided what to do for each of us for the upcoming week.
+
 Daniel is working on creating an account page. 
 
 Yuxi is working on the expiration reminder notification.
