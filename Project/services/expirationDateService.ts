@@ -89,9 +89,17 @@ Respond ONLY with a JSON object (no markdown formatting) in this exact format:
  * Validate if a date string is in valid format
  */
 export function isValidDate(dateString: string): boolean {
-  const regex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!regex.test(dateString)) return false;
-  
-  const date = new Date(dateString);
-  return date instanceof Date && !isNaN(date.getTime());
+  const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
 }
