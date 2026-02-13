@@ -33,16 +33,37 @@ try {
 export { auth };
 export const db = getFirestore(app);
 
+// Delay before treating "null" as "signed out" so we don't clear state on reload
+// before Firebase has restored the user from persistence (it often fires null first, then user).
+const AUTH_NULL_DELAY_MS = 200;
+
 export function useAuth(): { user: User | null; loading: boolean } {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let nullDelayTimeout: ReturnType<typeof setTimeout> | null = null;
+
     const unsubscribe = onAuthStateChanged(auth, user => {
-      setCurrentUser(user);
-      setLoading(false);
+      if (user !== null) {
+        if (nullDelayTimeout) clearTimeout(nullDelayTimeout);
+        nullDelayTimeout = null;
+        setCurrentUser(user);
+        setLoading(false);
+        return;
+      }
+      // user === null: might be "still restoring" or "really signed out"
+      setCurrentUser(null);
+      nullDelayTimeout = setTimeout(() => {
+        nullDelayTimeout = null;
+        setLoading(false);
+      }, AUTH_NULL_DELAY_MS);
     });
-    return unsubscribe;
+
+    return () => {
+      if (nullDelayTimeout) clearTimeout(nullDelayTimeout);
+      unsubscribe();
+    };
   }, []);
 
   return { user: currentUser, loading };
