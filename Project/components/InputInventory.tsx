@@ -5,6 +5,29 @@ import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot } from 'fi
 import { db, useAuth } from '../lib/firebase';
 import type { PantryItem } from '../types';
 
+const PANTRY_FULL_CACHE_KEY = (uid: string) => `pantry_full_${uid}`;
+
+function loadPantryFullFromCache(uid: string): PantryItem[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(PANTRY_FULL_CACHE_KEY(uid));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as PantryItem[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePantryFullToCache(uid: string, items: PantryItem[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(PANTRY_FULL_CACHE_KEY(uid), JSON.stringify(items));
+  } catch {
+    // ignore
+  }
+}
+
 type AddFoodProps = {
   onAddFood?: (item: PantryItem) => void;
 };
@@ -30,9 +53,16 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       return;
     }
 
+    const uid = user.uid;
+    // Show cached pantry immediately so reload doesn't show empty in Pantry tab
+    const cached = loadPantryFullFromCache(uid);
+    if (cached.length > 0) {
+      setPantryItems(cached);
+    }
+
     const q = query(
       collection(db, 'pantryItems'),
-      where('userId', '==', user.uid)
+      where('userId', '==', uid)
     );
 
     setIsLoadingItems(true);
@@ -43,6 +73,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       });
       items.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
       setPantryItems(items);
+      savePantryFullToCache(uid, items);
       setIsLoadingItems(false);
     }, (err) => {
       console.error('Error fetching pantry items:', err);
@@ -94,10 +125,11 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         updatedAt: new Date().toISOString()
       };
 
-      // Update local state
+      // Update local state and cache
       setPantryItems(prev => {
         const updated = [newItem, ...prev];
         updated.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
+        savePantryFullToCache(user.uid, updated);
         return updated;
       });
 
@@ -132,7 +164,11 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
     try {
       await deleteDoc(doc(db, 'pantryItems', id));
-      setPantryItems(prev => prev.filter(item => item.id !== id));
+      setPantryItems(prev => {
+        const updated = prev.filter(item => item.id !== id);
+        if (user) savePantryFullToCache(user.uid, updated);
+        return updated;
+      });
       console.log('Item deleted successfully');
     } catch (error) {
       console.error('Error deleting item:', error);
