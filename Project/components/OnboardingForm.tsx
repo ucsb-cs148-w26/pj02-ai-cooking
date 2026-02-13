@@ -46,7 +46,7 @@ const CUISINE_TYPES = [
 
 export default function OnboardingForm({ onComplete }: OnboardingFormProps) {
   const [step, setStep] = useState(1);
-  const user = useAuth();
+  const { user } = useAuth();
   const [preferences, setPreferences] = useState<Partial<UserPreferences>>({
     name: '',
     allergies: [],

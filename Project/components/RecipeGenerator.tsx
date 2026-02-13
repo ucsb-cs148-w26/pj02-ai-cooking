@@ -18,7 +18,7 @@ const formatIngredient = (item: Ingredient) => {
 };
 
 export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
-  const user = useAuth();
+  const { user } = useAuth();
   const [cuisine, setCuisine] = useState('');
   const [restrictions, setRestrictions] = useState('');
   const [recipes, setRecipes] = useState<Recipe[]>([]);

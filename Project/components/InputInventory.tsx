@@ -6,12 +6,35 @@ import { db, useAuth } from '../lib/firebase';
 import type { PantryItem } from '../types';
 import { ExpirationReminders } from './ExpirationReminders';
 
+const PANTRY_FULL_CACHE_KEY = (uid: string) => `pantry_full_${uid}`;
+
+function loadPantryFullFromCache(uid: string): PantryItem[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(PANTRY_FULL_CACHE_KEY(uid));
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as PantryItem[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function savePantryFullToCache(uid: string, items: PantryItem[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(PANTRY_FULL_CACHE_KEY(uid), JSON.stringify(items));
+  } catch {
+    // ignore
+  }
+}
+
 type AddFoodProps = {
   onAddFood?: (item: PantryItem) => void;
 };
 
 export default function AddFood({ onAddFood }: AddFoodProps) {
-  const user = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [food, setFood] = useState({
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
@@ -21,19 +44,26 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
   // Listen to pantry items in real time (only when user is signed in)
   useEffect(() => {
+    if (authLoading) {
+      setIsLoadingItems(true);
+      return;
+    }
     if (user === null) {
       setPantryItems([]);
       setIsLoadingItems(false);
       return;
     }
-    if (!user) {
-      setIsLoadingItems(true);
-      return;
+
+    const uid = user.uid;
+    // Show cached pantry immediately so reload doesn't show empty in Pantry tab
+    const cached = loadPantryFullFromCache(uid);
+    if (cached.length > 0) {
+      setPantryItems(cached);
     }
 
     const q = query(
       collection(db, 'pantryItems'),
-      where('userId', '==', user.uid)
+      where('userId', '==', uid)
     );
 
     setIsLoadingItems(true);
@@ -44,6 +74,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       });
       items.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
       setPantryItems(items);
+      savePantryFullToCache(uid, items);
       setIsLoadingItems(false);
     }, (err) => {
       console.error('Error fetching pantry items:', err);
@@ -51,7 +82,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     });
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user, authLoading]);
 
   const handleSubmit = async () => {
     if (!food.name || !food.category || !food.expiration || !food.storage) {
@@ -80,7 +111,6 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         updatedAt: new Date().toISOString()
       });
 
-      // Create new item object with the ID
       const newItem: PantryItem = {
         id: docRef.id,
         name: food.name,
@@ -96,10 +126,11 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         updatedAt: new Date().toISOString()
       };
 
-      // Update local state
+      // Update local state and cache
       setPantryItems(prev => {
         const updated = [newItem, ...prev];
         updated.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
+        savePantryFullToCache(user.uid, updated);
         return updated;
       });
 
@@ -134,7 +165,11 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
     try {
       await deleteDoc(doc(db, 'pantryItems', id));
-      setPantryItems(prev => prev.filter(item => item.id !== id));
+      setPantryItems(prev => {
+        const updated = prev.filter(item => item.id !== id);
+        if (user) savePantryFullToCache(user.uid, updated);
+        return updated;
+      });
       console.log('Item deleted successfully');
     } catch (error) {
       console.error('Error deleting item:', error);
@@ -284,7 +319,12 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           )}
         </div>
 
-        {!user ? (
+        {authLoading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+            <p className="mt-4 text-gray-800">Checking sign-in...</p>
+          </div>
+        ) : !user ? (
           <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-12 text-center border-2 border-gray-200">
             <p className="text-gray-800">Sign in to see and add pantry items.</p>
           </div>
