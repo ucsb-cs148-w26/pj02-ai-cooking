@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
-import { auth, db, useAuth } from '../lib/firebase';
+import { db, useAuth } from '../lib/firebase';
 import type { PantryItem } from '../types';
+import { ExpirationReminders } from './ExpirationReminders';
+import { ExpirationProgressBar } from './ExpirationProgressBar';
 
 type AddFoodProps = {
   onAddFood?: (item: PantryItem) => void;
@@ -141,41 +143,6 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     }
   };
 
-  const getCategoryIcon = (category: string) => {
-    const icons: Record<string, string> = {
-      'dairy': '🥛',
-      'meat': '🍗',
-      'fruits': '🍎',
-      'vegetables': '🥕',
-      'grains': '🌾',
-      'frozen': '❄️',
-      'other': '📦'
-    };
-    return icons[category] || '📦';
-  };
-
-  const getStorageIcon = (storage: string) => {
-    const icons: Record<string, string> = {
-      'fridge': '🧊',
-      'freezer': '❄️',
-      'pantry': '🗄️',
-      'counter': '🏠'
-    };
-    return icons[storage] || '🗄️';
-  };
-
-  const getExpirationStatus = (expirationDate: string) => {
-    const today = new Date();
-    const expDate = new Date(expirationDate);
-    const diffTime = expDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays < 0) return { text: 'Expired', color: 'bg-red-100 text-red-800' };
-    if (diffDays <= 3) return { text: 'Expiring Soon', color: 'bg-orange-100 text-orange-800' };
-    if (diffDays <= 7) return { text: 'This Week', color: 'bg-yellow-100 text-yellow-800' };
-    return { text: 'Fresh', color: 'bg-green-100 text-green-800' };
-  };
-
   const update = (field: string, value: string) => setFood({ ...food, [field]: value });
 
   return (
@@ -307,6 +274,15 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         </div>
       </div>
 
+      {/* Expiration Reminders (Dashboard) */}
+      {user && pantryItems.length > 0 && (
+        <ExpirationReminders
+          items={pantryItems}
+          onDelete={handleDelete}
+          loading={isLoadingItems}
+        />
+      )}
+
       {/* Pantry Items Display */}
       <div className="mb-12 text-gray-900">
         <div className="flex justify-between items-center mb-6">
@@ -332,62 +308,16 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
             <p className="text-gray-800">Add your first food item using the form above.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pantryItems.map((item) => {
-              const status = getExpirationStatus(item.expiration);
-              const formattedDate = new Date(item.expiration).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-              });
-
-              return (
-                <div 
-                  key={item.id} 
-                  className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-lg border-2 border-gray-100 hover:border-green-200 transition-all hover:shadow-xl text-gray-900"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{getCategoryIcon(item.category)}</span>
-                      <div>
-                        <h3 className="font-bold text-xl text-gray-900">{item.name}</h3>
-                        <p className="text-gray-700 text-sm">
-                          {item.quantity} {item.unit} • {getStorageIcon(item.storage)} {item.storage}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="text-gray-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-colors"
-                      title="Delete item"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${status.color}`}>
-                      {status.text}
-                    </div>
-
-                    <div className="flex items-center text-gray-700">
-                      <span className="mr-2">📅</span>
-                      <span>Expires: {formattedDate}</span>
-                    </div>
-
-                    {item.notes && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <p className="text-sm text-gray-600">📝 {item.notes}</p>
-                      </div>
-                    )}
-
-                    <div className="pt-3 border-t border-gray-100 text-xs text-gray-500">
-                      Added: {new Date(item.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl border-2 border-gray-100 text-gray-900">
+            <div className="divide-y divide-gray-200">
+              {pantryItems.map((item) => (
+                <ExpirationProgressBar
+                  key={item.id}
+                  item={item}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
