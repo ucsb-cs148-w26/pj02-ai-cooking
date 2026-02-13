@@ -1,207 +1,187 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ChefHat, ShoppingBag, Utensils, History, Sparkles, User } from 'lucide-react';
-import { useAuth } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { auth, useAuth } from '@/lib/firebase';
+import { getUserPreferences } from '@/services/userPreferencesService';
+import { UserPreferences } from '@/types';
+import { ChefHat, Mail, Calendar, LogOut, User, Sparkles } from 'lucide-react';
 
-interface LayoutProps {
-  children: React.ReactNode;
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-}
-
-export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
+export default function AccountPage() {
   const router = useRouter();
   const currentUser = useAuth();
+  const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  // Debug logging - Remove after testing
   useEffect(() => {
-    console.log('🔍 Layout Component - Current User:', currentUser);
-    console.log('🔍 Layout Component - User Email:', currentUser?.email);
-    console.log('🔍 Layout Component - Is Logged In?', !!currentUser);
-  }, [currentUser]);
+    // Redirect to login if not authenticated
+    if (!currentUser && !loading) {
+      router.push('/login');
+      return;
+    }
 
-  const handleLogin = () => {
-    router.push('/login');
+    // Load user preferences
+    if (currentUser) {
+      getUserPreferences(currentUser.uid).then(prefs => {
+        setUserPreferences(prefs);
+        setLoading(false);
+      });
+    }
+  }, [currentUser, router, loading]);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      setLoggingOut(false);
+    }
   };
 
-  const handleSignUp = () => {
-    router.push('/signup');
-  };
-
-  const handleAccount = () => {
-    router.push('/account');
-  };
+  if (loading || !currentUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 md:pt-16 bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 relative overflow-hidden">
-      {/* Animated Colorful Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 relative overflow-hidden px-4 py-8 md:pt-24">
+      {/* Colorful Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-blue-400 to-purple-500 opacity-20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
         <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-pink-400 to-red-400 opacity-15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-gradient-to-br from-green-300 to-teal-400 opacity-15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
       </div>
 
-      {/* Desktop Header - Solid Blue */}
-      <header className="hidden md:flex fixed top-0 w-full h-16 bg-blue-600 backdrop-blur-xl border-b border-white/30 px-8 items-center justify-between z-50 text-white shadow-2xl">
-        
-        <div className="relative flex items-center gap-3 font-bold text-xl tracking-tight group">
-          <div className="relative">
-            <ChefHat size={32} className="text-yellow-300 drop-shadow-[0_0_12px_rgba(253,224,71,0.8)] transform group-hover:rotate-12 transition-transform duration-300" />
-            <Sparkles size={16} className="absolute -top-1 -right-1 text-yellow-300 animate-pulse" />
+      <div className="max-w-2xl mx-auto relative z-10 space-y-6">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="relative inline-flex items-center justify-center mb-4">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-60 animate-pulse"></div>
+            <div className="relative bg-white/80 backdrop-blur-sm p-6 rounded-full border-4 border-purple-200">
+              <User size={48} className="text-purple-600" />
+            </div>
           </div>
-          <span className="bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent drop-shadow-lg">
-            PantryPal
-          </span>
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent mb-2">
+            My Account
+          </h1>
+          <p className="text-gray-600">Manage your PantryPal profile</p>
         </div>
-        
-        <nav className="relative flex gap-6">
-          <button 
-            onClick={() => onTabChange('scan')}
-            className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 ${
-              activeTab === 'scan' 
-                ? 'bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white font-bold shadow-[0_0_25px_rgba(251,191,36,0.7)] scale-105' 
-                : 'text-white/80 hover:text-white hover:bg-white/20 hover:scale-105'
-            }`}
-          >
-            <Utensils size={20} className={activeTab === 'scan' ? 'animate-bounce' : ''} />
-            <span>Scan</span>
-            {activeTab === 'scan' && <div className="absolute inset-0 rounded-full bg-yellow-300 opacity-30 blur-xl"></div>}
-          </button>
-          
-          <button 
-            onClick={() => onTabChange('pantry')}
-            className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 ${
-              activeTab === 'pantry' 
-                ? 'bg-gradient-to-r from-green-400 via-teal-400 to-cyan-400 text-white font-bold shadow-[0_0_25px_rgba(52,211,153,0.7)] scale-105' 
-                : 'text-white/80 hover:text-white hover:bg-white/20 hover:scale-105'
-            }`}
-          >
-            <ShoppingBag size={20} className={activeTab === 'pantry' ? 'animate-bounce' : ''} />
-            <span>Pantry</span>
-            {activeTab === 'pantry' && <div className="absolute inset-0 rounded-full bg-green-300 opacity-30 blur-xl"></div>}
-          </button>
-          
-          <button 
-            onClick={() => onTabChange('recipes')}
-            className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 ${
-              activeTab === 'recipes' 
-                ? 'bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 text-white font-bold shadow-[0_0_25px_rgba(236,72,153,0.7)] scale-105' 
-                : 'text-white/80 hover:text-white hover:bg-white/20 hover:scale-105'
-            }`}
-          >
-            <History size={20} className={activeTab === 'recipes' ? 'animate-bounce' : ''} />
-            <span>Recipes</span>
-            {activeTab === 'recipes' && <div className="absolute inset-0 rounded-full bg-pink-300 opacity-30 blur-xl"></div>}
-          </button>
-        </nav>
-      
-        {/* Auth Buttons - Show different buttons based on login state */}
-        <div className="relative flex items-center gap-4">
-          {currentUser ? (
-            // Logged in - Show Account button
-            <button 
-              onClick={handleAccount}
-              className="relative flex items-center gap-2 px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white rounded-full hover:shadow-[0_0_30px_rgba(251,191,36,0.8)] transition-all duration-300 hover:scale-110 transform"
-            >
-              <User size={20} />
-              <span className="relative z-10">Account</span>
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 via-pink-400 to-yellow-400 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
-          ) : (
-            // Not logged in - Show Login & Sign Up buttons
-            <>
-              <button 
-                onClick={handleLogin}
-                className="px-5 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-all duration-300 hover:scale-105 border-2 border-white/30 rounded-full hover:border-yellow-300/60 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(253,224,71,0.5)]"
-              >
-                Log In
-              </button>
-              <button 
-                onClick={handleSignUp}
-                className="relative px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white rounded-full hover:shadow-[0_0_30px_rgba(251,191,36,0.8)] transition-all duration-300 hover:scale-110 transform"
-              >
-                <span className="relative z-10">Sign Up</span>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 via-pink-400 to-yellow-400 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-            </>
+
+        {/* Account Info Card */}
+        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-2 border-purple-200 space-y-6">
+          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            <ChefHat className="text-purple-600" />
+            Account Information
+          </h2>
+
+          {/* Email */}
+          <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+            <div className="mt-1">
+              <Mail className="text-purple-600" size={24} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-600">Email Address</p>
+              <p className="text-lg text-gray-800">{currentUser.email}</p>
+            </div>
+          </div>
+
+          {/* User ID */}
+          <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
+            <div className="mt-1">
+              <User className="text-blue-600" size={24} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-600">User ID</p>
+              <p className="text-sm text-gray-800 font-mono break-all">{currentUser.uid}</p>
+            </div>
+          </div>
+
+          {/* Account Created */}
+          <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl">
+            <div className="mt-1">
+              <Calendar className="text-green-600" size={24} />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-600">Member Since</p>
+              <p className="text-lg text-gray-800">
+                {currentUser.metadata.creationTime 
+                  ? new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })
+                  : 'Unknown'}
+              </p>
+            </div>
+          </div>
+
+          {/* User Preferences (if available) */}
+          {userPreferences && (
+            <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl">
+              <div className="mt-1">
+                <Sparkles className="text-yellow-600" size={24} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-gray-600">Dietary Preferences</p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {userPreferences.dietaryRestrictions && userPreferences.dietaryRestrictions.length > 0 ? (
+                    userPreferences.dietaryRestrictions.map((restriction, index) => (
+                      <span 
+                        key={index}
+                        className="px-3 py-1 bg-white/60 rounded-full text-sm font-medium text-gray-700 border border-yellow-200"
+                      >
+                        {restriction}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm text-gray-500">No dietary restrictions set</span>
+                  )}
+                </div>
+              </div>
+            </div>
           )}
         </div>
-      </header>
 
-      {/* Main Content Area */}
-      <main className="relative max-w-4xl mx-auto p-4 md:p-8 z-10">
-        {children}
-      </main>
-
-      {/* Mobile Bottom Navigation - Colorful Glassmorphism */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-gradient-to-r from-purple-500/80 via-pink-500/80 to-orange-500/80 backdrop-blur-xl border-t border-white/30 flex items-center justify-around z-50 shadow-[0_-8px_20px_-4px_rgba(168,85,247,0.4)]">
-        <button 
-          onClick={() => onTabChange('scan')}
-          className={`flex flex-col items-center gap-1 transition-all duration-300 ${
-            activeTab === 'scan' 
-              ? 'text-yellow-300 scale-110' 
-              : 'text-white/70 hover:text-white'
-          }`}
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="w-full py-4 px-6 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-2xl hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
         >
-          <div className={`relative ${activeTab === 'scan' ? 'animate-bounce' : ''}`}>
-            <Utensils size={24} className={activeTab === 'scan' ? 'fill-yellow-300/20 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]' : ''} />
-            {activeTab === 'scan' && (
-              <div className="absolute inset-0 bg-yellow-300 opacity-30 blur-lg rounded-full"></div>
-            )}
-          </div>
-          <span className={`text-[10px] font-bold ${activeTab === 'scan' ? 'text-yellow-300 drop-shadow-[0_0_4px_rgba(253,224,71,0.8)]' : 'text-white'}`}>SCAN</span>
-        </button>
-        
-        <button 
-          onClick={() => onTabChange('pantry')}
-          className={`flex flex-col items-center gap-1 transition-all duration-300 ${
-            activeTab === 'pantry' 
-              ? 'text-green-300 scale-110' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <div className={`relative ${activeTab === 'pantry' ? 'animate-bounce' : ''}`}>
-            <ShoppingBag size={24} className={activeTab === 'pantry' ? 'fill-green-300/20 drop-shadow-[0_0_8px_rgba(134,239,172,0.8)]' : ''} />
-            {activeTab === 'pantry' && (
-              <div className="absolute inset-0 bg-green-300 opacity-30 blur-lg rounded-full"></div>
-            )}
-          </div>
-          <span className={`text-[10px] font-bold ${activeTab === 'pantry' ? 'text-green-300 drop-shadow-[0_0_4px_rgba(134,239,172,0.8)]' : 'text-white'}`}>PANTRY</span>
-        </button>
-        
-        <button 
-          onClick={() => onTabChange('recipes')}
-          className={`flex flex-col items-center gap-1 transition-all duration-300 ${
-            activeTab === 'recipes' 
-              ? 'text-pink-300 scale-110' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <div className={`relative ${activeTab === 'recipes' ? 'animate-bounce' : ''}`}>
-            <History size={24} className={activeTab === 'recipes' ? 'fill-pink-300/20 drop-shadow-[0_0_8px_rgba(249,168,212,0.8)]' : ''} />
-            {activeTab === 'recipes' && (
-              <div className="absolute inset-0 bg-pink-300 opacity-30 blur-lg rounded-full"></div>
-            )}
-          </div>
-          <span className={`text-[10px] font-bold ${activeTab === 'recipes' ? 'text-pink-300 drop-shadow-[0_0_4px_rgba(249,168,212,0.8)]' : 'text-white'}`}>RECIPES</span>
+          {loggingOut ? (
+            <>
+              <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Logging out...
+            </>
+          ) : (
+            <>
+              <LogOut size={24} />
+              Logout
+            </>
+          )}
         </button>
 
-        {/* Mobile Account Button - Only shows when logged in */}
-        {currentUser && (
-          <button 
-            onClick={handleAccount}
-            className="flex flex-col items-center gap-1 transition-all duration-300 text-white hover:text-yellow-300 hover:scale-110"
-          >
-            <div className="relative">
-              <User size={24} className="drop-shadow-[0_0_8px_rgba(253,224,71,0.6)]" />
-            </div>
-            <span className="text-[10px] font-bold">ACCOUNT</span>
-          </button>
-        )}
-      </nav>
+        {/* Back to Home */}
+        <button
+          onClick={() => router.push('/')}
+          className="w-full py-3 px-6 bg-white/60 backdrop-blur-sm text-gray-700 font-semibold rounded-2xl hover:bg-white/80 transition-all border-2 border-gray-200"
+        >
+          Back to Home
+        </button>
+      </div>
     </div>
   );
-};
+}
