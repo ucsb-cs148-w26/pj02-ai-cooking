@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { ChefHat, ShoppingBag, Utensils, History, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { ChefHat, ShoppingBag, Utensils, History, Sparkles, User } from 'lucide-react';
+import { useAuth } from '@/lib/firebase';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,6 +14,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
   const router = useRouter();
+  const currentUser = useAuth();
 
   const handleLogin = () => {
     router.push('/login');
@@ -85,21 +88,33 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
           </button>
         </nav>
       
-        {/* Auth Buttons - Colorful */}
-        <div className="relative flex items-center gap-4">    
-          <button 
-            onClick={handleLogin}
-            className="px-5 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-all duration-300 hover:scale-105 border-2 border-white/30 rounded-full hover:border-yellow-300/60 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(253,224,71,0.5)]"
-          >
-            Log In
-          </button>
-          <button 
-            onClick={handleSignUp}
-            className="relative px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white rounded-full hover:shadow-[0_0_30px_rgba(251,191,36,0.8)] transition-all duration-300 hover:scale-110 transform"
-          >
-            <span className="relative z-10">Sign Up</span>
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 via-pink-400 to-yellow-400 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-          </button>
+        {/* Auth: Account circle when logged in, else Log In / Sign Up */}
+        <div className="relative flex items-center gap-4">
+          {currentUser ? (
+            <Link
+              href="/account"
+              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 border-2 border-white/40"
+              title="Account"
+            >
+              <User size={22} className="text-white" />
+            </Link>
+          ) : (
+            <>
+              <button 
+                onClick={handleLogin}
+                className="px-5 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-all duration-300 hover:scale-105 border-2 border-white/30 rounded-full hover:border-yellow-300/60 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(253,224,71,0.5)]"
+              >
+                Log In
+              </button>
+              <button 
+                onClick={handleSignUp}
+                className="relative px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white rounded-full hover:shadow-[0_0_30px_rgba(251,191,36,0.8)] transition-all duration-300 hover:scale-110 transform"
+              >
+                <span className="relative z-10">Sign Up</span>
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 via-pink-400 to-yellow-400 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+              </button>
+            </>
+          )}
         </div>
       </header>
 
