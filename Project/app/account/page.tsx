@@ -10,14 +10,14 @@ import { ChefHat, Mail, Calendar, LogOut, User, Sparkles } from 'lucide-react';
 
 export default function AccountPage() {
   const router = useRouter();
-  const currentUser = useAuth();
+  const { user: currentUser, loading: authLoading } = useAuth();
   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     // Redirect to login if not authenticated
-    if (!currentUser && !loading) {
+    if (!authLoading && !currentUser) {
       router.push('/login');
       return;
     }
@@ -28,8 +28,10 @@ export default function AccountPage() {
         setUserPreferences(prefs);
         setLoading(false);
       });
+    } else if (!authLoading) {
+      setLoading(false);
     }
-  }, [currentUser, router, loading]);
+  }, [currentUser, router, authLoading]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -42,7 +44,7 @@ export default function AccountPage() {
     }
   };
 
-  if (loading || !currentUser) {
+  if (authLoading || loading || !currentUser) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100">
         <div className="text-center">
