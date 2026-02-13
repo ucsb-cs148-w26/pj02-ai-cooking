@@ -1,6 +1,6 @@
 'use client';
 
-import { ExpirationProgressBar, getExpirationStatus } from './ExpirationProgressBar';
+import { ExpirationProgressBar } from './ExpirationProgressBar';
 import type { PantryItem } from '@/types';
 
 interface ExpirationRemindersProps {
@@ -9,21 +9,14 @@ interface ExpirationRemindersProps {
   loading?: boolean;
 }
 
-const EXPIRING_SOON_DAYS = 3;
-
-function isExpiredOrExpiringSoon(item: PantryItem): boolean {
-  const status = getExpirationStatus(item.expiration);
-  return status.status === 'expired' || status.status === 'expiring_soon';
-}
-
 export function ExpirationReminders({
   items,
   onDelete,
   loading = false,
 }: ExpirationRemindersProps) {
-  const reminderItems = items
-    .filter(isExpiredOrExpiringSoon)
-    .sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
+  const sortedItems = [...items].sort(
+    (a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime()
+  );
 
   if (loading) {
     return (
@@ -36,15 +29,12 @@ export function ExpirationReminders({
     );
   }
 
-  if (reminderItems.length === 0) {
+  if (sortedItems.length === 0) {
     return (
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl border-2 border-green-100 text-gray-900 mb-8">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-800">
-          ✅ Expiration Reminders
-        </h2>
-        <p className="text-gray-600">
-          No items expiring in the next {EXPIRING_SOON_DAYS} days. You&apos;re all set!
-        </p>
+      <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-12 text-center border-2 border-gray-200">
+        <div className="text-6xl mb-4">🥘</div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">Your pantry is empty!</h3>
+        <p className="text-gray-800">Add your first food item using the form above.</p>
       </div>
     );
   }
@@ -54,11 +44,11 @@ export function ExpirationReminders({
       <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-orange-800">
         ⏰ Expiration Reminders
         <span className="ml-2 text-sm font-normal text-orange-600">
-          ({reminderItems.length} item{reminderItems.length !== 1 ? 's' : ''} need attention)
+          ({sortedItems.length} item{sortedItems.length !== 1 ? 's' : ''})
         </span>
       </h2>
       <div className="space-y-0 divide-y divide-gray-100">
-        {reminderItems.map((item) => (
+        {sortedItems.map((item) => (
           <ExpirationProgressBar
             key={item.id}
             item={item}
