@@ -5,7 +5,6 @@ import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot } from 'fi
 import { db, useAuth } from '../lib/firebase';
 import type { PantryItem } from '../types';
 import { ExpirationReminders } from './ExpirationReminders';
-import { ExpirationProgressBar } from './ExpirationProgressBar';
 
 type AddFoodProps = {
   onAddFood?: (item: PantryItem) => void;
@@ -274,51 +273,27 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         </div>
       </div>
 
-      {/* Expiration Reminders (Dashboard) */}
-      {user && pantryItems.length > 0 && (
-        <ExpirationReminders
-          items={pantryItems}
-          onDelete={handleDelete}
-          loading={isLoadingItems}
-        />
-      )}
-
-      {/* Pantry Items Display */}
+      {/* Pantry Items with Expiration Progress */}
       <div className="mb-12 text-gray-900">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold text-gray-900">Your Pantry Items</h2>
-          <div className="text-gray-800">
-            {isLoadingItems ? 'Loading...' : `${pantryItems.length} item${pantryItems.length !== 1 ? 's' : ''}`}
-          </div>
+          {user && !isLoadingItems && (
+            <div className="text-gray-800">
+              {pantryItems.length} item{pantryItems.length !== 1 ? 's' : ''}
+            </div>
+          )}
         </div>
 
         {!user ? (
           <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-12 text-center border-2 border-gray-200">
             <p className="text-gray-800">Sign in to see and add pantry items.</p>
           </div>
-        ) : isLoadingItems ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-            <p className="mt-4 text-gray-800">Loading your pantry items...</p>
-          </div>
-        ) : pantryItems.length === 0 ? (
-          <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-12 text-center border-2 border-gray-200">
-            <div className="text-6xl mb-4">🥘</div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Your pantry is empty!</h3>
-            <p className="text-gray-800">Add your first food item using the form above.</p>
-          </div>
         ) : (
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl border-2 border-gray-100 text-gray-900">
-            <div className="divide-y divide-gray-200">
-              {pantryItems.map((item) => (
-                <ExpirationProgressBar
-                  key={item.id}
-                  item={item}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          </div>
+          <ExpirationReminders
+            items={pantryItems}
+            onDelete={handleDelete}
+            loading={isLoadingItems}
+          />
         )}
       </div>
 
