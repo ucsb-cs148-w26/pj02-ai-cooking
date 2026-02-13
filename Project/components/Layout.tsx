@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChefHat, ShoppingBag, Utensils, History, Sparkles, User } from 'lucide-react';
-import { useAuth } from '@/lib/firebase';
+import { useAuthContext } from '@/components/AuthProvider';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
   const router = useRouter();
-  const currentUser = useAuth();
+  const currentUser = useAuthContext();
 
   const handleLogin = () => {
     router.push('/login');
@@ -175,6 +175,14 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
           </div>
           <span className={`text-[10px] font-bold ${activeTab === 'recipes' ? 'text-pink-300 drop-shadow-[0_0_4px_rgba(249,168,212,0.8)]' : 'text-white'}`}>RECIPES</span>
         </button>
+
+        <Link
+          href={currentUser ? '/account' : '/login'}
+          className="flex flex-col items-center gap-1 transition-all duration-300 text-white/70 hover:text-white"
+        >
+          <User size={24} />
+          <span className="text-[10px] font-bold">ACCOUNT</span>
+        </Link>
       </nav>
     </div>
   );
