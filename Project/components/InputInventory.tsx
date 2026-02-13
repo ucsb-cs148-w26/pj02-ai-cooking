@@ -163,17 +163,44 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
+    if (!user) {
+      alert('You must be signed in to delete items.');
+      return;
+    }
+
+    if (!id) {
+      console.error('Delete failed: Item ID is missing');
+      alert('Failed to delete item: Invalid item ID.');
+      return;
+    }
+
     try {
-      await deleteDoc(doc(db, 'pantryItems', id));
+      console.log('Attempting to delete item with ID:', id);
+      const itemRef = doc(db, 'pantryItems', id);
+      await deleteDoc(itemRef);
+      
       setPantryItems(prev => {
         const updated = prev.filter(item => item.id !== id);
         if (user) savePantryFullToCache(user.uid, updated);
         return updated;
       });
       console.log('Item deleted successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting item:', error);
-      alert('Failed to delete item. Please try again.');
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to delete item. Please try again.';
+      if (error?.code === 'permission-denied') {
+        errorMessage = 'Permission denied. You may not have permission to delete this item.';
+      } else if (error?.code === 'not-found') {
+        errorMessage = 'Item not found. It may have already been deleted.';
+      } else if (error?.message) {
+        errorMessage = `Failed to delete: ${error.message}`;
+      }
+      
+      alert(errorMessage);
     }
   };
 

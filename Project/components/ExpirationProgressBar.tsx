@@ -135,11 +135,19 @@ export function ExpirationProgressBar({ item, onDelete }: ExpirationProgressBarP
             </span>
             {onDelete && (
               <button
-                onClick={() => onDelete(item.id)}
-                className="text-gray-400 hover:text-red-500 p-1 rounded-full hover:bg-red-50 transition-colors"
-                title="Delete item"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (item.id) {
+                    onDelete(item.id);
+                  } else {
+                    console.error('Cannot delete: item.id is missing', item);
+                    alert('Error: Item ID is missing. Cannot delete this item.');
+                  }
+                }}
+                className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
               >
-                🗑️
+                Delete
               </button>
             )}
           </div>
