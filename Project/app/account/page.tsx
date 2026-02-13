@@ -134,13 +134,13 @@ export default function AccountPage() {
               <div>
                 <p className="text-sm font-semibold text-gray-600">Dietary Preferences</p>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {userPreferences.dietaryRestrictions && userPreferences.dietaryRestrictions.length > 0 ? (
-                    userPreferences.dietaryRestrictions.map((restriction, index) => (
+                  {userPreferences.allergies && userPreferences.allergies.length > 0 ? (
+                    userPreferences.allergies.map((item, index) => (
                       <span 
                         key={index}
                         className="px-3 py-1 bg-white/60 rounded-full text-sm font-medium text-gray-700 border border-yellow-200"
                       >
-                        {restriction}
+                        {item}
                       </span>
                     ))
                   ) : (
