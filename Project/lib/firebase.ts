@@ -27,7 +27,7 @@ let auth: ReturnType<typeof getAuth>;
 try {
   auth = initializeAuth(app, { persistence: browserLocalPersistence });
 } catch (e) {
-  // Already initialized (e.g. hot reload)
+  // Already initialized (e.g. hot reload); getAuth returns same instance with existing persistence
   auth = getAuth(app);
 }
 export { auth };
@@ -35,7 +35,7 @@ export const db = getFirestore(app);
 
 // Delay before treating "null" as "signed out" so we don't clear state on reload
 // before Firebase has restored the user from persistence (it often fires null first, then user).
-const AUTH_NULL_DELAY_MS = 200;
+const AUTH_NULL_DELAY_MS = 400;
 
 export function useAuth(): { user: User | null; loading: boolean } {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
