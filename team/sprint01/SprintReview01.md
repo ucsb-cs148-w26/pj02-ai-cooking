@@ -1,5 +1,7 @@
 Sprint Number: sprint01
+
 Sprint Duration: 4 weeks
+
 Team Members: Yuxi Ji, Daniel Du, Krisha Soneji, Mahima Chaudhary, Andy Wang
 
 ## Sprint Goal
