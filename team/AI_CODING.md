@@ -14,3 +14,12 @@
 - To make sure the AI output was correct and understandable, I reviewed every code change, ran `npm test`, and checked that all tests passed before pushing.
 - For fair use, I treated AI output as draft code, rewrote/improved parts to fit our codebase, and avoided copy-pasting unknown external snippets without understanding them.
 - A tool pointer I would share in `help_ai`: use Cursor + Vitest together, and ask for "edge cases first" before generating tests.
+
+# Krisha:
+- I experimented with using Cursor for my subissue this week, which was to make pantry items deletable
+- I found it very useful as it was able to easily identify what part of the code needed to be changed and quickly generate code for a delete button
+- When I first created the button it did not work and kept saying “permission denied” when I clicked on it, and I was able to ask Cursor how to solve this
+- Without it, it would have been very difficult for me to identify that it was a Firebase permissions issue since I didn’t have access to the Firebase log in
+- In class I was able to fix it with my team member who manages the Firebase account
+- To ensure that the output was correct I used my previous knowledge of html/css to ensure that it created the button properly
+- I also checked the Firebase permissions and ensured that they would only alter the delete functionality
