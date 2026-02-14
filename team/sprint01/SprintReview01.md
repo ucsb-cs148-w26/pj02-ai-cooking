@@ -12,16 +12,16 @@ We had technical issues with Vercel/Firebase since only one person can have an a
 
 ## User Feedback
 - Positive Feedback:
-    Clean, colorful, vibrant UI
-    Login and onboarding pages look good
-    Simple and beginner-friendly interface
+    Clean, colorful, vibrant UI,
+    Login and onboarding pages look good,
+    Simple and beginner-friendly interface,
     Clear categories and layout
 - Concerns:
-    Background gradients are distracting or cause lag
-    Text readability could be improved
-    UI feels like a form or social media app instead of food-related
-    Too many steps or pages for recipe generation
-    Onboarding may feel too long
+    Background gradients are distracting or cause lag,
+    Text readability could be improved,
+    UI feels like a form or social media app instead of food-related,
+    Too many steps or pages for recipe generation,
+    Onboarding may feel too long,
     Manual data entry takes too much time
 
 ## Key Learnings
