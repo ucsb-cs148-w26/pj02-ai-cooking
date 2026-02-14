@@ -23,3 +23,21 @@
 - In class I was able to fix it with my team member who manages the Firebase account
 - To ensure that the output was correct I used my previous knowledge of html/css to ensure that it created the button properly
 - I also checked the Firebase permissions and ensured that they would only alter the delete functionality
+
+## Yuxi: Expiration Progress Bar (Gradescope-style)
+
+**AI Tool Utilized:** Cursor (AI-first IDE with built-in code generation and editing)
+
+**Outcomes Produced:**
+- Created `ExpirationProgressBar.tsx` component with Gradescope-style visual design
+- Horizontal progress bar showing timeline from item creation to expiration
+- Status indicators (Fresh / Expiring Soon / Expired) with colored dots and "X days, Y hours left" countdown
+- Integrated `ExpirationReminders` dashboard section and refactored pantry list to use progress bars for all items
+
+**Reflections:**
+
+*Usefulness:* The AI was very effective for rapid prototyping. Providing a reference image (Gradescope UI) and acceptance criteria allowed it to generate a working component structure quickly. It handled Tailwind CSS styling, date calculations, and React patterns without manual scaffolding. For future work, this tool could speed up UI component creation, especially when clear design references exist.
+
+*Correctness & Fair Use:* I reviewed all generated code before committing. Steps taken: (1) Ran the dev server to verify the progress bar renders correctly; (2) Checked date logic for edge cases (expired items, missing `createdAt`); (3) Ensured no hardcoded secrets or improper dependencies. The AI output required minor fixes (e.g., fallback for missing `createdAt`). The design was inspired by Gradescope’s layout but implemented from scratch with our own data and styling—no direct copying of proprietary code.
+
+**Useful Tool Pointer:** [Cursor](https://cursor.com) — AI-assisted IDE that integrates chat and inline edits with your codebase; strong for iterative UI and component development.
