@@ -1,3 +1,7 @@
+# AI Coding Experiments
+
+This document records individual team members' "Coding with AI" experiments for the PantryPal project.
+
 ## Mahima:
 - I experimented with using Cursor for my sub-issue this week. My sub-issue was to make pantry items persist across page reloads and keep user state. 
 - Cursor was very useful. I liked that it could see all the project files without me having to uploading files each time, which made it easier to fix cross-file behavior.
