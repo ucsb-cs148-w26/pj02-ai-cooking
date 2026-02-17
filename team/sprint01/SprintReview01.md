@@ -50,6 +50,8 @@ The primary objective of this sprint was to deliver an MVP with our main feature
 ## Key Learnings
 We learned how to work together as a team better and communicate more effectively. We also overcame a lot of technical obstacles that we weren’t used to. For example, a lot of our team members haven't used our tech stack before so it took some getting used to. We are more prepared to take on our next sprint!
 
+---
+
 ## Next Sprint Focus
 
 - **UI refinement:** Improve the visual design so it feels more like a food app, addressing feedback on gradients, readability, and overall tone.
