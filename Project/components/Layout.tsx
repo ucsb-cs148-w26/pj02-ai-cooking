@@ -1,10 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChefHat, ShoppingBag, Utensils, History, Sparkles, User } from 'lucide-react';
+import { ChefHat, ShoppingBag, Utensils, History, Sparkles, User, Calendar } from 'lucide-react';
 import { useAuthContext } from '@/components/AuthProvider';
+import { ExpirationCalendar } from '@/components/ExpirationCalendar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,7 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange }) => {
   const router = useRouter();
   const currentUser = useAuthContext();
+  const [calendarOpen, setCalendarOpen] = useState(false);
 
   const handleLogin = () => {
     router.push('/login');
@@ -88,8 +90,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
           </button>
         </nav>
       
-        {/* Auth: Account circle when logged in, else Log In / Sign Up */}
+        {/* Calendar (left of Account) + Auth */}
         <div className="relative flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => setCalendarOpen(true)}
+            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 border-2 border-white/40"
+            title="Expiration Calendar"
+          >
+            <Calendar size={22} className="text-white" />
+          </button>
           {currentUser ? (
             <Link
               href="/account"
@@ -117,6 +127,21 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
           )}
         </div>
       </header>
+
+      {/* Expiration Calendar modal */}
+      {calendarOpen && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
+          onClick={() => setCalendarOpen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Expiration calendar"
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <ExpirationCalendar onClose={() => setCalendarOpen(false)} />
+          </div>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <main className="relative max-w-4xl mx-auto p-4 md:p-8 z-10">
