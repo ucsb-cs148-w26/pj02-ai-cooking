@@ -44,11 +44,9 @@ function deriveExpirationFromEstimate(expiryEstimate?: string): string {
   }
   const s = expiryEstimate.trim().toLowerCase();
 
-  // Already a date (YYYY-MM-DD)
   const dateMatch = s.match(/^\d{4}-\d{2}-\d{2}$/);
   if (dateMatch) return s;
 
-  // Relative: "3 days", "1 week", "2 weeks"
   const daysMatch = s.match(/(\d+)\s*days?/);
   if (daysMatch) {
     const d = new Date();
@@ -62,7 +60,6 @@ function deriveExpirationFromEstimate(expiryEstimate?: string): string {
     return d.toISOString().split('T')[0];
   }
 
-  // Default: 7 days
   const d = new Date();
   d.setDate(d.getDate() + 7);
   return d.toISOString().split('T')[0];
@@ -83,6 +80,7 @@ export default function Home() {
     const fetchPantryItems = async () => {
       if (uid) {
         previousUserIdRef.current = uid;
+        // Show cached pantry immediately so reload doesn't flash empty
         const cached = loadPantryFromCache(uid);
         if (cached.length > 0) setPantryItems(cached);
         setLoadingPantry(true);
@@ -111,6 +109,7 @@ export default function Home() {
           setLoadingPantry(false);
         }
       } else {
+        // Only clear pantry when user actually signed out (we had a user before), not on initial null
         if (previousUserIdRef.current !== null) {
           previousUserIdRef.current = null;
           setPantryItems([]);
@@ -176,7 +175,7 @@ export default function Home() {
           <ScanAnalyzer onAddItems={handleAddScanItems} />
         </div>
       )}
-
+      
       {activeTab === 'pantry' && (
         <>
           {authLoading || loadingPantry ? (
@@ -186,7 +185,7 @@ export default function Home() {
           )}
         </>
       )}
-
+      
       {activeTab === 'recipes' && (
         <div className="space-y-6">
           <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl text-gray-900">
@@ -199,3 +198,5 @@ export default function Home() {
     </Layout>
   );
 }
+
+
