@@ -1,15 +1,21 @@
-# Retrospective your-nr-goes-here, date-goes-here 
+# Retrospective 18, Feb 2026
 
-* Led by: name-goes-here
-* Present: name1, name2, ... , nameN
-* Absent: name1, name2, ...
+* Led by: Yuxi Ji
+* Present: Yuxi Ji, Daniel Du, Krisha Soneji, Mahima Chaudhary, Andy Wang
+* Absent: none
 
-## Action item
+## Action Item
 
-* a goal: identify something the team wants to get better at
-* a change: identify one thing that the team will change about how it works together
-* a measurement: identify at least one way to measure whether the change helped the team acheive the goal, or move closer to it.
+* **A goal:** Improve how we work together on overlapping files and reduce merge conflicts, while making the app feel more like a food app based on user feedback.
+
+* **A change:** We will establish a clearer merge and branching strategy before the next sprint (e.g., smaller feature branches, more frequent syncs with main, and clearer ownership of files). We will also document the deployment setup (Vercel env vars, Firebase config) so other team members can troubleshoot if needed.
+
+* **A measurement:** 
+  - Fewer merge conflicts in the next sprint compared to sprint 01.
+  - At least one piece of user feedback that the app “feels more food-related” after our UI changes.
 
 ## Optional
 
-* Record anything else you think the team might want to remember from this retro
+* Sprint 01 MVP delivered all core features (manual entry, login/signup, AI scanning, recipe generation, expiration progress bar, account page). The main pain points were deployment setup and merge conflicts.
+* User feedback was mostly positive on UI clarity and onboarding, but concerns about gradients, readability, recipe flow length, and onboarding length will guide our next sprint.
+* Communities / recipe sharing is a stretch goal for the next sprint if time permits.
