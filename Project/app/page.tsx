@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/firebase';
 import { ChefHat, Camera, ShoppingBag, BookOpen } from 'lucide-react';
-import { Playfair_Display, Josefin_Sans } from 'next/font/google';
+import { Playfair_Display, Roboto } from 'next/font/google';
 
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
-const josefin = Josefin_Sans({ subsets: ['latin'], variable: '--font-josefin' });
+const roboto = Roboto({ weight: ['400', '500', '700'], subsets: ['latin'], variable: '--font-roboto' });
 
 // Palette: C97064, 515B3A, ECDCC9, CF9D8C, 33658A
 const colors = {
@@ -32,7 +32,7 @@ export default function LandingPage() {
   if (loading) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${josefin.className}`}
+        className={`min-h-screen flex items-center justify-center ${roboto.className}`}
         style={{ backgroundColor: colors.cream }}
       >
         <div className="text-center">
@@ -52,7 +52,7 @@ export default function LandingPage() {
 
   return (
     <div
-      className={`min-h-screen relative overflow-hidden ${playfair.variable} ${josefin.variable}`}
+      className={`min-h-screen relative overflow-hidden ${playfair.variable} ${roboto.variable}`}
       style={{ backgroundColor: colors.cream }}
     >
       {/* Header */}
@@ -62,7 +62,7 @@ export default function LandingPage() {
             <ChefHat size={32} style={{ color: colors.terracotta }} />
             PantryPal
           </div>
-          <nav className={`flex gap-3 ${josefin.className}`}>
+          <nav className={`flex gap-3 ${roboto.className}`}>
             <Link
               href="/login"
               className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors"
@@ -92,7 +92,7 @@ export default function LandingPage() {
               Your smart cooking companion
             </h1>
             <p
-              className={`text-lg md:text-xl mb-10 max-w-xl mx-auto opacity-90 ${josefin.className}`}
+              className={`text-lg md:text-xl mb-10 max-w-xl mx-auto opacity-90 ${roboto.className}`}
               style={{ color: colors.olive }}
             >
               Transform your pantry into delicious meals. Scan, organize, and discover recipes with PantryPal.
@@ -100,14 +100,14 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 href="/signup"
-                className={`w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white rounded-lg text-center transition-opacity hover:opacity-90 ${josefin.className}`}
+                className={`w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white rounded-lg text-center transition-opacity hover:opacity-90 ${roboto.className}`}
                 style={{ backgroundColor: colors.terracotta }}
               >
                 Get started free
               </Link>
               <Link
                 href="/login"
-                className={`w-full sm:w-auto px-8 py-4 text-lg font-medium rounded-lg text-center border-2 transition-colors ${josefin.className}`}
+                className={`w-full sm:w-auto px-8 py-4 text-lg font-medium rounded-lg text-center border-2 transition-colors ${roboto.className}`}
                 style={{ color: colors.steelBlue, borderColor: colors.steelBlue }}
               >
                 Sign in
@@ -116,7 +116,7 @@ export default function LandingPage() {
           </section>
 
           {/* Features */}
-          <section className={`grid md:grid-cols-3 gap-6 md:gap-8 ${josefin.className}`}>
+          <section className={`grid md:grid-cols-3 gap-6 md:gap-8 ${roboto.className}`}>
             <div
               className="rounded-2xl p-6 md:p-8 border border-[#CF9D8C]/40"
               style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}
@@ -179,7 +179,7 @@ export default function LandingPage() {
             </h2>
             <Link
               href="/signup"
-              className={`inline-block px-8 py-4 text-lg font-semibold text-white rounded-lg transition-opacity hover:opacity-90 ${josefin.className}`}
+              className={`inline-block px-8 py-4 text-lg font-semibold text-white rounded-lg transition-opacity hover:opacity-90 ${roboto.className}`}
               style={{ backgroundColor: colors.terracotta }}
             >
               Start your free account
