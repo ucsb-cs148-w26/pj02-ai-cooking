@@ -4,7 +4,16 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/firebase';
-import { ChefHat, Sparkles, Utensils, ShoppingBag, History, Zap, Camera, BookOpen } from 'lucide-react';
+import { ChefHat, Camera, ShoppingBag, BookOpen } from 'lucide-react';
+
+// Palette: C97064, 515B3A, ECDCC9, CF9D8C, 33658A
+const colors = {
+  terracotta: '#C97064',
+  olive: '#515B3A',
+  cream: '#ECDCC9',
+  dustyRose: '#CF9D8C',
+  steelBlue: '#33658A',
+};
 
 export default function LandingPage() {
   const { user, loading } = useAuth();
@@ -18,162 +27,160 @@ export default function LandingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100">
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: colors.cream }}
+      >
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto mb-4"
+            style={{ borderColor: colors.terracotta }}
+          />
+          <p style={{ color: colors.olive }}>Loading...</p>
         </div>
       </div>
     );
   }
 
   if (user) {
-    return null; // Will redirect
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-blue-400 to-purple-500 opacity-20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-pink-400 to-red-400 opacity-15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-gradient-to-br from-green-300 to-teal-400 opacity-15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
-      </div>
-
+    <div
+      className="min-h-screen relative overflow-hidden"
+      style={{ backgroundColor: colors.cream }}
+    >
       {/* Header */}
       <header className="relative z-10 px-6 py-6 md:px-12 md:py-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3 font-bold text-2xl md:text-3xl tracking-tight group">
-            <div className="relative">
-              <ChefHat size={40} className="text-purple-600 drop-shadow-lg transform group-hover:rotate-12 transition-transform duration-300" />
-              <Sparkles size={20} className="absolute -top-1 -right-1 text-yellow-400 animate-pulse" />
-            </div>
-            <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-              PantryPal
-            </span>
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3 font-semibold text-xl md:text-2xl tracking-tight" style={{ color: colors.olive }}>
+            <ChefHat size={32} style={{ color: colors.terracotta }} />
+            PantryPal
           </div>
-          <div className="flex gap-4">
+          <nav className="flex gap-3">
             <Link
               href="/login"
-              className="px-5 py-2.5 text-sm font-medium text-purple-600 hover:text-purple-700 transition-all duration-300 hover:scale-105 border-2 border-purple-300 rounded-full hover:border-purple-400 hover:bg-purple-50"
+              className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors"
+              style={{ color: colors.steelBlue, backgroundColor: 'transparent' }}
             >
               Log In
             </Link>
             <Link
               href="/signup"
-              className="px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white rounded-full hover:shadow-lg transition-all duration-300 hover:scale-110"
+              className="px-5 py-2.5 text-sm font-semibold text-white rounded-lg transition-opacity hover:opacity-90"
+              style={{ backgroundColor: colors.terracotta }}
             >
               Sign Up
             </Link>
-          </div>
+          </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="relative z-10 px-6 md:px-12 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-              Your Smart Cooking Companion
+      {/* Hero */}
+      <main className="relative z-10 px-6 md:px-12 pt-8 pb-16 md:pt-12 md:pb-24">
+        <div className="max-w-5xl mx-auto">
+          <section className="text-center mb-16 md:mb-24">
+            <h1
+              className="text-4xl md:text-5xl font-bold mb-4 tracking-tight max-w-2xl mx-auto leading-tight"
+              style={{ color: colors.olive }}
+            >
+              Your smart cooking companion
             </h1>
-            <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto">
-              Transform your pantry into delicious meals. Scan, organize, and discover recipes with AI-powered PantryPal.
+            <p
+              className="text-lg md:text-xl mb-10 max-w-xl mx-auto opacity-90"
+              style={{ color: colors.olive }}
+            >
+              Transform your pantry into delicious meals. Scan, organize, and discover recipes with PantryPal.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 href="/signup"
-                className="px-8 py-4 text-lg font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white rounded-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 transform"
+                className="w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white rounded-lg text-center transition-opacity hover:opacity-90"
+                style={{ backgroundColor: colors.terracotta }}
               >
-                Get Started Free
+                Get started free
               </Link>
               <Link
                 href="/login"
-                className="px-8 py-4 text-lg font-semibold bg-white/80 backdrop-blur-lg text-purple-600 rounded-xl border-2 border-purple-300 hover:border-purple-400 hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="w-full sm:w-auto px-8 py-4 text-lg font-medium rounded-lg text-center border-2 transition-colors"
+                style={{ color: colors.steelBlue, borderColor: colors.steelBlue }}
               >
-                Sign In
+                Sign in
               </Link>
             </div>
-          </div>
+          </section>
 
-          {/* Features Grid */}
-          <div className="grid md:grid-cols-3 gap-8 mt-20">
-            <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl border-2 border-purple-200 hover:border-purple-400 transition-all duration-300 hover:scale-105">
-              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mb-4">
-                <Camera size={32} className="text-white" />
+          {/* Features */}
+          <section className="grid md:grid-cols-3 gap-6 md:gap-8">
+            <div
+              className="rounded-2xl p-6 md:p-8 border border-[#CF9D8C]/40"
+              style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: colors.dustyRose }}
+              >
+                <Camera size={24} style={{ color: colors.olive }} />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Smart Scanning</h3>
-              <p className="text-gray-600">
-                Upload photos of receipts or your fridge. Our AI automatically identifies and adds items to your pantry.
+              <h3 className="text-xl font-semibold mb-2" style={{ color: colors.olive }}>
+                Smart scanning
+              </h3>
+              <p className="text-sm leading-relaxed opacity-90" style={{ color: colors.olive }}>
+                Upload photos of receipts or your fridge. AI identifies and adds items to your pantry.
               </p>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl border-2 border-green-200 hover:border-green-400 transition-all duration-300 hover:scale-105">
-              <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-teal-500 rounded-2xl flex items-center justify-center mb-4">
-                <ShoppingBag size={32} className="text-white" />
+            <div
+              className="rounded-2xl p-6 md:p-8 border border-[#CF9D8C]/40"
+              style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: colors.steelBlue }}
+              >
+                <ShoppingBag size={24} className="text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">Organized Pantry</h3>
-              <p className="text-gray-600">
-                Keep track of expiration dates, quantities, and categories. Never waste food again with smart organization.
+              <h3 className="text-xl font-semibold mb-2" style={{ color: colors.olive }}>
+                Organized pantry
+              </h3>
+              <p className="text-sm leading-relaxed opacity-90" style={{ color: colors.olive }}>
+                Track expiration dates, quantities, and categories. Waste less and cook more.
               </p>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl border-2 border-pink-200 hover:border-pink-400 transition-all duration-300 hover:scale-105">
-              <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-500 rounded-2xl flex items-center justify-center mb-4">
-                <BookOpen size={32} className="text-white" />
+            <div
+              className="rounded-2xl p-6 md:p-8 border border-[#CF9D8C]/40"
+              style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}
+            >
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                style={{ backgroundColor: colors.terracotta }}
+              >
+                <BookOpen size={24} className="text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-3">AI Recipes</h3>
-              <p className="text-gray-600">
-                Generate personalized recipes based on what's in your pantry. Get cooking suggestions tailored to your preferences.
+              <h3 className="text-xl font-semibold mb-2" style={{ color: colors.olive }}>
+                AI recipes
+              </h3>
+              <p className="text-sm leading-relaxed opacity-90" style={{ color: colors.olive }}>
+                Get personalized recipe suggestions based on what’s in your pantry.
               </p>
             </div>
-          </div>
+          </section>
 
-          {/* How It Works */}
-          <div className="mt-20 bg-white/60 backdrop-blur-lg rounded-3xl p-8 md:p-12 shadow-2xl border-2 border-purple-200">
-            <h2 className="text-4xl font-bold text-center mb-12 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-              How It Works
+          {/* CTA */}
+          <section className="mt-16 md:mt-24 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: colors.olive }}>
+              Ready to cook smarter?
             </h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-3xl font-bold">
-                  1
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Sign Up</h3>
-                <p className="text-gray-600">Create your free account and set your dietary preferences</p>
-              </div>
-              <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-pink-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-3xl font-bold">
-                  2
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Add Items</h3>
-                <p className="text-gray-600">Scan receipts or manually add items to your digital pantry</p>
-              </div>
-              <div className="text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-3xl font-bold">
-                  3
-                </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Cook & Enjoy</h3>
-                <p className="text-gray-600">Get AI-powered recipe suggestions and start cooking!</p>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA Section */}
-          <div className="mt-20 text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-              Ready to Transform Your Cooking?
-            </h2>
-            <p className="text-xl text-gray-700 mb-8">
-              Join thousands of users who are cooking smarter with PantryPal
-            </p>
             <Link
               href="/signup"
-              className="inline-block px-10 py-5 text-xl font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white rounded-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 transform"
+              className="inline-block px-8 py-4 text-lg font-semibold text-white rounded-lg transition-opacity hover:opacity-90"
+              style={{ backgroundColor: colors.terracotta }}
             >
-              Start Your Free Account
+              Start your free account
             </Link>
-          </div>
+          </section>
         </div>
       </main>
     </div>
