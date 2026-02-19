@@ -178,10 +178,10 @@ export default function AccountPage() {
 
         {/* Back to Home */}
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push('/dashboard')}
           className="w-full py-3 px-6 bg-white/60 backdrop-blur-sm text-gray-700 font-semibold rounded-2xl hover:bg-white/80 transition-all border-2 border-gray-200"
         >
-          Back to Home
+          Back to Dashboard
         </button>
       </div>
     </div>

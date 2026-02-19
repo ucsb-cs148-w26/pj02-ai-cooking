@@ -55,7 +55,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     if (currentUser && preferences.onboardingComplete) {
-      router.push('/');
+      router.push('/dashboard');
     }
   }, [currentUser, preferences.onboardingComplete, router]);
 
@@ -76,7 +76,7 @@ export default function OnboardingPage() {
   const handleSkip = async () => {
     if (currentUser?.uid) {
       await markOnboardingComplete(currentUser.uid);
-      router.push('/');
+      router.push('/dashboard');
     }
   };
 
@@ -102,7 +102,7 @@ export default function OnboardingPage() {
 
     await saveUserPreferences(currentUser.uid, finalPreferences);
     await markOnboardingComplete(currentUser.uid);
-    router.push('/');
+    router.push('/dashboard');
   };
 
   const toggleAllergy = (allergen: string) => {
