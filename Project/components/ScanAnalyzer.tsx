@@ -4,6 +4,14 @@ import { useState } from 'react';
 import type { Ingredient, ScanMode } from '../types';
 import { analyzeImage } from '../services/geminiService';
 
+const colors = {
+  terracotta: '#C97064',
+  olive: '#515B3A',
+  cream: '#ECDCC9',
+  dustyRose: '#CF9D8C',
+  steelBlue: '#33658A',
+};
+
 const formatIngredient = (item: Ingredient) => {
   const details = [item.quantity, item.category, item.expiryEstimate]
     .filter(Boolean)
@@ -64,26 +72,31 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 className="text-2xl font-bold">Scan Image</h2>
+      <div
+        className="rounded-2xl p-6 space-y-4 border"
+        style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '40' }}
+      >
+        <h2 className="text-2xl font-bold" style={{ color: colors.olive }}>Scan Image</h2>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => setMode('food')}
-            className={`px-4 py-2 rounded-full border-2 ${
+            className="px-4 py-2 rounded-full border-2 text-sm font-medium transition-all"
+            style={
               mode === 'food'
-                ? 'bg-green-500 text-white border-green-500'
-                : 'bg-white text-gray-900 border-gray-200'
-            }`}
+                ? { backgroundColor: colors.terracotta, color: '#fff', borderColor: colors.terracotta }
+                : { backgroundColor: 'rgba(255,255,255,0.5)', color: colors.olive, borderColor: colors.dustyRose + '60' }
+            }
           >
             Fridge / Food Items
           </button>
           <button
             onClick={() => setMode('receipt')}
-            className={`px-4 py-2 rounded-full border-2 ${
+            className="px-4 py-2 rounded-full border-2 text-sm font-medium transition-all"
+            style={
               mode === 'receipt'
-                ? 'bg-orange-500 text-white border-orange-500'
-                : 'bg-white text-gray-900 border-gray-200'
-            }`}
+                ? { backgroundColor: colors.steelBlue, color: '#fff', borderColor: colors.steelBlue }
+                : { backgroundColor: 'rgba(255,255,255,0.5)', color: colors.olive, borderColor: colors.dustyRose + '60' }
+            }
           >
             Receipt
           </button>
@@ -92,27 +105,32 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
           type="file"
           accept="image/*"
           onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
-          className="w-full text-gray-900"
+          style={{ color: colors.olive }}
+          className="w-full"
         />
         {imageData && (
           <img src={imageData} alt="Uploaded preview" className="w-full rounded-xl" />
         )}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm" style={{ color: colors.terracotta }}>{error}</p>}
         <button
           onClick={handleAnalyze}
           disabled={loading}
-          className="w-full px-6 py-3 bg-gradient-to-r from-green-500 to-cyan-500 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-60"
+          className="w-full px-6 py-3 text-white font-semibold rounded-lg transition-opacity hover:opacity-90 disabled:opacity-60"
+          style={{ backgroundColor: colors.dustyRose }}
         >
           {loading ? 'Analyzing...' : 'Analyze Image'}
         </button>
       </div>
 
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-3 text-gray-900">
-        <h3 className="text-xl font-bold text-gray-900">Detected Items</h3>
+      <div
+        className="rounded-2xl p-6 space-y-3 border"
+        style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '40' }}
+      >
+        <h3 className="text-xl font-bold" style={{ color: colors.olive }}>Detected Items</h3>
         {items.length === 0 ? (
-          <p className="text-gray-700">No results yet.</p>
+          <p style={{ color: colors.olive, opacity: 0.7 }}>No results yet.</p>
         ) : (
-          <ul className="list-disc list-inside text-gray-800">
+          <ul className="list-disc list-inside" style={{ color: colors.olive }}>
             {items.map((item, idx) => (
               <li key={`${item.name}-${idx}`}>{formatIngredient(item)}</li>
             ))}

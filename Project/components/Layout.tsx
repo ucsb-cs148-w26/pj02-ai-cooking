@@ -3,9 +3,39 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChefHat, ShoppingBag, Utensils, History, Sparkles, User, Calendar } from 'lucide-react';
+import { ChefHat, ShoppingBag, Utensils, History, User, Calendar, Apple, Carrot, Wheat, Leaf, Cherry, UtensilsCrossed, Coffee } from 'lucide-react';
 import { useAuthContext } from '@/components/AuthProvider';
 import { ExpirationCalendar } from '@/components/ExpirationCalendar';
+
+const colors = {
+  terracotta: '#C97064',
+  olive: '#515B3A',
+  cream: '#ECDCC9',
+  dustyRose: '#CF9D8C',
+  steelBlue: '#33658A',
+};
+
+const bgIcons = [
+  // Top row
+  { Icon: UtensilsCrossed, top: '5%', left: '6%', size: 40, color: colors.dustyRose },
+  { Icon: Apple, top: '4%', left: '30%', size: 38, color: colors.terracotta },
+  { Icon: Wheat, top: '6%', right: '30%', size: 36, color: colors.steelBlue },
+  { Icon: Cherry, top: '3%', right: '6%', size: 40, color: colors.olive },
+  // Upper-mid
+  { Icon: Coffee, top: '22%', left: '3%', size: 32, color: colors.olive },
+  { Icon: Leaf, top: '20%', right: '4%', size: 34, color: colors.terracotta },
+  // Mid
+  { Icon: Carrot, top: '40%', left: '5%', size: 36, color: colors.steelBlue },
+  { Icon: UtensilsCrossed, top: '42%', right: '3%', size: 34, color: colors.dustyRose },
+  // Lower-mid
+  { Icon: Apple, top: '60%', left: '4%', size: 34, color: colors.dustyRose },
+  { Icon: Wheat, top: '62%', right: '5%', size: 36, color: colors.olive },
+  // Bottom row
+  { Icon: Leaf, bottom: '6%', left: '6%', size: 38, color: colors.terracotta },
+  { Icon: Carrot, bottom: '5%', left: '30%', size: 36, color: colors.olive },
+  { Icon: Coffee, bottom: '7%', right: '30%', size: 34, color: colors.steelBlue },
+  { Icon: UtensilsCrossed, bottom: '4%', right: '6%', size: 40, color: colors.dustyRose },
+];
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -18,120 +48,100 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
   const currentUser = useAuthContext();
   const [calendarOpen, setCalendarOpen] = useState(false);
 
-  const handleLogin = () => {
-    router.push('/login');
-  };
+  const handleLogin = () => router.push('/login');
+  const handleSignUp = () => router.push('/signup');
 
-  const handleSignUp = () => {
-    router.push('/signup');
-  };
+  const navItems = [
+    { key: 'scan', label: 'Scan', Icon: Utensils },
+    { key: 'pantry', label: 'Pantry', Icon: ShoppingBag },
+    { key: 'recipes', label: 'Recipes', Icon: History },
+  ];
 
   return (
-    <div className="min-h-screen pb-20 md:pb-0 md:pt-16 bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 relative overflow-hidden">
-      {/* Animated Colorful Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-blue-400 to-purple-500 opacity-20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-pink-400 to-red-400 opacity-15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-        <div className="absolute top-1/4 right-1/4 w-[300px] h-[300px] bg-gradient-to-br from-green-300 to-teal-400 opacity-15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1.5s'}}></div>
+    <div className="min-h-screen pb-20 md:pb-0 md:pt-16 relative overflow-hidden" style={{ backgroundColor: colors.cream }}>
+      {/* Background food icons */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+        {bgIcons.map(({ Icon, color, size, ...pos }, i) => (
+          <div key={i} className="absolute opacity-25" style={{ ...pos, color }}>
+            <Icon size={size} strokeWidth={1.5} />
+          </div>
+        ))}
       </div>
 
-      {/* Desktop Header - Solid Blue */}
-      <header className="hidden md:flex fixed top-0 w-full h-16 bg-blue-600 backdrop-blur-xl border-b border-white/30 px-8 items-center justify-between z-50 text-white shadow-2xl">
-        
-        <div className="relative flex items-center gap-3 font-bold text-xl tracking-tight group">
-          <div className="relative">
-            <ChefHat size={32} className="text-yellow-300 drop-shadow-[0_0_12px_rgba(253,224,71,0.8)] transform group-hover:rotate-12 transition-transform duration-300" />
-            <Sparkles size={16} className="absolute -top-1 -right-1 text-yellow-300 animate-pulse" />
-          </div>
-          <span className="bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent drop-shadow-lg">
-            PantryPal
-          </span>
+      {/* Desktop Header */}
+      <header
+        className="hidden md:flex fixed top-0 w-full h-16 px-8 items-center justify-between z-50 border-b"
+        style={{ backgroundColor: colors.olive, borderColor: colors.dustyRose + '40' }}
+      >
+        <div className="flex items-center gap-3 font-bold text-xl tracking-tight" style={{ fontFamily: 'var(--font-playfair)', color: colors.cream }}>
+          <ChefHat size={30} style={{ color: colors.dustyRose }} />
+          PantryPal
         </div>
-        
-        <nav className="relative flex gap-6">
-          <button 
-            onClick={() => onTabChange('scan')}
-            className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 ${
-              activeTab === 'scan' 
-                ? 'bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white font-bold shadow-[0_0_25px_rgba(251,191,36,0.7)] scale-105' 
-                : 'text-white/80 hover:text-white hover:bg-white/20 hover:scale-105'
-            }`}
-          >
-            <Utensils size={20} className={activeTab === 'scan' ? 'animate-bounce' : ''} />
-            <span>Scan</span>
-            {activeTab === 'scan' && <div className="absolute inset-0 rounded-full bg-yellow-300 opacity-30 blur-xl"></div>}
-          </button>
-          
-          <button 
-            onClick={() => onTabChange('pantry')}
-            className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 ${
-              activeTab === 'pantry' 
-                ? 'bg-gradient-to-r from-green-400 via-teal-400 to-cyan-400 text-white font-bold shadow-[0_0_25px_rgba(52,211,153,0.7)] scale-105' 
-                : 'text-white/80 hover:text-white hover:bg-white/20 hover:scale-105'
-            }`}
-          >
-            <ShoppingBag size={20} className={activeTab === 'pantry' ? 'animate-bounce' : ''} />
-            <span>Pantry</span>
-            {activeTab === 'pantry' && <div className="absolute inset-0 rounded-full bg-green-300 opacity-30 blur-xl"></div>}
-          </button>
-          
-          <button 
-            onClick={() => onTabChange('recipes')}
-            className={`relative flex items-center gap-2 px-5 py-2.5 rounded-full transition-all duration-300 ${
-              activeTab === 'recipes' 
-                ? 'bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 text-white font-bold shadow-[0_0_25px_rgba(236,72,153,0.7)] scale-105' 
-                : 'text-white/80 hover:text-white hover:bg-white/20 hover:scale-105'
-            }`}
-          >
-            <History size={20} className={activeTab === 'recipes' ? 'animate-bounce' : ''} />
-            <span>Recipes</span>
-            {activeTab === 'recipes' && <div className="absolute inset-0 rounded-full bg-pink-300 opacity-30 blur-xl"></div>}
-          </button>
+
+        <nav className="flex gap-2">
+          {navItems.map(({ key, label, Icon }) => (
+            <button
+              key={key}
+              onClick={() => onTabChange(key)}
+              className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+              style={
+                activeTab === key
+                  ? { backgroundColor: colors.terracotta, color: '#fff' }
+                  : { color: colors.cream + 'cc', backgroundColor: 'transparent' }
+              }
+              onMouseEnter={(e) => { if (activeTab !== key) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)'; }}
+              onMouseLeave={(e) => { if (activeTab !== key) e.currentTarget.style.backgroundColor = 'transparent'; }}
+            >
+              <Icon size={18} />
+              {label}
+            </button>
+          ))}
         </nav>
-      
-        {/* Calendar (left of Account) + Auth */}
-        <div className="relative flex items-center gap-4">
+
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => setCalendarOpen(true)}
-            className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 border-2 border-white/40"
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+            style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
             title="Expiration Calendar"
           >
-            <Calendar size={22} className="text-white" />
+            <Calendar size={20} />
           </button>
           {currentUser ? (
             <Link
               href="/account"
-              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all duration-300 hover:scale-110 border-2 border-white/40"
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+              style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
               title="Account"
             >
-              <User size={22} className="text-white" />
+              <User size={20} />
             </Link>
           ) : (
             <>
-              <button 
+              <button
                 onClick={handleLogin}
-                className="px-5 py-2 text-sm font-medium text-white hover:text-yellow-300 transition-all duration-300 hover:scale-105 border-2 border-white/30 rounded-full hover:border-yellow-300/60 hover:bg-white/10 hover:shadow-[0_0_15px_rgba(253,224,71,0.5)]"
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+                style={{ color: colors.cream, border: `1px solid ${colors.cream}40` }}
               >
                 Log In
               </button>
-              <button 
+              <button
                 onClick={handleSignUp}
-                className="relative px-6 py-2.5 text-sm font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white rounded-full hover:shadow-[0_0_30px_rgba(251,191,36,0.8)] transition-all duration-300 hover:scale-110 transform"
+                className="px-5 py-2 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
+                style={{ backgroundColor: colors.terracotta, color: '#fff' }}
               >
-                <span className="relative z-10">Sign Up</span>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-400 via-pink-400 to-yellow-400 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
+                Sign Up
               </button>
             </>
           )}
         </div>
       </header>
 
-      {/* Expiration Calendar modal */}
+      {/* Calendar modal */}
       {calendarOpen && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40"
           onClick={() => setCalendarOpen(false)}
           role="dialog"
           aria-modal="true"
@@ -143,70 +153,34 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
         </div>
       )}
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <main className="relative max-w-4xl mx-auto p-4 md:p-8 z-10">
         {children}
       </main>
 
-      {/* Mobile Bottom Navigation - Colorful Glassmorphism */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full h-16 bg-gradient-to-r from-purple-500/80 via-pink-500/80 to-orange-500/80 backdrop-blur-xl border-t border-white/30 flex items-center justify-around z-50 shadow-[0_-8px_20px_-4px_rgba(168,85,247,0.4)]">
-        <button 
-          onClick={() => onTabChange('scan')}
-          className={`flex flex-col items-center gap-1 transition-all duration-300 ${
-            activeTab === 'scan' 
-              ? 'text-yellow-300 scale-110' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <div className={`relative ${activeTab === 'scan' ? 'animate-bounce' : ''}`}>
-            <Utensils size={24} className={activeTab === 'scan' ? 'fill-yellow-300/20 drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]' : ''} />
-            {activeTab === 'scan' && (
-              <div className="absolute inset-0 bg-yellow-300 opacity-30 blur-lg rounded-full"></div>
-            )}
-          </div>
-          <span className={`text-[10px] font-bold ${activeTab === 'scan' ? 'text-yellow-300 drop-shadow-[0_0_4px_rgba(253,224,71,0.8)]' : 'text-white'}`}>SCAN</span>
-        </button>
-        
-        <button 
-          onClick={() => onTabChange('pantry')}
-          className={`flex flex-col items-center gap-1 transition-all duration-300 ${
-            activeTab === 'pantry' 
-              ? 'text-green-300 scale-110' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <div className={`relative ${activeTab === 'pantry' ? 'animate-bounce' : ''}`}>
-            <ShoppingBag size={24} className={activeTab === 'pantry' ? 'fill-green-300/20 drop-shadow-[0_0_8px_rgba(134,239,172,0.8)]' : ''} />
-            {activeTab === 'pantry' && (
-              <div className="absolute inset-0 bg-green-300 opacity-30 blur-lg rounded-full"></div>
-            )}
-          </div>
-          <span className={`text-[10px] font-bold ${activeTab === 'pantry' ? 'text-green-300 drop-shadow-[0_0_4px_rgba(134,239,172,0.8)]' : 'text-white'}`}>PANTRY</span>
-        </button>
-        
-        <button 
-          onClick={() => onTabChange('recipes')}
-          className={`flex flex-col items-center gap-1 transition-all duration-300 ${
-            activeTab === 'recipes' 
-              ? 'text-pink-300 scale-110' 
-              : 'text-white/70 hover:text-white'
-          }`}
-        >
-          <div className={`relative ${activeTab === 'recipes' ? 'animate-bounce' : ''}`}>
-            <History size={24} className={activeTab === 'recipes' ? 'fill-pink-300/20 drop-shadow-[0_0_8px_rgba(249,168,212,0.8)]' : ''} />
-            {activeTab === 'recipes' && (
-              <div className="absolute inset-0 bg-pink-300 opacity-30 blur-lg rounded-full"></div>
-            )}
-          </div>
-          <span className={`text-[10px] font-bold ${activeTab === 'recipes' ? 'text-pink-300 drop-shadow-[0_0_4px_rgba(249,168,212,0.8)]' : 'text-white'}`}>RECIPES</span>
-        </button>
-
+      {/* Mobile Bottom Nav */}
+      <nav
+        className="md:hidden fixed bottom-0 left-0 w-full h-16 flex items-center justify-around z-50 border-t"
+        style={{ backgroundColor: colors.olive, borderColor: colors.dustyRose + '40' }}
+      >
+        {navItems.map(({ key, label, Icon }) => (
+          <button
+            key={key}
+            onClick={() => onTabChange(key)}
+            className="flex flex-col items-center gap-1 transition-colors"
+            style={activeTab === key ? { color: colors.dustyRose } : { color: colors.cream + '99' }}
+          >
+            <Icon size={22} />
+            <span className="text-[10px] font-bold uppercase">{label}</span>
+          </button>
+        ))}
         <Link
           href={currentUser ? '/account' : '/login'}
-          className="flex flex-col items-center gap-1 transition-all duration-300 text-white/70 hover:text-white"
+          className="flex flex-col items-center gap-1"
+          style={{ color: colors.cream + '99' }}
         >
-          <User size={24} />
-          <span className="text-[10px] font-bold">ACCOUNT</span>
+          <User size={22} />
+          <span className="text-[10px] font-bold uppercase">Account</span>
         </Link>
       </nav>
     </div>

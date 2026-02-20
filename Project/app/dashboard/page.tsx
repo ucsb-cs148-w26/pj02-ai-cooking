@@ -168,9 +168,9 @@ export default function Home() {
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === 'scan' && (
         <div className="space-y-6">
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl text-gray-900">
-            <h1 className="text-3xl font-bold mb-2 text-gray-900">Scan Items</h1>
-            <p className="text-gray-800">Upload a receipt or fridge photo to analyze.</p>
+          <div className="rounded-2xl p-8 border" style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: '#515B3A' }}>Scan Items</h1>
+            <p style={{ color: '#515B3A', opacity: 0.8 }}>Upload a receipt or fridge photo to analyze.</p>
           </div>
           <ScanAnalyzer onAddItems={handleAddScanItems} />
         </div>
@@ -179,7 +179,7 @@ export default function Home() {
       {activeTab === 'pantry' && (
         <>
           {authLoading || loadingPantry ? (
-            <p className="text-center text-gray-600">Loading pantry...</p>
+            <p className="text-center" style={{ color: '#515B3A' }}>Loading pantry...</p>
           ) : (
             <AddFood onAddFood={handleAddFood} />
           )}
@@ -188,9 +188,9 @@ export default function Home() {
       
       {activeTab === 'recipes' && (
         <div className="space-y-6">
-          <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-8 shadow-xl text-gray-900">
-            <h1 className="text-3xl font-bold mb-2 text-gray-900">Recipes</h1>
-            <p className="text-gray-800">Generate recipes from your pantry items.</p>
+          <div className="rounded-2xl p-8 border" style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: '#515B3A' }}>Recipes</h1>
+            <p style={{ color: '#515B3A', opacity: 0.8 }}>Generate recipes from your pantry items.</p>
           </div>
           <RecipeGenerator ingredients={pantryItems} />
         </div>

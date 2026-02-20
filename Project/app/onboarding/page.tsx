@@ -5,39 +5,24 @@ import { UserPreferences } from '@/types';
 import { useAuth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 
+const colors = {
+  terracotta: '#C97064',
+  olive: '#515B3A',
+  cream: '#ECDCC9',
+  dustyRose: '#CF9D8C',
+  steelBlue: '#33658A',
+};
+
 const COMMON_ALLERGENS = [
-  'Peanuts',
-  'Tree Nuts',
-  'Milk',
-  'Eggs',
-  'Wheat',
-  'Soy',
-  'Fish',
-  'Shellfish',
+  'Peanuts', 'Tree Nuts', 'Milk', 'Eggs', 'Wheat', 'Soy', 'Fish', 'Shellfish',
 ];
 
 const DIET_TYPES = [
-  'None',
-  'Vegetarian',
-  'Vegan',
-  'Pescatarian',
-  'Keto',
-  'Paleo',
-  'Gluten-Free',
-  'Dairy-Free',
+  'None', 'Vegetarian', 'Vegan', 'Pescatarian', 'Keto', 'Paleo', 'Gluten-Free', 'Dairy-Free',
 ];
 
 const CUISINE_TYPES = [
-  'Italian',
-  'Mexican',
-  'Chinese',
-  'Japanese',
-  'Indian',
-  'Thai',
-  'Mediterranean',
-  'American',
-  'French',
-  'Korean',
+  'Italian', 'Mexican', 'Chinese', 'Japanese', 'Indian', 'Thai', 'Mediterranean', 'American', 'French', 'Korean',
 ];
 
 export default function OnboardingPage() {
@@ -60,17 +45,12 @@ export default function OnboardingPage() {
   }, [currentUser, preferences.onboardingComplete, router]);
 
   const handleNext = () => {
-    if (step < 3) {
-      setStep(step + 1);
-    } else {
-      handleSubmit();
-    }
+    if (step < 3) setStep(step + 1);
+    else handleSubmit();
   };
 
   const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
-    }
+    if (step > 1) setStep(step - 1);
   };
 
   const handleSkip = async () => {
@@ -107,63 +87,46 @@ export default function OnboardingPage() {
 
   const toggleAllergy = (allergen: string) => {
     const current = preferences.allergies || [];
-    if (current.includes(allergen)) {
-      setPreferences({
-        ...preferences,
-        allergies: current.filter(a => a !== allergen),
-      });
-    } else {
-      setPreferences({
-        ...preferences,
-        allergies: [...current, allergen],
-      });
-    }
+    setPreferences({
+      ...preferences,
+      allergies: current.includes(allergen) ? current.filter(a => a !== allergen) : [...current, allergen],
+    });
   };
 
   const toggleCuisine = (cuisine: string) => {
     const current = preferences.cuisinePreferences || [];
-    if (current.includes(cuisine)) {
-      setPreferences({
-        ...preferences,
-        cuisinePreferences: current.filter(c => c !== cuisine),
-      });
-    } else {
-      setPreferences({
-        ...preferences,
-        cuisinePreferences: [...current, cuisine],
-      });
-    }
+    setPreferences({
+      ...preferences,
+      cuisinePreferences: current.includes(cuisine) ? current.filter(c => c !== cuisine) : [...current, cuisine],
+    });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 p-4">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-blue-400 to-purple-500 opacity-20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: colors.cream }}>
       <div className="relative w-full max-w-2xl">
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border-2 border-purple-200">
+        <div
+          className="rounded-2xl p-8 border"
+          style={{ backgroundColor: 'rgba(255,255,255,0.65)', borderColor: colors.dustyRose + '40' }}
+        >
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-4xl font-bold mb-2" style={{ color: colors.olive }}>
               Welcome to PantryPal!
             </h1>
-            <p className="text-gray-600">Let's personalize your experience</p>
+            <p style={{ color: colors.olive, opacity: 0.8 }}>Let&apos;s personalize your experience</p>
           </div>
 
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Step {step} of 3</span>
-              <span className="text-sm font-medium text-gray-700">{Math.round((step / 3) * 100)}%</span>
+              <span className="text-sm font-medium" style={{ color: colors.olive }}>Step {step} of 3</span>
+              <span className="text-sm font-medium" style={{ color: colors.olive }}>{Math.round((step / 3) * 100)}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full rounded-full h-3" style={{ backgroundColor: colors.dustyRose + '30' }}>
               <div
-                className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-300"
-                style={{ width: `${(step / 3) * 100}%` }}
-              ></div>
+                className="h-3 rounded-full transition-all duration-300"
+                style={{ width: `${(step / 3) * 100}%`, backgroundColor: colors.terracotta }}
+              />
             </div>
           </div>
 
@@ -171,17 +134,17 @@ export default function OnboardingPage() {
           {step === 1 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Let's get started!</h2>
-                <p className="text-gray-600 mb-6">Tell us a bit about yourself</p>
-                
+                <h2 className="text-2xl font-bold mb-4" style={{ color: colors.olive }}>Let&apos;s get started!</h2>
+                <p className="mb-6" style={{ color: colors.olive, opacity: 0.8 }}>Tell us a bit about yourself</p>
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-2">What's your name?</label>
+                  <label className="block font-semibold mb-2 text-sm" style={{ color: colors.olive }}>What&apos;s your name?</label>
                   <input
                     type="text"
                     value={preferences.name}
                     onChange={(e) => setPreferences({ ...preferences, name: e.target.value })}
                     placeholder="Enter your name"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
+                    style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
                   />
                 </div>
               </div>
@@ -192,23 +155,23 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Dietary Restrictions</h2>
-                <p className="text-gray-600 mb-6">Help us keep you safe and satisfied</p>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: colors.olive }}>Dietary Restrictions</h2>
+                <p className="mb-6" style={{ color: colors.olive, opacity: 0.8 }}>Help us keep you safe and satisfied</p>
 
-                {/* Common Allergens */}
                 <div className="mb-6">
-                  <label className="block text-gray-700 font-semibold mb-3">Any food allergies? (Select all that apply)</label>
+                  <label className="block font-semibold mb-3 text-sm" style={{ color: colors.olive }}>Any food allergies? (Select all that apply)</label>
                   <div className="grid grid-cols-2 gap-3">
                     {COMMON_ALLERGENS.map((allergen) => (
                       <button
                         key={allergen}
                         type="button"
                         onClick={() => toggleAllergy(allergen)}
-                        className={`px-4 py-3 rounded-xl border-2 transition-all ${
+                        className="px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium"
+                        style={
                           preferences.allergies?.includes(allergen)
-                            ? 'bg-red-500 text-white border-red-500 shadow-lg'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-red-300'
-                        }`}
+                            ? { backgroundColor: colors.terracotta, color: '#fff', borderColor: colors.terracotta }
+                            : { backgroundColor: 'rgba(255,255,255,0.5)', color: colors.olive, borderColor: colors.dustyRose + '40' }
+                        }
                       >
                         {allergen}
                       </button>
@@ -216,30 +179,28 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                {/* Custom Allergies */}
                 <div className="mb-6">
-                  <label className="block text-gray-700 font-semibold mb-2">Other allergies? (comma-separated)</label>
+                  <label className="block font-semibold mb-2 text-sm" style={{ color: colors.olive }}>Other allergies? (comma-separated)</label>
                   <input
                     type="text"
                     value={preferences.customAllergies}
                     onChange={(e) => setPreferences({ ...preferences, customAllergies: e.target.value })}
                     placeholder="e.g., Sesame, Coconut, Mustard"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
+                    style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
                   />
                 </div>
 
-                {/* Diet Type */}
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-3">Diet Type</label>
+                  <label className="block font-semibold mb-3 text-sm" style={{ color: colors.olive }}>Diet Type</label>
                   <select
                     value={preferences.dietType}
                     onChange={(e) => setPreferences({ ...preferences, dietType: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
+                    style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
                   >
                     {DIET_TYPES.map((diet) => (
-                      <option key={diet} value={diet}>
-                        {diet}
-                      </option>
+                      <option key={diet} value={diet}>{diet}</option>
                     ))}
                   </select>
                 </div>
@@ -251,23 +212,23 @@ export default function OnboardingPage() {
           {step === 3 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Preferences</h2>
-                <p className="text-gray-600 mb-6">Let's tailor recipes to your taste</p>
+                <h2 className="text-2xl font-bold mb-4" style={{ color: colors.olive }}>Your Preferences</h2>
+                <p className="mb-6" style={{ color: colors.olive, opacity: 0.8 }}>Let&apos;s tailor recipes to your taste</p>
 
-                {/* Cuisine Preferences */}
                 <div className="mb-6">
-                  <label className="block text-gray-700 font-semibold mb-3">Favorite Cuisines (Select all you like)</label>
+                  <label className="block font-semibold mb-3 text-sm" style={{ color: colors.olive }}>Favorite Cuisines (Select all you like)</label>
                   <div className="grid grid-cols-2 gap-3">
                     {CUISINE_TYPES.map((cuisine) => (
                       <button
                         key={cuisine}
                         type="button"
                         onClick={() => toggleCuisine(cuisine)}
-                        className={`px-4 py-3 rounded-xl border-2 transition-all ${
+                        className="px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium"
+                        style={
                           preferences.cuisinePreferences?.includes(cuisine)
-                            ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-purple-500 shadow-lg'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300'
-                        }`}
+                            ? { backgroundColor: colors.steelBlue, color: '#fff', borderColor: colors.steelBlue }
+                            : { backgroundColor: 'rgba(255,255,255,0.5)', color: colors.olive, borderColor: colors.dustyRose + '40' }
+                        }
                       >
                         {cuisine}
                       </button>
@@ -275,15 +236,15 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                {/* Cooking Skill Level */}
                 <div>
-                  <label className="block text-gray-700 font-semibold mb-3">Cooking Skill Level</label>
+                  <label className="block font-semibold mb-3 text-sm" style={{ color: colors.olive }}>Cooking Skill Level</label>
                   <select
                     value={preferences.cookingSkillLevel}
                     onChange={(e) => setPreferences({ ...preferences, cookingSkillLevel: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-400 focus:outline-none"
+                    className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
+                    style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
                   >
-                    <option value="Beginner">Beginner - I'm just starting out</option>
+                    <option value="Beginner">Beginner - I&apos;m just starting out</option>
                     <option value="Intermediate">Intermediate - I can handle most recipes</option>
                     <option value="Advanced">Advanced - Bring on the challenge!</option>
                   </select>
@@ -297,7 +258,8 @@ export default function OnboardingPage() {
             {step > 1 && (
               <button
                 onClick={handleBack}
-                className="flex-1 px-6 py-4 bg-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-300 transition-all"
+                className="flex-1 px-6 py-4 font-semibold rounded-lg transition-colors border-2"
+                style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: colors.olive, borderColor: colors.dustyRose + '40' }}
               >
                 Back
               </button>
@@ -305,7 +267,8 @@ export default function OnboardingPage() {
             
             <button
               onClick={handleNext}
-              className="flex-1 px-6 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded-xl hover:shadow-lg transition-all"
+              className="flex-1 px-6 py-4 text-white font-bold rounded-lg transition-opacity hover:opacity-90"
+              style={{ backgroundColor: colors.terracotta }}
             >
               {step === 3 ? 'Complete Setup' : 'Next'}
             </button>
@@ -314,7 +277,8 @@ export default function OnboardingPage() {
           {/* Skip Button */}
           <button
             onClick={handleSkip}
-            className="w-full mt-4 text-gray-500 hover:text-gray-700 text-sm font-medium"
+            className="w-full mt-4 text-sm font-medium transition-colors"
+            style={{ color: colors.olive, opacity: 0.6 }}
           >
             Skip for now
           </button>
