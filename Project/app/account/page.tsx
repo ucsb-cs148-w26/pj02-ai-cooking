@@ -8,6 +8,14 @@ import { getUserPreferences } from '@/services/userPreferencesService';
 import { UserPreferences } from '@/types';
 import { ChefHat, Mail, Calendar, LogOut, User, Sparkles } from 'lucide-react';
 
+const colors = {
+  terracotta: '#C97064',
+  olive: '#515B3A',
+  cream: '#ECDCC9',
+  dustyRose: '#CF9D8C',
+  steelBlue: '#33658A',
+};
+
 export default function AccountPage() {
   const router = useRouter();
   const { user: currentUser, loading: authLoading } = useAuth();
@@ -16,13 +24,11 @@ export default function AccountPage() {
   const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
-    // Redirect to login if not authenticated
     if (!authLoading && !currentUser) {
       router.push('/login');
       return;
     }
 
-    // Load user preferences
     if (currentUser) {
       getUserPreferences(currentUser.uid).then(prefs => {
         setUserPreferences(prefs);
@@ -46,76 +52,74 @@ export default function AccountPage() {
 
   if (authLoading || loading || !currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.cream }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto" style={{ borderColor: colors.terracotta }} />
+          <p className="mt-4" style={{ color: colors.olive }}>Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 relative overflow-hidden px-4 py-8 md:pt-24">
-      {/* Colorful Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-blue-400 to-purple-500 opacity-20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-pink-400 to-red-400 opacity-15 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
-      </div>
-
+    <div className="min-h-screen relative overflow-hidden px-4 py-8 md:pt-24" style={{ backgroundColor: colors.cream }}>
       <div className="max-w-2xl mx-auto relative z-10 space-y-6">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="relative inline-flex items-center justify-center mb-4">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-60 animate-pulse"></div>
-            <div className="relative bg-white/80 backdrop-blur-sm p-6 rounded-full border-4 border-purple-200">
-              <User size={48} className="text-purple-600" />
+            <div
+              className="p-6 rounded-full border-4"
+              style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '60' }}
+            >
+              <User size={48} style={{ color: colors.terracotta }} />
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-4xl md:text-5xl font-bold mb-2" style={{ color: colors.olive }}>
             My Account
           </h1>
-          <p className="text-gray-600">Manage your PantryPal profile</p>
+          <p style={{ color: colors.olive, opacity: 0.8 }}>Manage your PantryPal profile</p>
         </div>
 
         {/* Account Info Card */}
-        <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-2 border-purple-200 space-y-6">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <ChefHat className="text-purple-600" />
+        <div
+          className="rounded-2xl p-8 space-y-6 border"
+          style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '40' }}
+        >
+          <h2 className="text-2xl font-bold flex items-center gap-2" style={{ color: colors.olive }}>
+            <ChefHat style={{ color: colors.terracotta }} />
             Account Information
           </h2>
 
           {/* Email */}
-          <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
+          <div className="flex items-start gap-4 p-4 rounded-xl" style={{ backgroundColor: colors.dustyRose + '15' }}>
             <div className="mt-1">
-              <Mail className="text-purple-600" size={24} />
+              <Mail style={{ color: colors.terracotta }} size={24} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-600">Email Address</p>
-              <p className="text-lg text-gray-800">{currentUser.email}</p>
+              <p className="text-sm font-semibold" style={{ color: colors.olive, opacity: 0.7 }}>Email Address</p>
+              <p className="text-lg" style={{ color: colors.olive }}>{currentUser.email}</p>
             </div>
           </div>
 
           {/* User ID */}
-          <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
+          <div className="flex items-start gap-4 p-4 rounded-xl" style={{ backgroundColor: colors.steelBlue + '10' }}>
             <div className="mt-1">
-              <User className="text-blue-600" size={24} />
+              <User style={{ color: colors.steelBlue }} size={24} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-600">User ID</p>
-              <p className="text-sm text-gray-800 font-mono break-all">{currentUser.uid}</p>
+              <p className="text-sm font-semibold" style={{ color: colors.olive, opacity: 0.7 }}>User ID</p>
+              <p className="text-sm font-mono break-all" style={{ color: colors.olive }}>{currentUser.uid}</p>
             </div>
           </div>
 
           {/* Account Created */}
-          <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl">
+          <div className="flex items-start gap-4 p-4 rounded-xl" style={{ backgroundColor: colors.olive + '10' }}>
             <div className="mt-1">
-              <Calendar className="text-green-600" size={24} />
+              <Calendar style={{ color: colors.olive }} size={24} />
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-600">Member Since</p>
-              <p className="text-lg text-gray-800">
+              <p className="text-sm font-semibold" style={{ color: colors.olive, opacity: 0.7 }}>Member Since</p>
+              <p className="text-lg" style={{ color: colors.olive }}>
                 {currentUser.metadata.creationTime 
                   ? new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', {
                       year: 'numeric',
@@ -127,26 +131,27 @@ export default function AccountPage() {
             </div>
           </div>
 
-          {/* User Preferences (if available) */}
+          {/* User Preferences */}
           {userPreferences && (
-            <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl">
+            <div className="flex items-start gap-4 p-4 rounded-xl" style={{ backgroundColor: colors.terracotta + '10' }}>
               <div className="mt-1">
-                <Sparkles className="text-yellow-600" size={24} />
+                <Sparkles style={{ color: colors.terracotta }} size={24} />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-600">Dietary Preferences</p>
+                <p className="text-sm font-semibold" style={{ color: colors.olive, opacity: 0.7 }}>Dietary Preferences</p>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {userPreferences.allergies && userPreferences.allergies.length > 0 ? (
                     userPreferences.allergies.map((item, index) => (
                       <span 
                         key={index}
-                        className="px-3 py-1 bg-white/60 rounded-full text-sm font-medium text-gray-700 border border-yellow-200"
+                        className="px-3 py-1 rounded-full text-sm font-medium border"
+                        style={{ backgroundColor: 'rgba(255,255,255,0.6)', color: colors.olive, borderColor: colors.dustyRose + '40' }}
                       >
                         {item}
                       </span>
                     ))
                   ) : (
-                    <span className="text-sm text-gray-500">No dietary restrictions set</span>
+                    <span className="text-sm" style={{ color: colors.olive, opacity: 0.6 }}>No dietary restrictions set</span>
                   )}
                 </div>
               </div>
@@ -158,7 +163,8 @@ export default function AccountPage() {
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="w-full py-4 px-6 bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold rounded-2xl hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+          className="w-full py-4 px-6 text-white font-bold rounded-xl transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+          style={{ backgroundColor: colors.terracotta }}
         >
           {loggingOut ? (
             <>
@@ -176,10 +182,11 @@ export default function AccountPage() {
           )}
         </button>
 
-        {/* Back to Home */}
+        {/* Back to Dashboard */}
         <button
           onClick={() => router.push('/dashboard')}
-          className="w-full py-3 px-6 bg-white/60 backdrop-blur-sm text-gray-700 font-semibold rounded-2xl hover:bg-white/80 transition-all border-2 border-gray-200"
+          className="w-full py-3 px-6 font-semibold rounded-xl transition-colors border-2"
+          style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: colors.olive, borderColor: colors.dustyRose + '40' }}
         >
           Back to Dashboard
         </button>

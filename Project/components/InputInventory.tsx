@@ -206,67 +206,73 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
   const update = (field: string, value: string) => setFood({ ...food, [field]: value });
 
+  const inputStyle = { borderColor: '#CF9D8C60', color: '#515B3A' };
+
   return (
-    <div className="max-w-6xl mx-auto text-gray-900">
+    <div className="max-w-6xl mx-auto" style={{ color: '#515B3A' }}>
       <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold mb-3 text-gray-900">
-          <span className="text-green-600">Add Food to your Pantry!</span>
+        <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ color: '#515B3A' }}>
+          Add Food to your Pantry
         </h1>
-        <p className="text-gray-800">Track your food and expiration dates</p>
+        <p style={{ color: '#515B3A', opacity: 0.8 }}>Track your food and expiration dates</p>
       </div>
 
       {/* Form */}
-      <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-green-200 space-y-5 mb-12 text-gray-900">
+      <div className="rounded-2xl p-6 md:p-8 space-y-5 mb-12 border" style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}>
         
         {/* Food Name */}
         <div>
-          <label className="block text-gray-900 font-semibold mb-2">Food Name *</label>
+          <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Food Name *</label>
           <input 
             type="text" 
             value={food.name}
             onChange={(e) => update('name', e.target.value)}
             placeholder="e.g., Milk, Chicken, Tomatoes"
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
+            className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+            style={inputStyle}
           />
         </div>
 
         {/* Category */}
         <div>
-          <label className="block text-gray-900 font-semibold mb-2">Category *</label>
+          <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Category *</label>
           <select 
             value={food.category}
             onChange={(e) => update('category', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-gray-900"
+            className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
+            style={inputStyle}
           >
             <option value="">Select category</option>
-            <option value="dairy">🥛 Dairy & Eggs</option>
-            <option value="meat">🍗 Meat & Poultry</option>
-            <option value="fruits">🍎 Fruits</option>
-            <option value="vegetables">🥕 Vegetables</option>
-            <option value="grains">🌾 Grains & Bread</option>
-            <option value="frozen">❄️ Frozen Foods</option>
-            <option value="other">📦 Other</option>
+            <option value="dairy">Dairy & Eggs</option>
+            <option value="meat">Meat & Poultry</option>
+            <option value="fruits">Fruits</option>
+            <option value="vegetables">Vegetables</option>
+            <option value="grains">Grains & Bread</option>
+            <option value="frozen">Frozen Foods</option>
+            <option value="other">Other</option>
           </select>
         </div>
 
         {/* Quantity & Unit */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-gray-900 font-semibold mb-2">Quantity</label>
+            <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Quantity</label>
             <input 
               type="number" 
               value={food.quantity}
               onChange={(e) => update('quantity', e.target.value)}
               placeholder="1, 2, 5..."
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
+              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+              style={inputStyle}
             />
           </div>
           <div>
-            <label className="block text-gray-900 font-semibold mb-2">Unit</label>
+            <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Unit</label>
             <select 
               value={food.unit}
               onChange={(e) => update('unit', e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-gray-900"
+              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
+              style={inputStyle}
             >
               <option value="">Select unit</option>
               <option value="piece">Piece(s)</option>
@@ -280,40 +286,43 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
         {/* Expiration Date */}
         <div>
-          <label className="block text-gray-900 font-semibold mb-2">Expiration Date *</label>
+          <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Expiration Date *</label>
           <input 
             type="date" 
             value={food.expiration}
             onChange={(e) => update('expiration', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border-2 border-orange-200 focus:border-orange-400 focus:outline-none text-gray-900"
+            className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
+            style={{ borderColor: '#C9706440', color: '#515B3A' }}
           />
         </div>
 
         {/* Storage Location */}
         <div>
-          <label className="block text-gray-900 font-semibold mb-2">Storage Location *</label>
+          <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Storage Location *</label>
           <select 
             value={food.storage}
             onChange={(e) => update('storage', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-gray-900"
+            className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
+            style={inputStyle}
           >
             <option value="">Select location</option>
-            <option value="fridge">🧊 Refrigerator</option>
-            <option value="freezer">❄️ Freezer</option>
-            <option value="pantry">🗄️ Pantry</option>
-            <option value="counter">🏠 Counter</option>
+            <option value="fridge">Refrigerator</option>
+            <option value="freezer">Freezer</option>
+            <option value="pantry">Pantry</option>
+            <option value="counter">Counter</option>
           </select>
         </div>
 
         {/* Notes */}
         <div>
-          <label className="block text-gray-900 font-semibold mb-2">Notes</label>
+          <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Notes</label>
           <textarea 
             value={food.notes}
             onChange={(e) => update('notes', e.target.value)}
             placeholder="Additional notes..."
             rows={2}
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none resize-none text-gray-900 placeholder:text-gray-500"
+            className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none resize-none placeholder:opacity-50"
+            style={inputStyle}
           />
         </div>
 
@@ -322,25 +331,27 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           <button 
             onClick={handleSubmit}
             disabled={loading}
-            className="flex-1 px-6 py-4 bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-4 text-white font-bold rounded-lg transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ backgroundColor: '#C97064' }}
           >
-            {loading ? 'Adding...' : '➕ Add to Pantry'}
+            {loading ? 'Adding...' : 'Add to Pantry'}
           </button>
           <button 
             onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
-            className="flex-1 px-6 py-4 bg-white text-gray-900 font-semibold rounded-xl border-2 border-gray-300 hover:bg-gray-50 transition-all"
+            className="flex-1 px-6 py-4 font-semibold rounded-lg border-2 transition-colors"
+            style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#515B3A', borderColor: '#CF9D8C40' }}
           >
-            🗑️ Clear
+            Clear
           </button>
         </div>
       </div>
 
       {/* Pantry Items with Expiration Progress */}
-      <div className="mb-12 text-gray-900">
+      <div className="mb-12">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-900">Your Pantry Items</h2>
+          <h2 className="text-3xl font-bold" style={{ color: '#515B3A' }}>Your Pantry Items</h2>
           {user && !isLoadingItems && (
-            <div className="text-gray-800">
+            <div style={{ color: '#515B3A', opacity: 0.7 }}>
               {pantryItems.length} item{pantryItems.length !== 1 ? 's' : ''}
             </div>
           )}
@@ -348,12 +359,12 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
         {authLoading ? (
           <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-            <p className="mt-4 text-gray-800">Checking sign-in...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-t-transparent mx-auto" style={{ borderColor: '#C97064' }} />
+            <p className="mt-4" style={{ color: '#515B3A' }}>Checking sign-in...</p>
           </div>
         ) : !user ? (
-          <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-12 text-center border-2 border-gray-200">
-            <p className="text-gray-800">Sign in to see and add pantry items.</p>
+          <div className="rounded-2xl p-12 text-center border" style={{ backgroundColor: 'rgba(255,255,255,0.5)', borderColor: '#CF9D8C40' }}>
+            <p style={{ color: '#515B3A' }}>Sign in to see and add pantry items.</p>
           </div>
         ) : (
           <ExpirationReminders
@@ -365,13 +376,13 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       </div>
 
       {/* Tips */}
-      <div className="mt-8 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-6 shadow-lg text-gray-900">
-        <h3 className="text-xl font-bold text-blue-900 mb-3">💡 Quick Tips</h3>
-        <ul className="space-y-1 text-gray-800">
-          <li>• Check packaging for "Best By" dates</li>
-          <li>• Store items properly to maximize freshness</li>
-          <li>• Get reminders before food expires!</li>
-          <li>• Click the trash icon to remove items you've used</li>
+      <div className="mt-8 rounded-2xl p-6 border" style={{ backgroundColor: '#33658A10', borderColor: '#33658A20' }}>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#33658A' }}>Quick Tips</h3>
+        <ul className="space-y-1 text-sm" style={{ color: '#515B3A' }}>
+          <li>Check packaging for &quot;Best By&quot; dates</li>
+          <li>Store items properly to maximize freshness</li>
+          <li>Get reminders before food expires</li>
+          <li>Click the trash icon to remove items you&apos;ve used</li>
         </ul>
       </div>
     </div>

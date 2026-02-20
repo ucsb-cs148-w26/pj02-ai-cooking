@@ -5,10 +5,6 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/firebase';
 import { ChefHat, Camera, ShoppingBag, BookOpen, UtensilsCrossed, Apple, Carrot, Wheat, Coffee, Leaf, Cherry } from 'lucide-react';
-import { Playfair_Display, Roboto } from 'next/font/google';
-
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
-const roboto = Roboto({ weight: ['400', '500', '700'], subsets: ['latin'], variable: '--font-roboto' });
 
 // Palette: C97064, 515B3A, ECDCC9, CF9D8C, 33658A
 const colors = {
@@ -32,7 +28,7 @@ export default function LandingPage() {
   if (loading) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${roboto.className}`}
+        className="min-h-screen flex items-center justify-center"
         style={{ backgroundColor: colors.cream }}
       >
         <div className="text-center">
@@ -72,7 +68,7 @@ export default function LandingPage() {
 
   return (
     <div
-      className={`min-h-screen relative overflow-hidden ${playfair.variable} ${roboto.variable}`}
+      className="min-h-screen relative overflow-hidden"
       style={{ backgroundColor: colors.cream }}
     >
       {/* Food-themed background icons */}
@@ -91,11 +87,11 @@ export default function LandingPage() {
       {/* Header */}
       <header className="relative z-10 px-6 py-6 md:px-12 md:py-8">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className={`flex items-center gap-3 font-bold text-xl md:text-2xl tracking-tight ${playfair.className}`} style={{ color: colors.olive }}>
+          <div className={`flex items-center gap-3 font-bold text-xl md:text-2xl tracking-tight `} style={{ color: colors.olive }}>
             <ChefHat size={32} style={{ color: colors.terracotta }} />
             PantryPal
           </div>
-          <nav className={`flex gap-3 ${roboto.className}`}>
+          <nav className={`flex gap-3 `}>
             <Link
               href="/login"
               className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors"
@@ -119,13 +115,13 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <section className="text-center mb-16 md:mb-24">
             <h1
-              className={`text-4xl md:text-5xl font-bold mb-4 tracking-tight max-w-2xl mx-auto leading-tight ${playfair.className}`}
+              className={`text-4xl md:text-5xl font-bold mb-4 tracking-tight max-w-2xl mx-auto leading-tight `}
               style={{ color: colors.olive }}
             >
               Your smart cooking companion
             </h1>
             <p
-              className={`text-lg md:text-xl mb-10 max-w-xl mx-auto opacity-90 ${roboto.className}`}
+              className={`text-lg md:text-xl mb-10 max-w-xl mx-auto opacity-90 `}
               style={{ color: colors.olive }}
             >
               Transform your ingredients into delicious, tailored meals. Scan, organize, and discover recipes with PantryPal.
@@ -133,14 +129,14 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 href="/signup"
-                className={`w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white rounded-lg text-center transition-opacity hover:opacity-90 ${roboto.className}`}
+                className={`w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white rounded-lg text-center transition-opacity hover:opacity-90 `}
                 style={{ backgroundColor: colors.terracotta }}
               >
                 Get started free
               </Link>
               <Link
                 href="/login"
-                className={`w-full sm:w-auto px-8 py-4 text-lg font-medium rounded-lg text-center border-2 transition-colors ${roboto.className}`}
+                className={`w-full sm:w-auto px-8 py-4 text-lg font-medium rounded-lg text-center border-2 transition-colors `}
                 style={{ color: colors.steelBlue, borderColor: colors.steelBlue }}
               >
                 Sign in
@@ -149,7 +145,7 @@ export default function LandingPage() {
           </section>
 
           {/* Features */}
-          <section className={`grid md:grid-cols-3 gap-6 md:gap-8 ${roboto.className}`}>
+          <section className={`grid md:grid-cols-3 gap-6 md:gap-8 `}>
             <div
               className="rounded-2xl p-6 md:p-8 border border-[#CF9D8C]/40"
               style={{ backgroundColor: 'rgba(255,255,255,0.6)' }}
@@ -160,7 +156,7 @@ export default function LandingPage() {
               >
                 <Camera size={24} style={{ color: colors.olive }} />
               </div>
-              <h3 className={`text-xl font-bold mb-2 ${playfair.className}`} style={{ color: colors.olive }}>
+              <h3 className={`text-xl font-bold mb-2 `} style={{ color: colors.olive }}>
                 Smart scanning
               </h3>
               <p className="text-sm leading-relaxed opacity-90" style={{ color: colors.olive }}>
@@ -178,7 +174,7 @@ export default function LandingPage() {
               >
                 <ShoppingBag size={24} className="text-white" />
               </div>
-              <h3 className={`text-xl font-bold mb-2 ${playfair.className}`} style={{ color: colors.olive }}>
+              <h3 className={`text-xl font-bold mb-2 `} style={{ color: colors.olive }}>
                 Organized pantry
               </h3>
               <p className="text-sm leading-relaxed opacity-90" style={{ color: colors.olive }}>
@@ -196,7 +192,7 @@ export default function LandingPage() {
               >
                 <BookOpen size={24} className="text-white" />
               </div>
-              <h3 className={`text-xl font-bold mb-2 ${playfair.className}`} style={{ color: colors.olive }}>
+              <h3 className={`text-xl font-bold mb-2 `} style={{ color: colors.olive }}>
                 AI recipes
               </h3>
               <p className="text-sm leading-relaxed opacity-90" style={{ color: colors.olive }}>
@@ -207,12 +203,12 @@ export default function LandingPage() {
 
           {/* CTA */}
           <section className="text-center mt-16 md:mt-24">
-            <h2 className={`text-2xl md:text-3xl font-bold mb-6 ${playfair.className}`} style={{ color: colors.olive }}>
+            <h2 className={`text-2xl md:text-3xl font-bold mb-6 `} style={{ color: colors.olive }}>
               Ready to cook smarter?
             </h2>
             <Link
               href="/signup"
-              className={`inline-block px-8 py-4 text-lg font-semibold text-white rounded-lg transition-opacity hover:opacity-90 ${roboto.className}`}
+              className={`inline-block px-8 py-4 text-lg font-semibold text-white rounded-lg transition-opacity hover:opacity-90 `}
               style={{ backgroundColor: colors.terracotta }}
             >
               Start your free account
