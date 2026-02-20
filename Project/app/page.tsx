@@ -50,23 +50,22 @@ export default function LandingPage() {
     return null;
   }
 
-  // Organized layout: top row, bottom row, left column, right column
   const iconSize = 44;
   const bgIcons = [
-    // Top row (4 icons, evenly spaced)
+    // Top row
     { Icon: UtensilsCrossed, top: '6%', left: '12%', size: iconSize, color: colors.dustyRose },
     { Icon: Apple, top: '6%', left: '32%', size: iconSize, color: colors.terracotta },
     { Icon: Wheat, top: '6%', left: '52%', size: iconSize, color: colors.steelBlue },
     { Icon: Cherry, top: '6%', left: '72%', size: iconSize, color: colors.olive },
-    // Bottom row (4 icons, evenly spaced)
+    // Bottom row
     { Icon: Leaf, bottom: '6%', left: '12%', size: iconSize, color: colors.terracotta },
     { Icon: Carrot, bottom: '6%', left: '32%', size: iconSize, color: colors.olive },
     { Icon: Coffee, bottom: '6%', left: '52%', size: iconSize, color: colors.steelBlue },
     { Icon: UtensilsCrossed, bottom: '6%', left: '72%', size: iconSize, color: colors.dustyRose },
-    // Left column (2 icons)
+    // Left column
     { Icon: Carrot, top: '38%', left: '4%', size: iconSize - 4, color: colors.olive },
     { Icon: Leaf, top: '62%', left: '4%', size: iconSize - 4, color: colors.terracotta },
-    // Right column (2 icons)
+    // Right column 
     { Icon: Apple, top: '38%', right: '4%', size: iconSize - 4, color: colors.dustyRose },
     { Icon: Wheat, top: '62%', right: '4%', size: iconSize - 4, color: colors.steelBlue },
   ];
