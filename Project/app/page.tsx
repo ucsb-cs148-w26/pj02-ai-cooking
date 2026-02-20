@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/firebase';
-import { ChefHat, Camera, ShoppingBag, BookOpen } from 'lucide-react';
+import { ChefHat, Camera, ShoppingBag, BookOpen, UtensilsCrossed, Apple, Carrot, Wheat, Coffee, Leaf, Cherry } from 'lucide-react';
 import { Playfair_Display, Roboto } from 'next/font/google';
 
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -50,11 +50,39 @@ export default function LandingPage() {
     return null;
   }
 
+  const bgIcons = [
+    { Icon: UtensilsCrossed, top: '8%', left: '5%', size: 28, color: colors.dustyRose },
+    { Icon: Apple, top: '12%', right: '8%', size: 24, color: colors.terracotta },
+    { Icon: Carrot, top: '35%', left: '3%', size: 22, color: colors.olive },
+    { Icon: Wheat, top: '25%', right: '12%', size: 26, color: colors.steelBlue },
+    { Icon: Coffee, bottom: '30%', left: '7%', size: 24, color: colors.olive },
+    { Icon: Leaf, bottom: '25%', right: '6%', size: 28, color: colors.terracotta },
+    { Icon: Cherry, bottom: '15%', left: '15%', size: 20, color: colors.dustyRose },
+    { Icon: UtensilsCrossed, bottom: '20%', right: '18%', size: 22, color: colors.steelBlue },
+    { Icon: Apple, top: '55%', left: '10%', size: 20, color: colors.dustyRose },
+    { Icon: Carrot, top: '70%', right: '8%', size: 24, color: colors.olive },
+    { Icon: Leaf, top: '80%', left: '8%', size: 22, color: colors.terracotta },
+    { Icon: Wheat, bottom: '8%', right: '10%', size: 24, color: colors.dustyRose },
+  ];
+
   return (
     <div
       className={`min-h-screen relative overflow-hidden ${playfair.variable} ${roboto.variable}`}
       style={{ backgroundColor: colors.cream }}
     >
+      {/* Food-themed background icons */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
+        {bgIcons.map(({ Icon, size, color, top, left, right, bottom }, i) => (
+          <div
+            key={i}
+            className="absolute opacity-[0.15]"
+            style={{ top, left, right, bottom, color }}
+          >
+            <Icon size={size} strokeWidth={1.5} />
+          </div>
+        ))}
+      </div>
+
       {/* Header */}
       <header className="relative z-10 px-6 py-6 md:px-12 md:py-8">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
@@ -95,7 +123,7 @@ export default function LandingPage() {
               className={`text-lg md:text-xl mb-10 max-w-xl mx-auto opacity-90 ${roboto.className}`}
               style={{ color: colors.olive }}
             >
-              Transform your pantry into delicious meals. Scan, organize, and discover recipes with PantryPal.
+              Transform your ingredients into delicious, tailored meals. Scan, organize, and discover recipes with PantryPal.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
