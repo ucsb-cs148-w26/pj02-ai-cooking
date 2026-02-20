@@ -51,18 +51,18 @@ export default function LandingPage() {
   }
 
   const bgIcons = [
-    { Icon: UtensilsCrossed, top: '8%', left: '5%', size: 28, color: colors.dustyRose },
-    { Icon: Apple, top: '12%', right: '8%', size: 24, color: colors.terracotta },
-    { Icon: Carrot, top: '35%', left: '3%', size: 22, color: colors.olive },
-    { Icon: Wheat, top: '25%', right: '12%', size: 26, color: colors.steelBlue },
-    { Icon: Coffee, bottom: '30%', left: '7%', size: 24, color: colors.olive },
-    { Icon: Leaf, bottom: '25%', right: '6%', size: 28, color: colors.terracotta },
-    { Icon: Cherry, bottom: '15%', left: '15%', size: 20, color: colors.dustyRose },
-    { Icon: UtensilsCrossed, bottom: '20%', right: '18%', size: 22, color: colors.steelBlue },
-    { Icon: Apple, top: '55%', left: '10%', size: 20, color: colors.dustyRose },
-    { Icon: Carrot, top: '70%', right: '8%', size: 24, color: colors.olive },
-    { Icon: Leaf, top: '80%', left: '8%', size: 22, color: colors.terracotta },
-    { Icon: Wheat, bottom: '8%', right: '10%', size: 24, color: colors.dustyRose },
+    { Icon: UtensilsCrossed, top: '8%', left: '5%', size: 48, color: colors.dustyRose },
+    { Icon: Apple, top: '12%', right: '8%', size: 44, color: colors.terracotta },
+    { Icon: Carrot, top: '35%', left: '3%', size: 40, color: colors.olive },
+    { Icon: Wheat, top: '25%', right: '12%', size: 46, color: colors.steelBlue },
+    { Icon: Coffee, bottom: '30%', left: '7%', size: 44, color: colors.olive },
+    { Icon: Leaf, bottom: '25%', right: '6%', size: 50, color: colors.terracotta },
+    { Icon: Cherry, bottom: '15%', left: '15%', size: 38, color: colors.dustyRose },
+    { Icon: UtensilsCrossed, bottom: '20%', right: '18%', size: 42, color: colors.steelBlue },
+    { Icon: Apple, top: '55%', left: '10%', size: 40, color: colors.dustyRose },
+    { Icon: Carrot, top: '70%', right: '8%', size: 44, color: colors.olive },
+    { Icon: Leaf, top: '80%', left: '8%', size: 42, color: colors.terracotta },
+    { Icon: Wheat, bottom: '8%', right: '10%', size: 46, color: colors.dustyRose },
   ];
 
   return (
@@ -75,7 +75,7 @@ export default function LandingPage() {
         {bgIcons.map(({ Icon, size, color, top, left, right, bottom }, i) => (
           <div
             key={i}
-            className="absolute opacity-[0.15]"
+            className="absolute opacity-30"
             style={{ top, left, right, bottom, color }}
           >
             <Icon size={size} strokeWidth={1.5} />
