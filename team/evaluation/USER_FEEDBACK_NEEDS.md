@@ -31,11 +31,9 @@ We care about:
 
 ## Ratings (Scale of 1–10)
 
-Please rate our product in the following areas:
-
-- **Functionality:**
-- **Website Design:**
-- **User Experience:**
+- **Functionality**
+- **Website Design**
+- **User Experience**
 
 ---
 
@@ -55,3 +53,4 @@ Improve overall usability and user satisfaction of our product.
 2. At least **80% of testers** report they can complete a core task  
    (add item, generate recipe, view expiration reminder)  
    without asking for clarification.
+
