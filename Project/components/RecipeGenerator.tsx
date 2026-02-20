@@ -6,6 +6,14 @@ import { db, useAuth } from '@/lib/firebase';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
 import { generateRecipes } from '../services/geminiService';
 
+const colors = {
+  terracotta: '#C97064',
+  olive: '#515B3A',
+  cream: '#ECDCC9',
+  dustyRose: '#CF9D8C',
+  steelBlue: '#33658A',
+};
+
 type RecipeGeneratorProps = {
   ingredients: Ingredient[];
 };
@@ -90,16 +98,21 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     }
   };
 
+  const inputStyle = { borderColor: colors.dustyRose + '60', color: colors.olive };
+
   return (
     <div className="space-y-6">
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4">
-        <h2 className="text-2xl font-bold">Pantry Items</h2>
+      <div
+        className="rounded-2xl p-6 space-y-4 border"
+        style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '40' }}
+      >
+        <h2 className="text-2xl font-bold" style={{ color: colors.olive }}>Pantry Items</h2>
         {pantryLoading ? (
-          <p className="text-gray-600">Loading pantry items...</p>
+          <p style={{ color: colors.olive, opacity: 0.7 }}>Loading pantry items...</p>
         ) : pantrySummary.length === 0 ? (
-          <p className="text-gray-600">No pantry items yet.</p>
+          <p style={{ color: colors.olive, opacity: 0.7 }}>No pantry items yet.</p>
         ) : (
-          <ul className="list-disc list-inside text-gray-700">
+          <ul className="list-disc list-inside" style={{ color: colors.olive }}>
             {pantrySummary.map((item, idx) => (
               <li key={`${item}-${idx}`}>{item}</li>
             ))}
@@ -107,33 +120,39 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         )}
       </div>
 
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl space-y-4 text-gray-900">
-        <h2 className="text-2xl font-bold text-gray-900">What kind of food do you want?</h2>
+      <div
+        className="rounded-2xl p-6 space-y-4 border"
+        style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '40' }}
+      >
+        <h2 className="text-2xl font-bold" style={{ color: colors.olive }}>What kind of food do you want?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-gray-900 font-semibold mb-2">Cuisine</label>
+            <label className="block font-semibold mb-2 text-sm" style={{ color: colors.olive }}>Cuisine</label>
             <input
               value={cuisine}
               onChange={(e) => setCuisine(e.target.value)}
               placeholder="e.g. Italian"
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-pink-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
+              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+              style={inputStyle}
             />
           </div>
           <div>
-            <label className="block text-gray-900 font-semibold mb-2">Restrictions</label>
+            <label className="block font-semibold mb-2 text-sm" style={{ color: colors.olive }}>Restrictions</label>
             <input
               value={restrictions}
               onChange={(e) => setRestrictions(e.target.value)}
               placeholder="e.g. vegetarian, no nuts"
-              className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-pink-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
+              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+              style={inputStyle}
             />
           </div>
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm" style={{ color: colors.terracotta }}>{error}</p>}
         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="w-full px-6 py-3 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-60"
+          className="w-full px-6 py-3 text-white font-semibold rounded-lg transition-opacity hover:opacity-90 disabled:opacity-60"
+          style={{ backgroundColor: colors.dustyRose }}
         >
           {loading ? 'Generating...' : 'Generate 3 Recipes'}
         </button>
@@ -142,29 +161,33 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       {recipes.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {recipes.map((recipe) => (
-            <div key={recipe.id} className="bg-white/90 rounded-2xl p-5 shadow-lg space-y-3 text-gray-900">
+            <div
+              key={recipe.id}
+              className="rounded-2xl p-5 space-y-3 border"
+              style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: colors.dustyRose + '40' }}
+            >
               {recipe.image && (
                 <img src={recipe.image} alt={recipe.title} className="w-full rounded-xl" />
               )}
               <div>
-                <h3 className="text-xl font-bold text-gray-900">{recipe.title}</h3>
-                <p className="text-sm text-gray-700">{recipe.description}</p>
+                <h3 className="text-xl font-bold" style={{ color: colors.olive }}>{recipe.title}</h3>
+                <p className="text-sm" style={{ color: colors.olive, opacity: 0.8 }}>{recipe.description}</p>
               </div>
-              <div className="text-sm text-gray-800">
+              <div className="text-sm" style={{ color: colors.olive }}>
                 <span className="font-semibold">Time:</span> {recipe.time} ·{' '}
                 <span className="font-semibold">Difficulty:</span> {recipe.difficulty}
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Ingredients</p>
-                <ul className="list-disc list-inside text-sm text-gray-800">
+                <p className="font-semibold" style={{ color: colors.olive }}>Ingredients</p>
+                <ul className="list-disc list-inside text-sm" style={{ color: colors.olive, opacity: 0.9 }}>
                   {recipe.ingredients.map((item, idx) => (
                     <li key={`${recipe.id}-ing-${idx}`}>{item}</li>
                   ))}
                 </ul>
               </div>
               <div>
-                <p className="font-semibold text-gray-900">Instructions</p>
-                <ol className="list-decimal list-inside text-sm text-gray-800 space-y-1">
+                <p className="font-semibold" style={{ color: colors.olive }}>Instructions</p>
+                <ol className="list-decimal list-inside text-sm space-y-1" style={{ color: colors.olive, opacity: 0.9 }}>
                   {recipe.instructions.map((step, idx) => (
                     <li key={`${recipe.id}-step-${idx}`}>{step}</li>
                   ))}

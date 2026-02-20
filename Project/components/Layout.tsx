@@ -15,16 +15,26 @@ const colors = {
   steelBlue: '#33658A',
 };
 
-const iconSize = 36;
 const bgIcons = [
-  { Icon: UtensilsCrossed, top: '5%', left: '8%', color: colors.dustyRose },
-  { Icon: Apple, top: '5%', left: '28%', color: colors.terracotta },
-  { Icon: Wheat, top: '5%', right: '28%', color: colors.steelBlue },
-  { Icon: Cherry, top: '5%', right: '8%', color: colors.olive },
-  { Icon: Leaf, bottom: '8%', left: '8%', color: colors.terracotta },
-  { Icon: Carrot, bottom: '8%', left: '28%', color: colors.olive },
-  { Icon: Coffee, bottom: '8%', right: '28%', color: colors.steelBlue },
-  { Icon: UtensilsCrossed, bottom: '8%', right: '8%', color: colors.dustyRose },
+  // Top row
+  { Icon: UtensilsCrossed, top: '5%', left: '6%', size: 40, color: colors.dustyRose },
+  { Icon: Apple, top: '4%', left: '30%', size: 38, color: colors.terracotta },
+  { Icon: Wheat, top: '6%', right: '30%', size: 36, color: colors.steelBlue },
+  { Icon: Cherry, top: '3%', right: '6%', size: 40, color: colors.olive },
+  // Upper-mid
+  { Icon: Coffee, top: '22%', left: '3%', size: 32, color: colors.olive },
+  { Icon: Leaf, top: '20%', right: '4%', size: 34, color: colors.terracotta },
+  // Mid
+  { Icon: Carrot, top: '40%', left: '5%', size: 36, color: colors.steelBlue },
+  { Icon: UtensilsCrossed, top: '42%', right: '3%', size: 34, color: colors.dustyRose },
+  // Lower-mid
+  { Icon: Apple, top: '60%', left: '4%', size: 34, color: colors.dustyRose },
+  { Icon: Wheat, top: '62%', right: '5%', size: 36, color: colors.olive },
+  // Bottom row
+  { Icon: Leaf, bottom: '6%', left: '6%', size: 38, color: colors.terracotta },
+  { Icon: Carrot, bottom: '5%', left: '30%', size: 36, color: colors.olive },
+  { Icon: Coffee, bottom: '7%', right: '30%', size: 34, color: colors.steelBlue },
+  { Icon: UtensilsCrossed, bottom: '4%', right: '6%', size: 40, color: colors.dustyRose },
 ];
 
 interface LayoutProps {
@@ -51,9 +61,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
     <div className="min-h-screen pb-20 md:pb-0 md:pt-16 relative overflow-hidden" style={{ backgroundColor: colors.cream }}>
       {/* Background food icons */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden>
-        {bgIcons.map(({ Icon, color, ...pos }, i) => (
-          <div key={i} className="absolute opacity-20" style={{ ...pos, color }}>
-            <Icon size={iconSize} strokeWidth={1.5} />
+        {bgIcons.map(({ Icon, color, size, ...pos }, i) => (
+          <div key={i} className="absolute opacity-25" style={{ ...pos, color }}>
+            <Icon size={size} strokeWidth={1.5} />
           </div>
         ))}
       </div>
