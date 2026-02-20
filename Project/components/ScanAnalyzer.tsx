@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Ingredient, ScanMode } from '../types';
 import { analyzeImage } from '../services/geminiService';
+
+const MAX_IMAGE_DIMENSION = 1280;
+const COMPRESSED_IMAGE_QUALITY = 0.72;
 
 const colors = {
   terracotta: '#C97064',
@@ -10,6 +13,53 @@ const colors = {
   cream: '#ECDCC9',
   dustyRose: '#CF9D8C',
   steelBlue: '#33658A',
+};
+
+const readFileAsDataUrl = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error('Failed to read the image.'));
+    };
+    reader.onerror = () => reject(new Error('Failed to read the image.'));
+    reader.readAsDataURL(file);
+  });
+
+const loadImageElement = (src: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Failed to decode the image.'));
+    image.src = src;
+  });
+
+const optimizeImage = async (file: File): Promise<string> => {
+  const originalDataUrl = await readFileAsDataUrl(file);
+  const image = await loadImageElement(originalDataUrl);
+  const longestSide = Math.max(image.width, image.height);
+
+  if (longestSide <= MAX_IMAGE_DIMENSION) {
+    return originalDataUrl;
+  }
+
+  const scale = MAX_IMAGE_DIMENSION / longestSide;
+  const targetWidth = Math.max(1, Math.round(image.width * scale));
+  const targetHeight = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+
+  const context = canvas.getContext('2d');
+  if (!context) {
+    return originalDataUrl;
+  }
+
+  context.drawImage(image, 0, 0, targetWidth, targetHeight);
+  return canvas.toDataURL('image/jpeg', COMPRESSED_IMAGE_QUALITY);
 };
 
 const formatIngredient = (item: Ingredient) => {
@@ -28,30 +78,46 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
   const [imageData, setImageData] = useState<string>('');
   const [items, setItems] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(false);
+  const [preparingImage, setPreparingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const uploadRequestId = useRef(0);
 
-  const handleFile = (file: File | null) => {
+  const handleFile = async (file: File | null) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       setError('Please upload an image file.');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImageData(typeof reader.result === 'string' ? reader.result : '');
+    const requestId = ++uploadRequestId.current;
+    setPreparingImage(true);
+    setError(null);
+    try {
+      const optimizedImage = await optimizeImage(file);
+      if (requestId !== uploadRequestId.current) {
+        return;
+      }
+      setImageData(optimizedImage);
       setItems([]);
-      setError(null);
-    };
-    reader.onerror = () => {
-      setError('Failed to read the image.');
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      if (requestId !== uploadRequestId.current) {
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Failed to process the image.');
+    } finally {
+      if (requestId === uploadRequestId.current) {
+        setPreparingImage(false);
+      }
+    }
   };
 
   const handleAnalyze = async () => {
     if (!imageData) {
       setError('Upload an image first.');
+      return;
+    }
+    if (preparingImage) {
+      setError('Please wait for image optimization to finish.');
       return;
     }
 
@@ -104,7 +170,9 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => handleFile(e.target.files?.[0] ?? null)}
+          onChange={(e) => {
+            void handleFile(e.target.files?.[0] ?? null);
+          }}
           style={{ color: colors.olive }}
           className="w-full"
         />
@@ -114,11 +182,11 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
         {error && <p className="text-sm" style={{ color: colors.terracotta }}>{error}</p>}
         <button
           onClick={handleAnalyze}
-          disabled={loading}
+          disabled={loading || preparingImage}
           className="w-full px-6 py-3 text-white font-semibold rounded-lg transition-opacity hover:opacity-90 disabled:opacity-60"
           style={{ backgroundColor: colors.dustyRose }}
         >
-          {loading ? 'Analyzing...' : 'Analyze Image'}
+          {preparingImage ? 'Preparing image...' : loading ? 'Analyzing...' : 'Analyze Image'}
         </button>
       </div>
 
