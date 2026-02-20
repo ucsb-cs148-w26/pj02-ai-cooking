@@ -12,4 +12,23 @@
 
 ## Scribed Discussion
 
-We worked together on **user feedback** this lab. We defined and documented our user feedback needs in `team/evaluation/USER_FEEDBACK_NEEDS.md`. We focused on **overall product satisfaction** (first-time and ongoing use) for the full flow: landing → signup/onboarding → dashboard (Scan, Pantry, Recipes, Calendar). We agreed on specific questions to ask users: whether the UI can be improved, if it feels intuitive and cohesive, where they got confused, how many clicks it took for core tasks (add item, generate recipe, check expiration reminders), what extra features they want, and 1–10 ratings for functionality, website design, and user experience. We also set **metrics to measure improvement**: (1) average rating of at least 8/10 in functionality, website design, and user experience, and (2) at least 80% of testers able to complete a core task without asking for clarification.
+e worked together on **user feedback** this lab. Our goal was to agree on what we want to learn from users and how we will measure improvement.
+
+We defined and documented our user feedback needs in **`team/evaluation/USER_FEEDBACK_NEEDS.md`**. We decided to focus on **overall product satisfaction** (first-time and ongoing use) for the full flow: **landing → signup/onboarding → dashboard (Scan, Pantry, Recipes, Calendar)**. We want to know whether this flow feels clear and valuable to users.
+
+We agreed on a set of **specific questions** to ask users during feedback sessions:
+
+- Is there a way for us to make the UI better?
+- Is the UI intuitive and cohesive?
+- Were you ever confused about what to click next? If so, where?
+- How many clicks did it take you to complete a core task (e.g., add an item, generate a recipe, check expiration reminders)?
+- Are there any more features you would like to see in our app?
+- How would you rate our product on a scale of 1–10 for: functionality, website design, and user experience?
+
+We also defined **metrics to measure improvement**:
+
+1. Achieve an average rating of at least **8/10** in functionality, website design, and user experience.
+2. At least **80%** of testers report they can complete a core task (add item, generate recipe, view expiration reminder) **without asking for clarification**.
+
+We aligned on using these questions and metrics so we can run user evaluations in future labs and use the results to guide design and feature work.
+
