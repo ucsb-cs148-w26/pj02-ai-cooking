@@ -32,6 +32,39 @@ function savePantryToCache(uid: string, items: Ingredient[]) {
   }
 }
 
+/**
+ * Derives an expiration date (YYYY-MM-DD) from expiryEstimate.
+ * Handles formats like "3 days", "1 week", "2 weeks", or "YYYY-MM-DD".
+ */
+function deriveExpirationFromEstimate(expiryEstimate?: string): string {
+  if (!expiryEstimate || !expiryEstimate.trim()) {
+    const d = new Date();
+    d.setDate(d.getDate() + 7);
+    return d.toISOString().split('T')[0];
+  }
+  const s = expiryEstimate.trim().toLowerCase();
+
+  const dateMatch = s.match(/^\d{4}-\d{2}-\d{2}$/);
+  if (dateMatch) return s;
+
+  const daysMatch = s.match(/(\d+)\s*days?/);
+  if (daysMatch) {
+    const d = new Date();
+    d.setDate(d.getDate() + parseInt(daysMatch[1], 10));
+    return d.toISOString().split('T')[0];
+  }
+  const weeksMatch = s.match(/(\d+)\s*weeks?/);
+  if (weeksMatch) {
+    const d = new Date();
+    d.setDate(d.getDate() + parseInt(weeksMatch[1], 10) * 7);
+    return d.toISOString().split('T')[0];
+  }
+
+  const d = new Date();
+  d.setDate(d.getDate() + 7);
+  return d.toISOString().split('T')[0];
+}
+
 export default function Home() {
   const [activeTab, setActiveTab] = useState('pantry');
   const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
@@ -102,14 +135,24 @@ export default function Home() {
   const handleAddScanItems = async (items: Ingredient[]) => {
     if (!currentUser?.uid) return;
     const newPantryItems: Ingredient[] = [];
+    const now = new Date().toISOString();
     for (const item of items) {
       try {
-        const docRef = await addDoc(collection(db, 'pantryItems'), {
-          ...item,
+        const expiration = deriveExpirationFromEstimate(item.expiryEstimate);
+        const docData = {
+          name: item.name,
+          quantity: item.quantity,
+          category: item.category || 'other',
+          expiryEstimate: item.expiryEstimate,
+          expiration,
+          storage: 'pantry',
           userId: currentUser.uid,
-          createdAt: new Date().toISOString(),
-        });
-        newPantryItems.push({ ...item, id: docRef.id });
+          userEmail: currentUser.email ?? undefined,
+          createdAt: now,
+          updatedAt: now,
+        };
+        const docRef = await addDoc(collection(db, 'pantryItems'), docData);
+        newPantryItems.push({ ...item, id: docRef.id, expiryEstimate: item.expiryEstimate } as Ingredient);
       } catch (error) {
         console.error('Error adding scanned item to Firestore:', error);
       }
@@ -155,3 +198,5 @@ export default function Home() {
     </Layout>
   );
 }
+
+
