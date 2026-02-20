@@ -55,6 +55,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     }
 
     const uid = user.uid;
+    // Show cached pantry immediately so reload doesn't show empty in Pantry tab
     const cached = loadPantryFullFromCache(uid);
     if (cached.length > 0) {
       setPantryItems(cached);
@@ -125,6 +126,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         updatedAt: new Date().toISOString()
       };
 
+      // Update local state and cache
       setPantryItems(prev => {
         const updated = [newItem, ...prev];
         updated.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
@@ -132,10 +134,12 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         return updated;
       });
 
+      // Call the callback if provided
       if (onAddFood) {
         onAddFood(newItem);
       }
 
+      // Clear form
       setFood({ 
         name: '', 
         category: '', 
@@ -181,17 +185,19 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         return updated;
       });
       console.log('Item deleted successfully');
-    } catch (error: unknown) {
-      const err = error as { code?: string; message?: string };
-      console.error('Error deleting item:', err);
+    } catch (error: any) {
+      console.error('Error deleting item:', error);
+      console.error('Error code:', error?.code);
+      console.error('Error message:', error?.message);
       
+      // Provide more specific error messages
       let errorMessage = 'Failed to delete item. Please try again.';
-      if (err?.code === 'permission-denied') {
+      if (error?.code === 'permission-denied') {
         errorMessage = 'Permission denied. You may not have permission to delete this item.';
-      } else if (err?.code === 'not-found') {
+      } else if (error?.code === 'not-found') {
         errorMessage = 'Item not found. It may have already been deleted.';
-      } else if (err?.message) {
-        errorMessage = `Failed to delete: ${err.message}`;
+      } else if (error?.message) {
+        errorMessage = `Failed to delete: ${error.message}`;
       }
       
       alert(errorMessage);
@@ -212,6 +218,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       {/* Form */}
       <div className="bg-white/70 backdrop-blur-lg rounded-3xl p-6 md:p-8 shadow-2xl border-2 border-green-200 space-y-5 mb-12 text-gray-900">
         
+        {/* Food Name */}
         <div>
           <label className="block text-gray-900 font-semibold mb-2">Food Name *</label>
           <input 
@@ -223,6 +230,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           />
         </div>
 
+        {/* Category */}
         <div>
           <label className="block text-gray-900 font-semibold mb-2">Category *</label>
           <select 
@@ -241,6 +249,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           </select>
         </div>
 
+        {/* Quantity & Unit */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-900 font-semibold mb-2">Quantity</label>
@@ -269,6 +278,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           </div>
         </div>
 
+        {/* Expiration Date */}
         <div>
           <label className="block text-gray-900 font-semibold mb-2">Expiration Date *</label>
           <input 
@@ -279,6 +289,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           />
         </div>
 
+        {/* Storage Location */}
         <div>
           <label className="block text-gray-900 font-semibold mb-2">Storage Location *</label>
           <select 
@@ -294,6 +305,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           </select>
         </div>
 
+        {/* Notes */}
         <div>
           <label className="block text-gray-900 font-semibold mb-2">Notes</label>
           <textarea 
@@ -301,10 +313,11 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
             onChange={(e) => update('notes', e.target.value)}
             placeholder="Additional notes..."
             rows={2}
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none text-gray-900 placeholder:text-gray-500"
+            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-green-400 focus:outline-none resize-none text-gray-900 placeholder:text-gray-500"
           />
         </div>
 
+        {/* Buttons */}
         <div className="flex gap-4 pt-4">
           <button 
             onClick={handleSubmit}

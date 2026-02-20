@@ -16,10 +16,13 @@ export default function AccountPage() {
   const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
+    // Redirect to login if not authenticated
     if (!authLoading && !currentUser) {
       router.push('/login');
       return;
     }
+
+    // Load user preferences
     if (currentUser) {
       getUserPreferences(currentUser.uid).then(prefs => {
         setUserPreferences(prefs);
@@ -54,6 +57,7 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-50 via-blue-50 to-yellow-100 relative overflow-hidden px-4 py-8 md:pt-24">
+      {/* Colorful Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-yellow-300 to-orange-400 opacity-20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gradient-to-tr from-blue-400 to-purple-500 opacity-20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
@@ -61,6 +65,7 @@ export default function AccountPage() {
       </div>
 
       <div className="max-w-2xl mx-auto relative z-10 space-y-6">
+        {/* Header */}
         <div className="text-center mb-8">
           <div className="relative inline-flex items-center justify-center mb-4">
             <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-60 animate-pulse"></div>
@@ -74,12 +79,14 @@ export default function AccountPage() {
           <p className="text-gray-600">Manage your PantryPal profile</p>
         </div>
 
+        {/* Account Info Card */}
         <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border-2 border-purple-200 space-y-6">
           <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <ChefHat className="text-purple-600" />
             Account Information
           </h2>
 
+          {/* Email */}
           <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl">
             <div className="mt-1">
               <Mail className="text-purple-600" size={24} />
@@ -90,6 +97,7 @@ export default function AccountPage() {
             </div>
           </div>
 
+          {/* User ID */}
           <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl">
             <div className="mt-1">
               <User className="text-blue-600" size={24} />
@@ -100,6 +108,7 @@ export default function AccountPage() {
             </div>
           </div>
 
+          {/* Account Created */}
           <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl">
             <div className="mt-1">
               <Calendar className="text-green-600" size={24} />
@@ -118,6 +127,7 @@ export default function AccountPage() {
             </div>
           </div>
 
+          {/* User Preferences (if available) */}
           {userPreferences && (
             <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl">
               <div className="mt-1">
@@ -144,6 +154,7 @@ export default function AccountPage() {
           )}
         </div>
 
+        {/* Logout Button */}
         <button
           onClick={handleLogout}
           disabled={loggingOut}
@@ -165,6 +176,7 @@ export default function AccountPage() {
           )}
         </button>
 
+        {/* Back to Home */}
         <button
           onClick={() => router.push('/')}
           className="w-full py-3 px-6 bg-white/60 backdrop-blur-sm text-gray-700 font-semibold rounded-2xl hover:bg-white/80 transition-all border-2 border-gray-200"
