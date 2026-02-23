@@ -5,52 +5,20 @@
 We would like user feedback on:
 
 - User satisfaction with the overall product (first-time and ongoing use)
-- Whether PantryPal meets user expectations as a “smart cooking companion”
+- How helpful the generated recipes actually are
+- How accurate the image scanner is
 - Whether the combination of:
   - Landing
   - Signup/Onboarding
   - Dashboard (Scan, Pantry, Recipes, Calendar)
   
-  feels clear and valuable.
-
-We care about:
-- Satisfaction right after first use
-- Satisfaction after repeated use
-
----
-
-## UI & Experience Questions
-
-- Is there a way for us to make the UI better?
-- Is the UI intuitive and cohesive?
-- Were you ever confused about what to click next? If so, where?
-- How many clicks did it take you to complete a core task (e.g., add an item, generate a recipe, check expiration reminders)?
-- Are there any more features you would like to see in our app?
-
----
-
-## Ratings (Scale of 1–10)
-
-- **Functionality**
-- **Website Design**
-- **User Experience**
-
----
+  feels clear and easy to navigate.
 
 ## Metrics to Measure Improvement
 
-### Objective
+1) Out of the 3 recipes that were generated, what percent of testers would use at least 1 recipe that was generated?
+2) For each tester, how many out of the 3 recipes would you use 1,2, or 3?
+3) For each reciept/fridge image inserted, how many items were correctly identified?
+4) On average how long did image detection take?
 
-Improve overall usability and user satisfaction of our product.
-
-### Key Results (Measurable & Testable)
-
-1. Achieve an average rating of at least **8/10** in:
-   - Functionality
-   - Website Design
-   - User Experience
-
-2. At least **80% of testers** report they can complete a core task  
-   (add item, generate recipe, view expiration reminder)  
-   without asking for clarification.
 
