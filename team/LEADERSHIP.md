@@ -16,11 +16,11 @@
 | Role | Team Member |
 | --- | --- |
 | Product Owner | Yuxi Ji  |
-| Scrum Master | Krisha Soneji  |
+| Scrum Master | Mahima Chaudhary  |
 | Testing/QA Coordinator | Andy Wang |
-| Retro 3 Leader (Week 9) | Mahima Chaudhary |
-| UX Coordinator | Krisha Soneji |
+| Retro 3 Leader (Week 9) | Krisha Soneji |
+| UX Coordinator | Mahima Chaudhary |
 | Design Document Coordinator | Daniel Du |
 | Deployment Document Coordinator | Daniel Du |
 | User Manual Coordinator | Yuxi Ji |
-| Final Presentation Leader (Week 9/10) | Mahima Chaudhary |
+| Final Presentation Leader (Week 9/10) | Krisha Soneji |
