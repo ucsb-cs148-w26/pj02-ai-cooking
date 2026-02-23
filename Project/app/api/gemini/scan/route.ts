@@ -10,8 +10,14 @@ const getApiKey = () => {
   return key;
 };
 
-const getImagePayload = (base64Image: string) => {
-  return base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
+const getImagePayload = (rawImage: string): { data: string; mimeType: string } => {
+  const [prefix, data] = rawImage.split(',', 2);
+  if (data) {
+    const mimeTypeMatch = prefix.match(/^data:(image\/[a-zA-Z0-9.+-]+)/i);
+    return { mimeType: mimeTypeMatch?.[1] ?? 'image/jpeg', data };
+  }
+
+  return { mimeType: 'image/jpeg', data: rawImage };
 };
 
 export async function POST(request: Request) {
@@ -56,11 +62,13 @@ export async function POST(request: Request) {
       }
     };
 
+    const imagePayload = getImagePayload(base64Image);
+
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: {
         parts: [
-          { inlineData: { data: getImagePayload(base64Image), mimeType: 'image/jpeg' } },
+          { inlineData: imagePayload },
           { text: prompt }
         ]
       },
