@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
-import type { Ingredient, ScanMode } from '@/types';
+import type { Ingredient } from '@/types';
 
 const getApiKey = () => {
   const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
@@ -22,14 +22,13 @@ const getImagePayload = (rawImage: string): { data: string; mimeType: string } =
 
 export async function POST(request: Request) {
   try {
-    const { base64Image, mode } = (await request.json()) as {
+    const { base64Image } = (await request.json()) as {
       base64Image?: string;
-      mode?: ScanMode;
     };
 
-    if (!base64Image || !mode) {
+    if (!base64Image) {
       return NextResponse.json(
-        { error: 'Missing base64Image or mode.' },
+        { error: 'Missing base64Image.' },
         { status: 400 }
       );
     }
@@ -48,9 +47,9 @@ export async function POST(request: Request) {
     };
 
     const prompt =
-      mode === 'food'
-        ? 'Identify all food ingredients in this image. Return a JSON list with quantity and shelf life estimates.'
-        : 'Extract food items from this receipt. Ignore taxes/totals. Estimate expiry based on food type (e.g. Milk = 1 week).';
+      'Identify all food items visible in this image. The image may be a photo of food, a fridge, ' +
+      'a grocery receipt, or a shopping list. For each food item, return its name, estimated quantity, ' +
+      'category, and shelf-life estimate. Ignore non-food entries such as taxes, totals, and store info.';
 
     const schema = {
       type: Type.OBJECT,
