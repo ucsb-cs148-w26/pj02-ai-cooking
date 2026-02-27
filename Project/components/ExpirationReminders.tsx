@@ -6,12 +6,14 @@ import type { PantryItem } from '@/types';
 interface ExpirationRemindersProps {
   items: PantryItem[];
   onDelete?: (id: string) => void;
+  onEdit?: (item: PantryItem) => void;
   loading?: boolean;
 }
 
 export function ExpirationReminders({
   items,
   onDelete,
+  onEdit,
   loading = false,
 }: ExpirationRemindersProps) {
   const sortedItems = [...items].sort(
@@ -53,6 +55,7 @@ export function ExpirationReminders({
             key={item.id}
             item={item}
             onDelete={onDelete}
+            onEdit={onEdit}
           />
         ))}
       </div>
