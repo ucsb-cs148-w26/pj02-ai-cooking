@@ -1,1 +1,1 @@
-PlaceHolder for now
+[Please use this link to access](https://docs.google.com/document/d/1iUBZEyKCQ5k1bGQs3GmxCC7X62Pxq4EsVzq0XrUpr-g/edit?tab=t.0)
