@@ -6,6 +6,7 @@ import { Heart } from 'lucide-react';
 import { db, useAuth } from '@/lib/firebase';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
 import { generateRecipes } from '../services/geminiService';
+import { getUserPreferences } from '../services/userPreferencesService';
 import { saveRecipe, unsaveRecipe } from '../services/savedRecipesService';
 import { useSavedRecipeIds } from '@/hooks/useSavedRecipeIds';
 
@@ -37,6 +38,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   const [error, setError] = useState<string | null>(null);
   const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
   const [pantryLoading, setPantryLoading] = useState(true);
+  const [userPrefs, setUserPrefs] = useState<UserPreferences | null>(null);
   const {
     savedRecipeIds,
     loading: savedIdsLoading,
@@ -45,6 +47,14 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
 
   const itemsForRecipes = pantryItems.length > 0 ? pantryItems : ingredients;
   const pantrySummary = itemsForRecipes.map(formatIngredient);
+
+  useEffect(() => {
+    if (!user) {
+      setUserPrefs(null);
+      return;
+    }
+    getUserPreferences(user.uid).then(setUserPrefs);
+  }, [user]);
 
   useEffect(() => {
     if (user === null) {
@@ -94,8 +104,9 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     setError(null);
     try {
       const preferences: Partial<UserPreferences> = {
-        cuisine: cuisine.trim(),
-        restrictions: restrictions.trim()
+        ...userPrefs,
+        cuisine: cuisine.trim() || userPrefs?.cuisinePreferences?.join(', ') || '',
+        restrictions: restrictions.trim() || ''
       };
       const result = await generateRecipes(itemsForRecipes, preferences);
       setRecipes(result);

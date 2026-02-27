@@ -54,18 +54,39 @@ export async function POST(request: Request) {
       .map((i) => `${i.name} (${i.expiryEstimate || 'N/A'})`)
       .join(', ');
 
-    const constraints = [
-      preferences?.cuisine ? `Cuisine: ${preferences.cuisine}` : '',
-      preferences?.restrictions ? `Restrictions: ${preferences.restrictions}` : '',
-      'Prioritize ingredients expiring soon (short shelf life).'
-    ]
-      .filter(Boolean)
-      .join('. ');
+    const constraints: string[] = [];
+
+    if (preferences?.cuisine) {
+      constraints.push(`Preferred cuisine: ${preferences.cuisine}`);
+    } else if (preferences?.cuisinePreferences?.length) {
+      constraints.push(`Preferred cuisines: ${preferences.cuisinePreferences.join(', ')}`);
+    }
+
+    if (preferences?.restrictions) {
+      constraints.push(`Dietary restrictions: ${preferences.restrictions}`);
+    }
+
+    if (preferences?.dietType && preferences.dietType !== 'None') {
+      constraints.push(`Diet type: ${preferences.dietType}`);
+    }
+
+    if (preferences?.allergies?.length) {
+      const allAllergies = preferences.customAllergies
+        ? [...preferences.allergies, preferences.customAllergies]
+        : preferences.allergies;
+      constraints.push(`Allergies (MUST AVOID these ingredients): ${allAllergies.join(', ')}`);
+    }
+
+    if (preferences?.cookingSkillLevel) {
+      constraints.push(`Cooking skill level: ${preferences.cookingSkillLevel} (adjust recipe complexity accordingly)`);
+    }
+
+    constraints.push('Prioritize ingredients expiring soon (short shelf life).');
 
     const prompt = `
       Ingredients available: ${ingredientList}.
-      Constraints: ${constraints}.
-      Suggest 3 practical, delicious recipes.
+      ${constraints.length > 0 ? `Constraints: ${constraints.join('. ')}.` : ''}
+      Suggest 3 practical, delicious recipes that respect all dietary restrictions and allergies.
     `;
 
     const schema = {
