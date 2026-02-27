@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { Heart } from 'lucide-react';
 import { db, useAuth } from '@/lib/firebase';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
 import { generateRecipes } from '../services/geminiService';
@@ -163,9 +164,21 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
           {recipes.map((recipe) => (
             <div
               key={recipe.id}
-              className="rounded-2xl p-5 space-y-3 border"
+              className="rounded-2xl p-5 space-y-3 border relative"
               style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: colors.dustyRose + '40' }}
             >
+              <button
+                type="button"
+                className="absolute top-4 right-4 p-2 rounded-full border transition-opacity hover:opacity-80"
+                style={{ borderColor: colors.dustyRose, color: colors.terracotta }}
+                aria-label="Save recipe"
+                onClick={() => {}}
+              >
+                <Heart size={20} />
+              </button>
+              <span className="absolute top-4 right-14 text-sm font-medium" style={{ color: colors.olive }}>
+                Save
+              </span>
               {recipe.image && (
                 <img src={recipe.image} alt={recipe.title} className="w-full rounded-xl" />
               )}
