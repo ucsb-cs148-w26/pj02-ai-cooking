@@ -84,7 +84,22 @@ export async function POST(request: Request) {
     const parsed = JSON.parse(response.text);
     return NextResponse.json({ items: parsed.ingredients || [] });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Scan failed.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    const rawMessage = error instanceof Error ? error.message : 'Scan failed.';
+    const status = (error as { status?: number }).status;
+    const isRateLimited =
+      status == 429 ||
+      /429|RESOURCE_EXHAUSTED|quota|rate limit/i.test(rawMessage);
+
+    if (isRateLimited) {
+      return NextResponse.json(
+        { error: 'Scan service is temporarily busy. Please try again in a minute.' },
+        { status: 429 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'The scanner could not process your image. Please try again or upload a different photo.' },
+      { status: 500 }
+    );
   }
 }
