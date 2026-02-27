@@ -24,18 +24,9 @@ This work satisfies the Lab07 design document requirements and will be expanded 
 
 ### Part 2: Review and Plan Leadership Roles
 
-We also discussed leadership roles for the rest of the quarter and how they relate to our past work.
+We also discussed leadership roles for the rest of the quarter.
 
-#### Previous leadership roles (from team docs)
-
-- **Initial Retro Leader(s):**  
-  - Retro 02 was led by **Yuxi Ji** (see `team/retrospectives/RETRO_02.md`).  
-- **Sprint 01 coordination:**  
-  - Sprint 01 (led by **Daniel Du**) review (`team/SPRINT01_REVIEW.md`) lists all team members and documents our MVP scope and outcomes; informal leadership was shared across the team, but we did not explicitly label Product Owner / Scrum Master roles in early weeks.
-
-We noted that going forward we should be more explicit about who holds which leadership responsibilities so that we can share the workload fairly and meet course requirements.
-
-#### New leadership role assignments
+#### Leadership role assignments
 
 Following the constraints in the lab handout (Product Owner ≠ Scrum Master; different people for multiple retros; avoid any one person taking on three roles before others have two), we assigned:
 
