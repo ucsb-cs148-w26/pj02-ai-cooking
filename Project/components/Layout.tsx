@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChefHat, ShoppingBag, Utensils, History, User, Calendar, Apple, Carrot, Wheat, Leaf, Cherry, UtensilsCrossed, Coffee } from 'lucide-react';
+import { ChefHat, ShoppingBag, Utensils, History, User, Calendar, Heart, Apple, Carrot, Wheat, Leaf, Cherry, UtensilsCrossed, Coffee } from 'lucide-react';
 import { useAuthContext } from '@/components/AuthProvider';
 import { ExpirationCalendar } from '@/components/ExpirationCalendar';
 
@@ -109,14 +109,25 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
             <Calendar size={20} />
           </button>
           {currentUser ? (
-            <Link
-              href="/account"
-              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
-              style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
-              title="Account"
-            >
-              <User size={20} />
-            </Link>
+            <>
+              <Link
+                href="/saved-recipes"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
+                title="My Saved Recipes"
+              >
+                <Heart size={18} />
+                <span className="hidden lg:inline">My Saved Recipes</span>
+              </Link>
+              <Link
+                href="/account"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
+                title="Account"
+              >
+                <User size={20} />
+              </Link>
+            </>
           ) : (
             <>
               <button
@@ -174,6 +185,16 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
             <span className="text-[10px] font-bold uppercase">{label}</span>
           </button>
         ))}
+        {currentUser && (
+          <Link
+            href="/saved-recipes"
+            className="flex flex-col items-center gap-1"
+            style={{ color: colors.cream + '99' }}
+          >
+            <Heart size={22} />
+            <span className="text-[10px] font-bold uppercase">Saved</span>
+          </Link>
+        )}
         <Link
           href={currentUser ? '/account' : '/login'}
           className="flex flex-col items-center gap-1"
