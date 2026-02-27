@@ -168,10 +168,7 @@ export default function Home() {
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === 'scan' && (
         <div className="space-y-6">
-          <div
-            className="rounded-2xl p-6 md:p-8 border text-center"
-            style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}
-          >
+          <div className="text-center">
             <h1
               className="text-4xl md:text-5xl font-bold mb-3"
               style={{ color: '#515B3A' }}
@@ -198,10 +195,7 @@ export default function Home() {
       
       {activeTab === 'recipes' && (
         <div className="space-y-6">
-          <div
-            className="rounded-2xl p-6 md:p-8 border text-center"
-            style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}
-          >
+          <div className="text-center">
             <h1
               className="text-4xl md:text-5xl font-bold mb-3"
               style={{ color: '#515B3A' }}
