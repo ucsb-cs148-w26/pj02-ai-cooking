@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/firebase';
 import {
   getSavedRecipes,
   type SavedRecipeDocument,
+  unsaveRecipe,
 } from '@/services/savedRecipesService';
 
 export default function SavedRecipesPage() {
@@ -14,6 +15,8 @@ export default function SavedRecipesPage() {
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipeDocument[]>([]);
   const [listLoading, setListLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -56,6 +59,42 @@ export default function SavedRecipesPage() {
       cancelled = true;
     };
   }, [user, loading]);
+
+  const handleToggleExpand = (id: string) => {
+    setExpandedId((current) => (current === id ? null : id));
+  };
+
+  const handleUnsave = async (recipe: SavedRecipeDocument) => {
+    if (!user) {
+      return;
+    }
+
+    const recipeKey = recipe.recipeId || recipe.id;
+
+    if (!recipeKey) {
+      return;
+    }
+
+    try {
+      setRemovingId(recipe.id);
+      setError(null);
+
+      await unsaveRecipe(user.uid, recipeKey);
+
+      setSavedRecipes((current) =>
+        current.filter((item) => item.id !== recipe.id),
+      );
+
+      setExpandedId((current) =>
+        current === recipe.id ? null : current,
+      );
+    } catch (err) {
+      console.error('Failed to remove saved recipe:', err);
+      setError('Failed to remove saved recipe. Please try again.');
+    } finally {
+      setRemovingId(null);
+    }
+  };
 
   if (loading || !user) {
     return (
@@ -105,29 +144,93 @@ export default function SavedRecipesPage() {
                 key={recipe.id}
                 className="rounded-2xl border border-gray-200 bg-white/80 p-5 shadow-sm"
               >
-                <div className="flex flex-col gap-2">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {recipe.title}
-                  </h2>
-                  {recipe.description && (
-                    <p className="text-gray-700">
-                      {recipe.description}
-                    </p>
-                  )}
-                  <div className="text-sm text-gray-600">
-                    {recipe.time && (
-                      <span className="mr-3">
-                        <span className="font-semibold">Time:</span>{' '}
-                        {recipe.time}
-                      </span>
-                    )}
-                    {recipe.difficulty && (
-                      <span>
-                        <span className="font-semibold">Difficulty:</span>{' '}
-                        {recipe.difficulty}
-                      </span>
-                    )}
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-semibold text-gray-900">
+                        {recipe.title}
+                      </h2>
+                      {recipe.description && (
+                        <p className="text-gray-700">
+                          {recipe.description}
+                        </p>
+                      )}
+                      <div className="text-sm text-gray-600">
+                        {recipe.time && (
+                          <span className="mr-3">
+                            <span className="font-semibold">Time:</span>{' '}
+                            {recipe.time}
+                          </span>
+                        )}
+                        {recipe.difficulty && (
+                          <span>
+                            <span className="font-semibold">Difficulty:</span>{' '}
+                            {recipe.difficulty}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row gap-2 md:flex-col md:items-end">
+                      <button
+                        type="button"
+                        className="rounded-full border border-gray-300 px-4 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        onClick={() => handleToggleExpand(recipe.id)}
+                      >
+                        {expandedId === recipe.id ? 'Hide details' : 'View details'}
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-full border border-red-200 px-4 py-1 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60"
+                        onClick={() => handleUnsave(recipe)}
+                        disabled={removingId === recipe.id}
+                      >
+                        {removingId === recipe.id ? 'Removing…' : 'Remove from saved'}
+                      </button>
+                    </div>
                   </div>
+
+                  {expandedId === recipe.id && (
+                    <div className="mt-3 grid gap-4 border-t border-gray-200 pt-4 md:grid-cols-2">
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-900">
+                          Ingredients
+                        </h3>
+                        {recipe.ingredients.length === 0 ? (
+                          <p className="mt-1 text-sm text-gray-600">
+                            No ingredients listed.
+                          </p>
+                        ) : (
+                          <ul className="mt-1 list-disc list-inside text-sm text-gray-700">
+                            {recipe.ingredients.map((item, index) => (
+                              <li key={`${recipe.id}-ing-${index}`}>
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+
+                      <div>
+                        <h3 className="text-sm font-semibold text-gray-900">
+                          Instructions
+                        </h3>
+                        {recipe.instructions.length === 0 ? (
+                          <p className="mt-1 text-sm text-gray-600">
+                            No instructions listed.
+                          </p>
+                        ) : (
+                          <ol className="mt-1 list-decimal list-inside space-y-1 text-sm text-gray-700">
+                            {recipe.instructions.map((step, index) => (
+                              <li key={`${recipe.id}-step-${index}`}>
+                                {step}
+                              </li>
+                            ))}
+                          </ol>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </article>
             ))}
