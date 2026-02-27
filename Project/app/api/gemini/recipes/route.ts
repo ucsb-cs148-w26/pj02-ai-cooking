@@ -120,12 +120,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ recipes: [] as Recipe[] });
     }
 
-    const recipes: Recipe[] = JSON.parse(response.text);
+    const parsed = JSON.parse(response.text) as Recipe[];
+    const recipes: Recipe[] = Array.isArray(parsed) ? parsed : [];
     const hydrated = await Promise.all(
-      recipes.map(async (recipe) => ({
-        ...recipe,
-        image: await generateRecipeImage(ai, recipe.title)
-      }))
+      recipes.map(async (recipe, index) => {
+        const id = recipe?.id && String(recipe.id).trim()
+          ? String(recipe.id).trim()
+          : `recipe-${index}-${Date.now()}`;
+        return {
+          ...recipe,
+          id,
+          image: await generateRecipeImage(ai, recipe.title)
+        };
+      })
     );
 
     return NextResponse.json({ recipes: hydrated });

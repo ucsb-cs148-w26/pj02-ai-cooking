@@ -109,7 +109,11 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         restrictions: restrictions.trim() || ''
       };
       const result = await generateRecipes(itemsForRecipes, preferences);
-      setRecipes(result);
+      const withIds = (result || []).map((r, i) => ({
+        ...r,
+        id: r?.id?.trim() || `recipe-${i}-${Date.now()}`,
+      }));
+      setRecipes(withIds);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Recipe generation failed.');
     } finally {
@@ -123,19 +127,27 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       return;
     }
 
+    const recipeId = recipe?.id?.trim() || `recipe-${recipe?.title ?? 'unknown'}-${Date.now()}`;
+    const recipeToSave = { ...recipe, id: recipeId };
+
     try {
-      const alreadySaved = savedRecipeIds.includes(recipe.id);
+      const alreadySaved = savedRecipeIds.includes(recipeId);
 
       if (alreadySaved) {
-        await unsaveRecipe(user.uid, recipe.id);
+        await unsaveRecipe(user.uid, recipeId);
       } else {
-        await saveRecipe(user.uid, recipe);
+        await saveRecipe(user.uid, recipeToSave);
       }
 
       await refetchSavedIds();
     } catch (err) {
       console.error('Failed to toggle saved recipe state:', err);
-      setError('Could not update saved recipes. Please try again.');
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('permission') || msg.includes('PERMISSION_DENIED')) {
+        setError('Cannot save: Firestore rules may be blocking. Check Firebase Console → Firestore → Rules for "savedRecipes".');
+      } else {
+        setError('Could not update saved recipes. Please try again.');
+      }
     }
   };
 
@@ -226,9 +238,12 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
 
       {recipes.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {recipes.map((recipe) => (
+          {recipes.map((recipe, index) => {
+            const recipeId = recipe?.id?.trim() || `recipe-${recipe?.title ?? 'unknown'}-${index}`;
+            const recipeWithId = { ...recipe, id: recipeId };
+            return (
             <div
-              key={recipe.id}
+              key={recipeId}
               className="rounded-2xl p-5 space-y-3 border relative"
               style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: colors.dustyRose + '40' }}
             >
@@ -239,9 +254,9 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
                     type="button"
                     className="absolute top-4 right-4 p-2 rounded-full border transition-opacity hover:opacity-80 disabled:opacity-50"
                     style={{ borderColor: colors.dustyRose, color: colors.terracotta }}
-                    aria-label={savedRecipeIds.includes(recipe.id) ? 'Unsave recipe' : 'Save recipe'}
+                    aria-label={savedRecipeIds.includes(recipeId) ? 'Unsave recipe' : 'Save recipe'}
                     disabled={savedIdsLoading}
-                    onClick={() => handleToggleSave(recipe)}
+                    onClick={() => handleToggleSave(recipeWithId)}
                   >
                     <Heart size={20} />
                   </button>
@@ -249,7 +264,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
                     className="absolute top-4 right-14 text-sm font-medium"
                     style={{ color: colors.olive }}
                   >
-                    {savedRecipeIds.includes(recipe.id) ? 'Saved' : 'Save'}
+                    {savedRecipeIds.includes(recipeId) ? 'Saved' : 'Save'}
                   </span>
                 </>
               ) : (
@@ -286,7 +301,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
                 <p className="font-semibold" style={{ color: colors.olive }}>Ingredients</p>
                 <ul className="list-disc list-inside text-sm" style={{ color: colors.olive, opacity: 0.9 }}>
                   {recipe.ingredients.map((item, idx) => (
-                    <li key={`${recipe.id}-ing-${idx}`}>{item}</li>
+                    <li key={`${recipeId}-ing-${idx}`}>{item}</li>
                   ))}
                 </ul>
               </div>
@@ -294,12 +309,13 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
                 <p className="font-semibold" style={{ color: colors.olive }}>Instructions</p>
                 <ol className="list-decimal list-inside text-sm space-y-1" style={{ color: colors.olive, opacity: 0.9 }}>
                   {recipe.instructions.map((step, idx) => (
-                    <li key={`${recipe.id}-step-${idx}`}>{step}</li>
+                    <li key={`${recipeId}-step-${idx}`}>{step}</li>
                   ))}
                 </ol>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
