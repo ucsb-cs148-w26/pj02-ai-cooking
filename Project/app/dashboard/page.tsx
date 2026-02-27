@@ -168,9 +168,19 @@ export default function Home() {
     <Layout activeTab={activeTab} onTabChange={setActiveTab}>
       {activeTab === 'scan' && (
         <div className="space-y-6">
-          <div className="rounded-2xl p-8 border" style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}>
-            <h1 className="text-3xl font-bold mb-2" style={{ color: '#515B3A' }}>Scan Items</h1>
-            <p style={{ color: '#515B3A', opacity: 0.8 }}>Upload a receipt or fridge photo to analyze.</p>
+          <div
+            className="rounded-2xl p-6 md:p-8 border text-center"
+            style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}
+          >
+            <h1
+              className="text-4xl md:text-5xl font-bold mb-3"
+              style={{ color: '#515B3A' }}
+            >
+              Scan Items
+            </h1>
+            <p style={{ color: '#515B3A', opacity: 0.8 }}>
+              Upload a receipt or fridge photo to analyze.
+            </p>
           </div>
           <ScanAnalyzer onAddItems={handleAddScanItems} />
         </div>
@@ -188,9 +198,19 @@ export default function Home() {
       
       {activeTab === 'recipes' && (
         <div className="space-y-6">
-          <div className="rounded-2xl p-8 border" style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}>
-            <h1 className="text-3xl font-bold mb-2" style={{ color: '#515B3A' }}>Recipes</h1>
-            <p style={{ color: '#515B3A', opacity: 0.8 }}>Generate recipes from your pantry items.</p>
+          <div
+            className="rounded-2xl p-6 md:p-8 border text-center"
+            style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: '#CF9D8C40' }}
+          >
+            <h1
+              className="text-4xl md:text-5xl font-bold mb-3"
+              style={{ color: '#515B3A' }}
+            >
+              Recipes
+            </h1>
+            <p style={{ color: '#515B3A', opacity: 0.8 }}>
+              Generate recipes from your pantry items.
+            </p>
           </div>
           <RecipeGenerator ingredients={pantryItems} />
         </div>
