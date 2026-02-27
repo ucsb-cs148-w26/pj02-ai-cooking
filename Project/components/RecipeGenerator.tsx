@@ -136,17 +136,42 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         className="rounded-2xl p-6 space-y-4 border"
         style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '40' }}
       >
-        <h2 className="text-2xl font-bold" style={{ color: colors.olive }}>Pantry Items</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-2xl font-bold" style={{ color: colors.olive }}>
+            Pantry Items
+          </h2>
+          {!pantryLoading && pantrySummary.length > 0 && (
+            <span className="text-sm font-medium" style={{ color: colors.olive, opacity: 0.75 }}>
+              {pantrySummary.length} item{pantrySummary.length !== 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
         {pantryLoading ? (
           <p style={{ color: colors.olive, opacity: 0.7 }}>Loading pantry items...</p>
         ) : pantrySummary.length === 0 ? (
           <p style={{ color: colors.olive, opacity: 0.7 }}>No pantry items yet.</p>
         ) : (
-          <ul className="list-disc list-inside" style={{ color: colors.olive }}>
-            {pantrySummary.map((item, idx) => (
-              <li key={`${item}-${idx}`}>{item}</li>
-            ))}
-          </ul>
+          <div className="max-h-52 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {pantrySummary.map((item, idx) => (
+                <div
+                  key={`${item}-${idx}`}
+                  className="rounded-xl px-3 py-2 text-sm border flex items-start gap-2"
+                  style={{
+                    borderColor: colors.dustyRose + '50',
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    color: colors.olive,
+                  }}
+                >
+                  <span
+                    className="mt-1 h-2 w-2 rounded-full shrink-0"
+                    style={{ backgroundColor: colors.terracotta }}
+                  />
+                  <span className="leading-snug break-words">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
