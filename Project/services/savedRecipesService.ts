@@ -14,6 +14,24 @@ import type { Recipe } from '../types';
 const SAVED_RECIPES_COLLECTION = 'savedRecipes';
 
 /**
+ * Shape of a saved recipe document as returned from Firestore.
+ * Includes the Firestore document id plus the fields we store.
+ */
+export interface SavedRecipeDocument {
+  id: string;
+  userId: string;
+  recipeId: string;
+  title: string;
+  description?: string;
+  time?: string;
+  difficulty?: string;
+  ingredients: string[];
+  instructions: string[];
+  image?: string;
+  savedAt?: string;
+}
+
+/**
  * Returns the Firestore collection reference for saved recipes.
  * Use this for addDoc, query, etc.
  */
@@ -114,4 +132,50 @@ export async function getSavedRecipeIds(userId: string): Promise<string[]> {
     }
   });
   return ids;
+}
+
+/**
+ * Returns the full list of saved recipes for a user, including
+ * all fields needed to render a card or detail view.
+ *
+ * @param userId - Current user's uid
+ */
+export async function getSavedRecipes(
+  userId: string
+): Promise<SavedRecipeDocument[]> {
+  if (!userId) {
+    return [];
+  }
+
+  const colRef = getSavedRecipesCollectionRef();
+  const q = query(colRef, where('userId', '==', userId));
+  const snapshot = await getDocs(q);
+
+  const results: SavedRecipeDocument[] = [];
+
+  snapshot.forEach((document) => {
+    const data = document.data();
+
+    results.push({
+      id: document.id,
+      userId: typeof data.userId === 'string' ? data.userId : userId,
+      recipeId: typeof data.recipeId === 'string' ? data.recipeId : '',
+      title: typeof data.title === 'string' ? data.title : 'Untitled recipe',
+      description:
+        typeof data.description === 'string' ? data.description : undefined,
+      time: typeof data.time === 'string' ? data.time : undefined,
+      difficulty:
+        typeof data.difficulty === 'string' ? data.difficulty : undefined,
+      ingredients: Array.isArray(data.ingredients)
+        ? data.ingredients
+        : [],
+      instructions: Array.isArray(data.instructions)
+        ? data.instructions
+        : [],
+      image: typeof data.image === 'string' ? data.image : undefined,
+      savedAt: typeof data.savedAt === 'string' ? data.savedAt : undefined,
+    });
+  });
+
+  return results;
 }
