@@ -10,6 +10,4 @@ Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
 
 Scribed Discussion:
 
-We all worked on our sub-issues for the week and prepared for the tagged release.
-
-We discussed what we should put in the USER_FEEDBACK_NEEDS document.
+We defined and documented our user feedback needs in **`team/evaluation/USER_FEEDBACK_NEEDS.md`**. We decided to focus on **overall product satisfaction** (first-time and ongoing use) for the full flow: **landing → signup/onboarding → dashboard (Scan, Pantry, Recipes, Calendar)**. We want to know whether this flow feels clear and valuable to users.
