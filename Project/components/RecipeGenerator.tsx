@@ -6,6 +6,8 @@ import { Heart } from 'lucide-react';
 import { db, useAuth } from '@/lib/firebase';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
 import { generateRecipes } from '../services/geminiService';
+import { saveRecipe, unsaveRecipe } from '../services/savedRecipesService';
+import { useSavedRecipeIds } from '@/hooks/useSavedRecipeIds';
 
 const colors = {
   terracotta: '#C97064',
@@ -35,6 +37,11 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   const [error, setError] = useState<string | null>(null);
   const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
   const [pantryLoading, setPantryLoading] = useState(true);
+  const {
+    savedRecipeIds,
+    loading: savedIdsLoading,
+    refetch: refetchSavedIds,
+  } = useSavedRecipeIds();
 
   const itemsForRecipes = pantryItems.length > 0 ? pantryItems : ingredients;
   const pantrySummary = itemsForRecipes.map(formatIngredient);
@@ -96,6 +103,28 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       setError(err instanceof Error ? err.message : 'Recipe generation failed.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleSave = async (recipe: Recipe) => {
+    if (!user) {
+      setError('Sign in to save recipes.');
+      return;
+    }
+
+    try {
+      const alreadySaved = savedRecipeIds.includes(recipe.id);
+
+      if (alreadySaved) {
+        await unsaveRecipe(user.uid, recipe.id);
+      } else {
+        await saveRecipe(user.uid, recipe);
+      }
+
+      await refetchSavedIds();
+    } catch (err) {
+      console.error('Failed to toggle saved recipe state:', err);
+      setError('Could not update saved recipes. Please try again.');
     }
   };
 
@@ -167,18 +196,45 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
               className="rounded-2xl p-5 space-y-3 border relative"
               style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: colors.dustyRose + '40' }}
             >
-              <button
-                type="button"
-                className="absolute top-4 right-4 p-2 rounded-full border transition-opacity hover:opacity-80"
-                style={{ borderColor: colors.dustyRose, color: colors.terracotta }}
-                aria-label="Save recipe"
-                onClick={() => {}}
-              >
-                <Heart size={20} />
-              </button>
-              <span className="absolute top-4 right-14 text-sm font-medium" style={{ color: colors.olive }}>
-                Save
-              </span>
+              {/** Save / Saved control (Sub-issue 2) */}
+              {user ? (
+                <>
+                  <button
+                    type="button"
+                    className="absolute top-4 right-4 p-2 rounded-full border transition-opacity hover:opacity-80 disabled:opacity-50"
+                    style={{ borderColor: colors.dustyRose, color: colors.terracotta }}
+                    aria-label={savedRecipeIds.includes(recipe.id) ? 'Unsave recipe' : 'Save recipe'}
+                    disabled={savedIdsLoading}
+                    onClick={() => handleToggleSave(recipe)}
+                  >
+                    <Heart size={20} />
+                  </button>
+                  <span
+                    className="absolute top-4 right-14 text-sm font-medium"
+                    style={{ color: colors.olive }}
+                  >
+                    {savedRecipeIds.includes(recipe.id) ? 'Saved' : 'Save'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="absolute top-4 right-4 p-2 rounded-full border opacity-60 cursor-not-allowed"
+                    style={{ borderColor: colors.dustyRose, color: colors.terracotta }}
+                    aria-label="Sign in to save recipes"
+                    disabled
+                  >
+                    <Heart size={20} />
+                  </button>
+                  <span
+                    className="absolute top-4 right-14 text-sm font-medium"
+                    style={{ color: colors.olive, opacity: 0.7 }}
+                  >
+                    Sign in to save
+                  </span>
+                </>
+              )}
               {recipe.image && (
                 <img src={recipe.image} alt={recipe.title} className="w-full rounded-xl" />
               )}
