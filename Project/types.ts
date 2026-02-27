@@ -1,5 +1,3 @@
-export type ScanMode = 'food' | 'receipt';
-
 export interface Ingredient {
   id?: string;
   name: string;
@@ -38,12 +36,6 @@ export interface Recipe {
   instructions: string[];
   calories?: number;
   image?: string;
-}
-
-export interface ScanResult {
-  mode: ScanMode;
-  items: string[];
-  rawAnalysis?: any;
 }
 
 export interface UserPreferences {

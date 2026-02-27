@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db, useAuth } from '../lib/firebase';
 import type { PantryItem } from '../types';
 import { ExpirationReminders } from './ExpirationReminders';
@@ -41,6 +41,11 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   const [loading, setLoading] = useState(false);
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [isLoadingItems, setIsLoadingItems] = useState(true);
+  const [editItem, setEditItem] = useState<PantryItem | null>(null);
+  const [editFood, setEditFood] = useState({
+    name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
 
   // Listen to pantry items in real time (only when user is signed in)
   useEffect(() => {
@@ -85,6 +90,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   }, [user, authLoading]);
 
   const handleSubmit = async () => {
+    // Name, category, expiration, and storage are required
     if (!food.name || !food.category || !food.expiration || !food.storage) {
       alert('Please fill in all required fields');
       return;
@@ -97,6 +103,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     setLoading(true);
 
     try {
+      const nowIso = new Date().toISOString();
       const docRef = await addDoc(collection(db, 'pantryItems'), {
         name: food.name,
         category: food.category,
@@ -107,8 +114,8 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         notes: food.notes,
         userId: user.uid,
         userEmail: user.email ?? undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: nowIso,
+        updatedAt: nowIso,
       });
 
       const newItem: PantryItem = {
@@ -122,36 +129,36 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         notes: food.notes,
         userId: user.uid,
         userEmail: user.email ?? undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: nowIso,
+        updatedAt: nowIso,
       };
 
-      // Update local state and cache
-      setPantryItems(prev => {
+      setPantryItems((prev) => {
         const updated = [newItem, ...prev];
-        updated.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
+        updated.sort(
+          (a, b) =>
+            new Date(a.expiration).getTime() -
+            new Date(b.expiration).getTime()
+        );
         savePantryFullToCache(user.uid, updated);
         return updated;
       });
 
-      // Call the callback if provided
       if (onAddFood) {
         onAddFood(newItem);
       }
 
-      // Clear form
-      setFood({ 
-        name: '', 
-        category: '', 
-        quantity: '', 
-        unit: '', 
-        expiration: '', 
-        storage: '', 
-        notes: '' 
+      setFood({
+        name: '',
+        category: '',
+        quantity: '',
+        unit: '',
+        expiration: '',
+        storage: '',
+        notes: '',
       });
 
       console.log('Document written with ID:', docRef.id);
-
     } catch (error) {
       console.error('Error adding food to Firestore:', error);
       alert('Failed to add food. Please try again.');
@@ -185,22 +192,97 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         return updated;
       });
       console.log('Item deleted successfully');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting item:', error);
-      console.error('Error code:', error?.code);
-      console.error('Error message:', error?.message);
+      const err = error as { code?: string; message?: string };
+      console.error('Error code:', err.code);
+      console.error('Error message:', err.message);
       
       // Provide more specific error messages
       let errorMessage = 'Failed to delete item. Please try again.';
-      if (error?.code === 'permission-denied') {
+      if (err.code === 'permission-denied') {
         errorMessage = 'Permission denied. You may not have permission to delete this item.';
-      } else if (error?.code === 'not-found') {
+      } else if (err.code === 'not-found') {
         errorMessage = 'Item not found. It may have already been deleted.';
-      } else if (error?.message) {
-        errorMessage = `Failed to delete: ${error.message}`;
+      } else if (err.message) {
+        errorMessage = `Failed to delete: ${err.message}`;
       }
       
       alert(errorMessage);
+    }
+  };
+
+  const handleStartEdit = (item: PantryItem) => {
+    setEditItem(item);
+    setEditFood({
+      name: item.name || '',
+      category: item.category || '',
+      quantity: item.quantity || '',
+      unit: item.unit || '',
+      expiration: item.expiration || '',
+      storage: item.storage || '',
+      notes: item.notes || '',
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editItem) return;
+    if (!editFood.name || !editFood.category || !editFood.expiration || !editFood.storage) {
+      alert('Please fill in all required fields for the item.');
+      return;
+    }
+    if (!user) {
+      alert('Please log in first!');
+      return;
+    }
+
+    setSavingEdit(true);
+    const nowIso = new Date().toISOString();
+
+    try {
+      const itemRef = doc(db, 'pantryItems', editItem.id);
+      await updateDoc(itemRef, {
+        name: editFood.name,
+        category: editFood.category,
+        quantity: editFood.quantity,
+        unit: editFood.unit,
+        expiration: editFood.expiration,
+        storage: editFood.storage,
+        notes: editFood.notes,
+        updatedAt: nowIso,
+      });
+
+      setPantryItems((prev) => {
+        const updated = prev.map((item) =>
+          item.id === editItem.id
+            ? {
+                ...item,
+                name: editFood.name,
+                category: editFood.category,
+                quantity: editFood.quantity,
+                unit: editFood.unit,
+                expiration: editFood.expiration,
+                storage: editFood.storage,
+                notes: editFood.notes,
+                updatedAt: nowIso,
+              }
+            : item
+        );
+        updated.sort(
+          (a, b) =>
+            new Date(a.expiration).getTime() -
+            new Date(b.expiration).getTime()
+        );
+        savePantryFullToCache(user.uid, updated);
+        return updated;
+      });
+
+      setEditItem(null);
+    } catch (error) {
+      console.error('Error updating food in Firestore:', error);
+      alert('Failed to update item. Please try again.');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -337,7 +419,9 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
             {loading ? 'Adding...' : 'Add to Pantry'}
           </button>
           <button 
-            onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
+            onClick={() => {
+              setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' });
+            }}
             className="flex-1 px-6 py-4 font-semibold rounded-lg border-2 transition-colors"
             style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#515B3A', borderColor: '#CF9D8C40' }}
           >
@@ -370,21 +454,150 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           <ExpirationReminders
             items={pantryItems}
             onDelete={handleDelete}
+            onEdit={handleStartEdit}
             loading={isLoadingItems}
           />
         )}
       </div>
+      
+      {/* Edit modal */}
+      {editItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="max-w-lg w-full rounded-2xl bg-white p-6 shadow-2xl">
+            <h3 className="text-2xl font-bold mb-4" style={{ color: '#515B3A' }}>
+              Edit Pantry Item
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold mb-1 text-sm" style={{ color: '#515B3A' }}>
+                  Food Name *
+                </label>
+                <input
+                  type="text"
+                  value={editFood.name}
+                  onChange={(e) => setEditFood({ ...editFood, name: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1 text-sm" style={{ color: '#515B3A' }}>
+                  Category *
+                </label>
+                <select
+                  value={editFood.category}
+                  onChange={(e) => setEditFood({ ...editFood, category: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none"
+                  style={inputStyle}
+                >
+                  <option value="">Select category</option>
+                  <option value="dairy">Dairy & Eggs</option>
+                  <option value="meat">Meat & Poultry</option>
+                  <option value="fruits">Fruits</option>
+                  <option value="vegetables">Vegetables</option>
+                  <option value="grains">Grains & Bread</option>
+                  <option value="frozen">Frozen Foods</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold mb-1 text-sm" style={{ color: '#515B3A' }}>
+                    Quantity
+                  </label>
+                  <input
+                    type="number"
+                    value={editFood.quantity}
+                    onChange={(e) => setEditFood({ ...editFood, quantity: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+                    style={inputStyle}
+                  />
+                </div>
+                <div>
+                  <label className="block font-semibold mb-1 text-sm" style={{ color: '#515B3A' }}>
+                    Unit
+                  </label>
+                  <select
+                    value={editFood.unit}
+                    onChange={(e) => setEditFood({ ...editFood, unit: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none"
+                    style={inputStyle}
+                  >
+                    <option value="">Select unit</option>
+                    <option value="piece">Piece(s)</option>
+                    <option value="lb">Pounds</option>
+                    <option value="kg">Kilograms</option>
+                    <option value="cup">Cups</option>
+                    <option value="box">Box(es)</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block font-semibold mb-1 text-sm" style={{ color: '#515B3A' }}>
+                  Expiration Date *
+                </label>
+                <input
+                  type="date"
+                  value={editFood.expiration}
+                  onChange={(e) => setEditFood({ ...editFood, expiration: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none"
+                  style={{ borderColor: '#C9706440', color: '#515B3A' }}
+                />
+              </div>
+              <div>
+                <label className="block font-semibold mb-1 text-sm" style={{ color: '#515B3A' }}>
+                  Storage Location *
+                </label>
+                <select
+                  value={editFood.storage}
+                  onChange={(e) => setEditFood({ ...editFood, storage: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none"
+                  style={inputStyle}
+                >
+                  <option value="">Select location</option>
+                  <option value="fridge">Refrigerator</option>
+                  <option value="freezer">Freezer</option>
+                  <option value="pantry">Pantry</option>
+                  <option value="counter">Counter</option>
+                </select>
+              </div>
+              <div>
+                <label className="block font-semibold mb-1 text-sm" style={{ color: '#515B3A' }}>
+                  Notes
+                </label>
+                <textarea
+                  value={editFood.notes}
+                  onChange={(e) => setEditFood({ ...editFood, notes: e.target.value })}
+                  rows={2}
+                  className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none resize-none placeholder:opacity-50"
+                  style={inputStyle}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  onClick={() => setEditItem(null)}
+                  type="button"
+                  className="px-4 py-2 rounded-lg border-2 text-sm font-semibold"
+                  style={{ borderColor: '#CF9D8C40', color: '#515B3A', backgroundColor: 'rgba(255,255,255,0.9)' }}
+                  disabled={savingEdit}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  type="button"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-white"
+                  style={{ backgroundColor: '#C97064' }}
+                  disabled={savingEdit}
+                >
+                  {savingEdit ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
-      {/* Tips */}
-      <div className="mt-8 rounded-2xl p-6 border" style={{ backgroundColor: '#33658A10', borderColor: '#33658A20' }}>
-        <h3 className="text-xl font-bold mb-3" style={{ color: '#33658A' }}>Quick Tips</h3>
-        <ul className="space-y-1 text-sm" style={{ color: '#515B3A' }}>
-          <li>Check packaging for &quot;Best By&quot; dates</li>
-          <li>Store items properly to maximize freshness</li>
-          <li>Get reminders before food expires</li>
-          <li>Click the trash icon to remove items you&apos;ve used</li>
-        </ul>
-      </div>
     </div>
   );
 }

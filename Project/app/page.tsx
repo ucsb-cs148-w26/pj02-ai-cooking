@@ -91,22 +91,6 @@ export default function LandingPage() {
             <ChefHat size={32} style={{ color: colors.terracotta }} />
             PantryPal
           </div>
-          <nav className={`flex gap-3 `}>
-            <Link
-              href="/login"
-              className="px-4 py-2.5 text-sm font-medium rounded-lg transition-colors"
-              style={{ color: colors.steelBlue, backgroundColor: 'transparent' }}
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className="px-5 py-2.5 text-sm font-semibold text-white rounded-lg transition-opacity hover:opacity-90"
-              style={{ backgroundColor: colors.terracotta }}
-            >
-              Sign Up
-            </Link>
-          </nav>
         </div>
       </header>
 
@@ -132,14 +116,14 @@ export default function LandingPage() {
                 className={`w-full sm:w-auto px-8 py-4 text-lg font-semibold text-white rounded-lg text-center transition-opacity hover:opacity-90 `}
                 style={{ backgroundColor: colors.terracotta }}
               >
-                Get started free
+                Sign Up
               </Link>
               <Link
                 href="/login"
                 className={`w-full sm:w-auto px-8 py-4 text-lg font-medium rounded-lg text-center border-2 transition-colors `}
                 style={{ color: colors.steelBlue, borderColor: colors.steelBlue }}
               >
-                Sign in
+                Log in
               </Link>
             </div>
           </section>
@@ -201,19 +185,7 @@ export default function LandingPage() {
             </div>
           </section>
 
-          {/* CTA */}
-          <section className="text-center mt-16 md:mt-24">
-            <h2 className={`text-2xl md:text-3xl font-bold mb-6 `} style={{ color: colors.olive }}>
-              Ready to cook smarter?
-            </h2>
-            <Link
-              href="/signup"
-              className={`inline-block px-8 py-4 text-lg font-semibold text-white rounded-lg transition-opacity hover:opacity-90 `}
-              style={{ backgroundColor: colors.terracotta }}
-            >
-              Start your free account
-            </Link>
-          </section>
+        
         </div>
       </main>
     </div>

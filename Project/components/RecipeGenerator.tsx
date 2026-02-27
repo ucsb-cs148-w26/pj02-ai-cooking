@@ -2,10 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { Heart } from 'lucide-react';
 import { db, useAuth } from '@/lib/firebase';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
 import { generateRecipes } from '../services/geminiService';
 import { getUserPreferences } from '../services/userPreferencesService';
+import { saveRecipe, unsaveRecipe } from '../services/savedRecipesService';
+import { useSavedRecipeIds } from '@/hooks/useSavedRecipeIds';
 
 const colors = {
   terracotta: '#C97064',
@@ -36,6 +39,11 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
   const [pantryLoading, setPantryLoading] = useState(true);
   const [userPrefs, setUserPrefs] = useState<UserPreferences | null>(null);
+  const {
+    savedRecipeIds,
+    loading: savedIdsLoading,
+    refetch: refetchSavedIds,
+  } = useSavedRecipeIds();
 
   const itemsForRecipes = pantryItems.length > 0 ? pantryItems : ingredients;
   const pantrySummary = itemsForRecipes.map(formatIngredient);
@@ -109,6 +117,28 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     }
   };
 
+  const handleToggleSave = async (recipe: Recipe) => {
+    if (!user) {
+      setError('Sign in to save recipes.');
+      return;
+    }
+
+    try {
+      const alreadySaved = savedRecipeIds.includes(recipe.id);
+
+      if (alreadySaved) {
+        await unsaveRecipe(user.uid, recipe.id);
+      } else {
+        await saveRecipe(user.uid, recipe);
+      }
+
+      await refetchSavedIds();
+    } catch (err) {
+      console.error('Failed to toggle saved recipe state:', err);
+      setError('Could not update saved recipes. Please try again.');
+    }
+  };
+
   const inputStyle = { borderColor: colors.dustyRose + '60', color: colors.olive };
 
   return (
@@ -117,17 +147,42 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         className="rounded-2xl p-6 space-y-4 border"
         style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '40' }}
       >
-        <h2 className="text-2xl font-bold" style={{ color: colors.olive }}>Pantry Items</h2>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-2xl font-bold" style={{ color: colors.olive }}>
+            Pantry Items
+          </h2>
+          {!pantryLoading && pantrySummary.length > 0 && (
+            <span className="text-sm font-medium" style={{ color: colors.olive, opacity: 0.75 }}>
+              {pantrySummary.length} item{pantrySummary.length !== 1 ? 's' : ''}
+            </span>
+          )}
+        </div>
         {pantryLoading ? (
           <p style={{ color: colors.olive, opacity: 0.7 }}>Loading pantry items...</p>
         ) : pantrySummary.length === 0 ? (
           <p style={{ color: colors.olive, opacity: 0.7 }}>No pantry items yet.</p>
         ) : (
-          <ul className="list-disc list-inside" style={{ color: colors.olive }}>
-            {pantrySummary.map((item, idx) => (
-              <li key={`${item}-${idx}`}>{item}</li>
-            ))}
-          </ul>
+          <div className="max-h-52 overflow-y-auto pr-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {pantrySummary.map((item, idx) => (
+                <div
+                  key={`${item}-${idx}`}
+                  className="rounded-xl px-3 py-2 text-sm border flex items-start gap-2"
+                  style={{
+                    borderColor: colors.dustyRose + '50',
+                    backgroundColor: 'rgba(255,255,255,0.85)',
+                    color: colors.olive,
+                  }}
+                >
+                  <span
+                    className="mt-1 h-2 w-2 rounded-full shrink-0"
+                    style={{ backgroundColor: colors.terracotta }}
+                  />
+                  <span className="leading-snug break-words">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </div>
 
@@ -174,9 +229,48 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
           {recipes.map((recipe) => (
             <div
               key={recipe.id}
-              className="rounded-2xl p-5 space-y-3 border"
+              className="rounded-2xl p-5 space-y-3 border relative"
               style={{ backgroundColor: 'rgba(255,255,255,0.7)', borderColor: colors.dustyRose + '40' }}
             >
+              {/** Save / Saved control (Sub-issue 2) */}
+              {user ? (
+                <>
+                  <button
+                    type="button"
+                    className="absolute top-4 right-4 p-2 rounded-full border transition-opacity hover:opacity-80 disabled:opacity-50"
+                    style={{ borderColor: colors.dustyRose, color: colors.terracotta }}
+                    aria-label={savedRecipeIds.includes(recipe.id) ? 'Unsave recipe' : 'Save recipe'}
+                    disabled={savedIdsLoading}
+                    onClick={() => handleToggleSave(recipe)}
+                  >
+                    <Heart size={20} />
+                  </button>
+                  <span
+                    className="absolute top-4 right-14 text-sm font-medium"
+                    style={{ color: colors.olive }}
+                  >
+                    {savedRecipeIds.includes(recipe.id) ? 'Saved' : 'Save'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="absolute top-4 right-4 p-2 rounded-full border opacity-60 cursor-not-allowed"
+                    style={{ borderColor: colors.dustyRose, color: colors.terracotta }}
+                    aria-label="Sign in to save recipes"
+                    disabled
+                  >
+                    <Heart size={20} />
+                  </button>
+                  <span
+                    className="absolute top-4 right-14 text-sm font-medium"
+                    style={{ color: colors.olive, opacity: 0.7 }}
+                  >
+                    Sign in to save
+                  </span>
+                </>
+              )}
               {recipe.image && (
                 <img src={recipe.image} alt={recipe.title} className="w-full rounded-xl" />
               )}

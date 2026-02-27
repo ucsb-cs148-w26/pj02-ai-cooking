@@ -91,9 +91,10 @@ function getProgressPercent(startDate: string, endDate: string): number {
 interface ExpirationProgressBarProps {
   item: PantryItem;
   onDelete?: (id: string) => void;
+  onEdit?: (item: PantryItem) => void;
 }
 
-export function ExpirationProgressBar({ item, onDelete }: ExpirationProgressBarProps) {
+export function ExpirationProgressBar({ item, onDelete, onEdit }: ExpirationProgressBarProps) {
   const startDate = item.createdAt || (() => {
     const exp = new Date(item.expiration);
     exp.setDate(exp.getDate() - 7);
@@ -133,6 +134,18 @@ export function ExpirationProgressBar({ item, onDelete }: ExpirationProgressBarP
             >
               {timeRemaining}
             </span>
+            {onEdit && (
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onEdit(item);
+                }}
+                className="px-3 py-1.5 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition font-medium"
+              >
+                Edit
+              </button>
+            )}
             {onDelete && (
               <button
                 onClick={(e) => {

@@ -1,4 +1,4 @@
-import { Ingredient, Recipe, ScanMode, UserPreferences } from "../types";
+import { Ingredient, Recipe, UserPreferences } from "../types";
 
 const requestJson = async <T>(url: string, body: unknown): Promise<T> => {
   const response = await fetch(url, {
@@ -23,12 +23,10 @@ const requestJson = async <T>(url: string, body: unknown): Promise<T> => {
  * Normalizes output into a standard Ingredient list.
  */
 export const analyzeImage = async (
-  base64Image: string,
-  mode: ScanMode
+  base64Image: string
 ): Promise<Ingredient[]> => {
   const data = await requestJson<{ items: Ingredient[] }>('/api/gemini/scan', {
-    base64Image,
-    mode
+    base64Image
   });
   return data.items ?? [];
 };
