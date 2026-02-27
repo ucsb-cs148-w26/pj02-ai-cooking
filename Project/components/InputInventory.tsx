@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db, useAuth } from '../lib/firebase';
 import type { PantryItem } from '../types';
 import { ExpirationReminders } from './ExpirationReminders';
@@ -41,6 +41,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   const [loading, setLoading] = useState(false);
   const [pantryItems, setPantryItems] = useState<PantryItem[]>([]);
   const [isLoadingItems, setIsLoadingItems] = useState(true);
+  const [editingItemId, setEditingItemId] = useState<string | null>(null);
 
   // Listen to pantry items in real time (only when user is signed in)
   useEffect(() => {
@@ -85,6 +86,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   }, [user, authLoading]);
 
   const handleSubmit = async () => {
+    // Name, category, expiration, and storage are required
     if (!food.name || !food.category || !food.expiration || !food.storage) {
       alert('Please fill in all required fields');
       return;
@@ -96,65 +98,94 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
     setLoading(true);
 
+    const nowIso = new Date().toISOString();
+    const baseFields = {
+      name: food.name,
+      category: food.category,
+      quantity: food.quantity,
+      unit: food.unit,
+      expiration: food.expiration,
+      storage: food.storage,
+      notes: food.notes,
+    };
+
     try {
-      const docRef = await addDoc(collection(db, 'pantryItems'), {
-        name: food.name,
-        category: food.category,
-        quantity: food.quantity,
-        unit: food.unit,
-        expiration: food.expiration,
-        storage: food.storage,
-        notes: food.notes,
-        userId: user.uid,
-        userEmail: user.email ?? undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      });
+      if (editingItemId) {
+        // Update existing pantry item
+        const itemRef = doc(db, 'pantryItems', editingItemId);
+        await updateDoc(itemRef, {
+          ...baseFields,
+          updatedAt: nowIso,
+        });
 
-      const newItem: PantryItem = {
-        id: docRef.id,
-        name: food.name,
-        category: food.category,
-        quantity: food.quantity,
-        unit: food.unit,
-        expiration: food.expiration,
-        storage: food.storage,
-        notes: food.notes,
-        userId: user.uid,
-        userEmail: user.email ?? undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
+        setPantryItems((prev) => {
+          const updated = prev.map((item) =>
+            item.id === editingItemId
+              ? { ...item, ...baseFields, updatedAt: nowIso }
+              : item
+          );
+          updated.sort(
+            (a, b) =>
+              new Date(a.expiration).getTime() -
+              new Date(b.expiration).getTime()
+          );
+          savePantryFullToCache(user.uid, updated);
+          return updated;
+        });
 
-      // Update local state and cache
-      setPantryItems(prev => {
-        const updated = [newItem, ...prev];
-        updated.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
-        savePantryFullToCache(user.uid, updated);
-        return updated;
-      });
+        setEditingItemId(null);
+      } else {
+        // Add a new pantry item
+        const docRef = await addDoc(collection(db, 'pantryItems'), {
+          ...baseFields,
+          userId: user.uid,
+          userEmail: user.email ?? undefined,
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        });
 
-      // Call the callback if provided
-      if (onAddFood) {
-        onAddFood(newItem);
+        const newItem: PantryItem = {
+          id: docRef.id,
+          ...baseFields,
+          userId: user.uid,
+          userEmail: user.email ?? undefined,
+          createdAt: nowIso,
+          updatedAt: nowIso,
+        };
+
+        // Update local state and cache
+        setPantryItems((prev) => {
+          const updated = [newItem, ...prev];
+          updated.sort(
+            (a, b) =>
+              new Date(a.expiration).getTime() -
+              new Date(b.expiration).getTime()
+          );
+          savePantryFullToCache(user.uid, updated);
+          return updated;
+        });
+
+        // Call the callback if provided
+        if (onAddFood) {
+          onAddFood(newItem);
+        }
+
+        console.log('Document written with ID:', docRef.id);
       }
 
-      // Clear form
-      setFood({ 
-        name: '', 
-        category: '', 
-        quantity: '', 
-        unit: '', 
-        expiration: '', 
-        storage: '', 
-        notes: '' 
+      // Clear form after add or edit
+      setFood({
+        name: '',
+        category: '',
+        quantity: '',
+        unit: '',
+        expiration: '',
+        storage: '',
+        notes: '',
       });
-
-      console.log('Document written with ID:', docRef.id);
-
     } catch (error) {
-      console.error('Error adding food to Firestore:', error);
-      alert('Failed to add food. Please try again.');
+      console.error('Error saving food to Firestore:', error);
+      alert('Failed to save food. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -185,22 +216,39 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         return updated;
       });
       console.log('Item deleted successfully');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error deleting item:', error);
-      console.error('Error code:', error?.code);
-      console.error('Error message:', error?.message);
+      const err = error as { code?: string; message?: string };
+      console.error('Error code:', err.code);
+      console.error('Error message:', err.message);
       
       // Provide more specific error messages
       let errorMessage = 'Failed to delete item. Please try again.';
-      if (error?.code === 'permission-denied') {
+      if (err.code === 'permission-denied') {
         errorMessage = 'Permission denied. You may not have permission to delete this item.';
-      } else if (error?.code === 'not-found') {
+      } else if (err.code === 'not-found') {
         errorMessage = 'Item not found. It may have already been deleted.';
-      } else if (error?.message) {
-        errorMessage = `Failed to delete: ${error.message}`;
+      } else if (err.message) {
+        errorMessage = `Failed to delete: ${err.message}`;
       }
       
       alert(errorMessage);
+    }
+  };
+
+  const handleStartEdit = (item: PantryItem) => {
+    setFood({
+      name: item.name || '',
+      category: item.category || '',
+      quantity: item.quantity || '',
+      unit: item.unit || '',
+      expiration: item.expiration || '',
+      storage: item.storage || '',
+      notes: item.notes || '',
+    });
+    setEditingItemId(item.id);
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -334,10 +382,19 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
             className="flex-1 px-6 py-4 text-white font-bold rounded-lg transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ backgroundColor: '#C97064' }}
           >
-            {loading ? 'Adding...' : 'Add to Pantry'}
+            {loading
+              ? editingItemId
+                ? 'Saving...'
+                : 'Adding...'
+              : editingItemId
+                ? 'Save Changes'
+                : 'Add to Pantry'}
           </button>
           <button 
-            onClick={() => setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' })}
+            onClick={() => {
+              setFood({ name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: '' });
+              setEditingItemId(null);
+            }}
             className="flex-1 px-6 py-4 font-semibold rounded-lg border-2 transition-colors"
             style={{ backgroundColor: 'rgba(255,255,255,0.5)', color: '#515B3A', borderColor: '#CF9D8C40' }}
           >
@@ -370,6 +427,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           <ExpirationReminders
             items={pantryItems}
             onDelete={handleDelete}
+            onEdit={handleStartEdit}
             loading={isLoadingItems}
           />
         )}
