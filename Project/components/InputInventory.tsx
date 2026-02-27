@@ -374,17 +374,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
           />
         )}
       </div>
-
-      {/* Tips */}
-      <div className="mt-8 rounded-2xl p-6 border" style={{ backgroundColor: '#33658A10', borderColor: '#33658A20' }}>
-        <h3 className="text-xl font-bold mb-3" style={{ color: '#33658A' }}>Quick Tips</h3>
-        <ul className="space-y-1 text-sm" style={{ color: '#515B3A' }}>
-          <li>Check packaging for &quot;Best By&quot; dates</li>
-          <li>Store items properly to maximize freshness</li>
-          <li>Get reminders before food expires</li>
-          <li>Click the trash icon to remove items you&apos;ve used</li>
-        </ul>
-      </div>
+      
     </div>
   );
 }
