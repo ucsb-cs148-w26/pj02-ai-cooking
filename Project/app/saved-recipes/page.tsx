@@ -107,7 +107,15 @@ export default function SavedRecipesPage() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-12">
       <div className="max-w-4xl mx-auto space-y-6">
-        <header className="space-y-2">
+        <header className="space-y-3">
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+            onClick={() => router.push('/dashboard')}
+          >
+            <span aria-hidden="true">←</span>
+            <span>Back to Dashboard</span>
+          </button>
           <h1 className="text-3xl font-bold text-gray-900">
             My Saved Recipes
           </h1>
