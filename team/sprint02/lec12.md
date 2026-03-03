@@ -12,8 +12,6 @@ Scriped Discussion:
 
 - During Lecture 12, our team worked together on the **PantryPal design document** linked at `./docs/DESIGN.md`:
 
-As a group, we:
-
 Reviewed our existing code (landing page, dashboard, pantry/scan/recipes, expiration calendar, preferences service, Firebase setup).
 
 Agreed on a **high-level system architecture** (Next.js frontend, Firebase Auth, Firestore, AI services, localStorage caches) and captured it in a diagram and explanation.
