@@ -10,15 +10,7 @@
 
 ---
 
-# Lab 08: Sprint Contributions
-
-## Overview
-
-This document summarizes what each team member completed during the Lab 08 sprint.
-
----
-
-## Yuxi
+### Yuxi
 
 **Add Firestore collection and save/unsave logic for saved recipes**
 
@@ -28,7 +20,7 @@ This document summarizes what each team member completed during the Lab 08 sprin
 
 ---
 
-## Daniel
+### Daniel
 
 **Add Save / Unsave button and state on recipe cards**
 
@@ -38,7 +30,7 @@ This document summarizes what each team member completed during the Lab 08 sprin
 
 ---
 
-## Andy
+### Andy
 
 **Fix API limit issue & add error message for when scanner doesn’t work**
 
@@ -47,7 +39,7 @@ This document summarizes what each team member completed during the Lab 08 sprin
 
 ---
 
-## Krisha
+### Krisha
 
 **Allow user to edit pantry items**
 
@@ -56,7 +48,7 @@ This document summarizes what each team member completed during the Lab 08 sprin
 
 ---
 
-## Mahima
+### Mahima
 
 **Fix recipe generation to take into account onboarding data and prompt answer**
 
