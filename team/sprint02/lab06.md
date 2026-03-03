@@ -13,7 +13,9 @@
 * **Change:** Clearer merge and branching strategy (smaller feature branches, more frequent syncs with main, clearer ownership of files). Document deployment setup (Vercel env vars, Firebase config) so others can troubleshoot.
 * **Measurement:** Fewer merge conflicts than sprint 01; at least one piece of user feedback that the app "feels more food-related" after UI changes.
 
+
 - We defined and documented our user feedback needs in **`team/evaluation/USER_FEEDBACK_NEEDS.md`**.
 - We decided to focus on **overall product satisfaction** (first-time and ongoing use) for the full flow: **landing → signup/onboarding → dashboard (Scan, Pantry, Recipes, Calendar)**. We want to know whether this flow feels clear and valuable to users.
 
 
+We all continued completing our issues on the Kanban Board
