@@ -8,6 +8,8 @@
 
 **Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[], Mahima[X]  
 
+We all worked together on the docs/MANUAL.md
+
 ### Yuxi
 
 **Add Firestore collection and save/unsave logic for saved recipes**
