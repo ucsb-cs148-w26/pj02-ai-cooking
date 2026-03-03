@@ -52,7 +52,7 @@ We should be more clear in directing them to the deployed site
 
 They all liked the UI and found it to be clean, intuitive and user friendly  
 
-The most impactful opportunity for improvement is improving the error handling for the Gemini API so that it does not show directly on the website to the user  
+The most impactful opportunity for improvement is improving the error handling for the Gemini API so that it does not show directly on the website to the user, and also fixing the pantry addition issue 
 
 One final thing they all liked were the recipes that were generated, they were generally usable as long as the recipe generator was used in the way that it was intended  
 
