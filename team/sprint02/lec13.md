@@ -15,3 +15,5 @@ Cross-Team Project Evaluation
 In Lecture 13, our team split into two smaller subgroups to participate in a cross-team evaluation activity with the **Rideshare** team.
 
 This session helped both teams see strengths and weaknesses in two different projects and gather fresh ideas for improvements from an outside perspective.
+
+We all continued completing our issues on the Kanban Board
