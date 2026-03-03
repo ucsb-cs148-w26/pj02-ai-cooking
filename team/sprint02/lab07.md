@@ -15,6 +15,6 @@
 We worked together on **user feedback** this lab. Our goal was to agree on what we want to learn from users and how we will measure improvement.
 We agreed on a set of specific questions to ask users during feedback sessions and defined **metrics to measure improvement**
 
-
+We all continued completing our issues on the Kanban Board
 
 
