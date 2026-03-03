@@ -1,7 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  deleteDoc,
+  doc,
+  getDocs,
+  updateDoc,
+} from 'firebase/firestore';
 import { Heart } from 'lucide-react';
 import { db, useAuth } from '@/lib/firebase';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
@@ -45,6 +54,8 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     refetch: refetchSavedIds,
   } = useSavedRecipeIds();
 
+  const [usingRecipeId, setUsingRecipeId] = useState<string | null>(null);
+
   const itemsForRecipes = pantryItems.length > 0 ? pantryItems : ingredients;
   const pantrySummary = itemsForRecipes.map(formatIngredient);
 
@@ -75,13 +86,14 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     setPantryLoading(true);
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items: Ingredient[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
         items.push({
+          id: docSnap.id,
           name: data.name,
           quantity: data.quantity ? `${data.quantity} ${data.unit || ''}`.trim() : undefined,
           category: data.category,
-          expiryEstimate: data.expiration ? `Expires ${data.expiration}` : undefined
+          expiryEstimate: data.expiration ? `Expires ${data.expiration}` : undefined,
         });
       });
       setPantryItems(items);
@@ -148,6 +160,150 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       } else {
         setError('Could not update saved recipes. Please try again.');
       }
+    }
+  };
+  const handleUseRecipe = async (recipe: Recipe) => {
+    if (!user) {
+      setError('Sign in to use recipes.');
+      return;
+    }
+
+    setUsingRecipeId(recipe.id);
+
+    try {
+      const q = query(
+        collection(db, 'pantryItems'),
+        where('userId', '==', user.uid)
+      );
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        setError('No pantry items to use.');
+        return;
+      }
+
+      type ParsedIngredient = {
+        name: string;
+        amount: number;
+        remainingAmount: number;
+        unit: string;
+      };
+
+      const parsedIngredients: ParsedIngredient[] = recipe.ingredients
+        .map((raw) => {
+          const lower = raw.toLowerCase().trim();
+
+          // Try to match patterns like "1 cup milk" or "2.5 tbsp olive oil"
+          const match = lower.match(
+            /^(\d*\.?\d+)\s*([a-zA-Z]+)?\s+(.*)$/
+          );
+
+          if (!match) {
+            // Fallback: treat as 1 unit of the whole string
+            return {
+              name: lower,
+              amount: 1,
+              remainingAmount: 1,
+              unit: '',
+            };
+          }
+
+          const amount = parseFloat(match[1]);
+          const unit = match[2] || '';
+          const name = match[3].trim();
+
+          const safeAmount = isNaN(amount) ? 1 : amount;
+          return {
+            name,
+            amount: safeAmount,
+            remainingAmount: safeAmount,
+            unit,
+          };
+        })
+        .filter((p) => p.name.length > 0);
+
+      if (parsedIngredients.length === 0) {
+        setError('Could not interpret recipe ingredients to update the pantry.');
+        return;
+      }
+
+      const ops: Promise<unknown>[] = [];
+
+      // Collect pantry docs with expiration to sort by earliest expiration first
+      const pantryDocs = snapshot.docs
+        .map((docSnap) => {
+          const data = docSnap.data() as {
+            name?: string;
+            quantity?: string;
+            unit?: string;
+            expiration?: string;
+          };
+
+          const expirationTime = data.expiration
+            ? new Date(data.expiration).getTime()
+            : Number.POSITIVE_INFINITY;
+
+          return { docSnap, data, expirationTime };
+        })
+        .sort((a, b) => a.expirationTime - b.expirationTime);
+
+      pantryDocs.forEach(({ docSnap, data }) => {
+        const pantryName = (data.name || '').toLowerCase();
+        if (!pantryName) return;
+
+        // Find a single ingredient that references this pantry item by name,
+        // preferring those that still need quantity deducted.
+        const ing = parsedIngredients.find(
+          (candidate) =>
+            candidate.remainingAmount > 0 &&
+            (candidate.name.includes(pantryName) ||
+              pantryName.includes(candidate.name))
+        );
+
+        if (!ing) return;
+
+        const pantryQty = parseFloat(data.quantity ?? '0');
+        const pantryUnit = (data.unit || '').toLowerCase();
+
+        if (isNaN(pantryQty) || pantryQty <= 0) return;
+
+        // If units are specified on both sides and don't match, skip this item
+        if (ing.unit && pantryUnit && ing.unit !== pantryUnit) {
+          return;
+        }
+
+        const maxUsableFromThisItem = Math.min(ing.remainingAmount, pantryQty);
+        if (maxUsableFromThisItem <= 0) {
+          return;
+        }
+
+        const remainingPantryQty = pantryQty - maxUsableFromThisItem;
+        ing.remainingAmount -= maxUsableFromThisItem;
+
+        const docRef = doc(db, 'pantryItems', docSnap.id);
+
+        if (remainingPantryQty <= 0) {
+          ops.push(deleteDoc(docRef));
+        } else if (remainingPantryQty !== pantryQty) {
+          ops.push(
+            updateDoc(docRef, {
+              quantity: String(remainingPantryQty),
+            })
+          );
+        }
+      });
+
+      if (ops.length === 0) {
+        setError('No matching pantry quantities were updated for this recipe.');
+        return;
+      }
+
+      await Promise.all(ops);
+    } catch (err) {
+      console.error('Failed to use recipe and update pantry:', err);
+      setError('Failed to update pantry items for this recipe.');
+    } finally {
+      setUsingRecipeId(null);
     }
   };
 
@@ -312,6 +468,17 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
                     <li key={`${recipeId}-step-${idx}`}>{step}</li>
                   ))}
                 </ol>
+              </div>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => handleUseRecipe(recipeWithId)}
+                  disabled={usingRecipeId === recipeId}
+                  className="w-full px-4 py-2 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  style={{ backgroundColor: colors.terracotta }}
+                >
+                  {usingRecipeId === recipeId ? 'Using...' : 'Use Recipe (update pantry)'}
+                </button>
               </div>
             </div>
             );
