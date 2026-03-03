@@ -8,6 +8,8 @@ Type of Meeting: Daily Scrum
 
 Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
 
+Scriped Discussion:
+
 During Lecture 12, our team worked together on the **PantryPal design document** linked at `./docs/DESIGN.md`.
 We also discussed leadership roles for the rest of the quarter and added them to LEADERSHIP.md
 
