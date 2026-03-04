@@ -10,7 +10,7 @@ Team: Krisha[X], Daniel[X], Yuxi[X], Andy[ ], Mahima[X]
 
 Scribed Discussion:
 
-Mahima fixed the Firestore Rules and is working on integrating the social media aspect.
+Mahima is working on fixing the Firestore Rules.
 
 Yuki is woking on integrating the saved recipes section.
 
