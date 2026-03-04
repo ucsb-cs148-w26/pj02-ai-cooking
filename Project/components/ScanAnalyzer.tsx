@@ -80,6 +80,7 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
   const [loading, setLoading] = useState(false);
   const [preparingImage, setPreparingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
   const uploadRequestId = useRef(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,6 +95,7 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
     const requestId = ++uploadRequestId.current;
     setPreparingImage(true);
     setError(null);
+    setStatusMessage(null);
     try {
       const optimizedImage = await optimizeImage(file);
       if (requestId !== uploadRequestId.current) {
@@ -125,14 +127,19 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
 
     setLoading(true);
     setError(null);
+    setStatusMessage(null);
     try {
-      const result = await analyzeImage(imageData);
+      const result = await analyzeImage(imageData, (message) => {
+        setStatusMessage(message);
+      });
       setItems(result);
+      setStatusMessage(null);
       if (result.length > 0) {
         onAddItems?.(result);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed.');
+      setStatusMessage(null);
     } finally {
       setLoading(false);
     }
@@ -214,7 +221,16 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
           </div>
         )}
 
-        {error && <p className="text-sm" style={{ color: colors.terracotta }}>{error}</p>}
+        {error && (
+          <div className="space-y-1">
+            <p className="text-sm" style={{ color: colors.terracotta }}>{error}</p>
+            {error.toLowerCase().includes('rate limit') && (
+              <p className="text-xs" style={{ color: colors.olive, opacity: 0.8 }}>
+                You can add items manually below while you wait.
+              </p>
+            )}
+          </div>
+        )}
         <button
           onClick={handleAnalyze}
           disabled={loading || preparingImage}
@@ -223,6 +239,11 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
         >
           {preparingImage ? 'Preparing image...' : loading ? 'Analyzing...' : 'Analyze Image'}
         </button>
+        {loading && statusMessage && (
+          <p className="text-sm" style={{ color: colors.olive, opacity: 0.85 }}>
+            {statusMessage}
+          </p>
+        )}
       </div>
 
       <div

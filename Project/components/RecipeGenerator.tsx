@@ -36,6 +36,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [pantryItems, setPantryItems] = useState<Ingredient[]>([]);
   const [pantryLoading, setPantryLoading] = useState(true);
   const [userPrefs, setUserPrefs] = useState<UserPreferences | null>(null);
@@ -102,20 +103,25 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
 
     setLoading(true);
     setError(null);
+    setStatusMessage(null);
     try {
       const preferences: Partial<UserPreferences> = {
         ...userPrefs,
         cuisine: cuisine.trim() || userPrefs?.cuisinePreferences?.join(', ') || '',
         restrictions: restrictions.trim() || ''
       };
-      const result = await generateRecipes(itemsForRecipes, preferences);
+      const result = await generateRecipes(itemsForRecipes, preferences, (message) => {
+        setStatusMessage(message);
+      });
       const withIds = (result || []).map((r, i) => ({
         ...r,
         id: r?.id?.trim() || `recipe-${i}-${Date.now()}`,
       }));
       setRecipes(withIds);
+      setStatusMessage(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Recipe generation failed.');
+      setStatusMessage(null);
     } finally {
       setLoading(false);
     }
@@ -226,6 +232,11 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
           </div>
         </div>
         {error && <p className="text-sm" style={{ color: colors.terracotta }}>{error}</p>}
+        {loading && statusMessage && (
+          <p className="text-sm" style={{ color: colors.olive, opacity: 0.85 }}>
+            {statusMessage}
+          </p>
+        )}
         <button
           onClick={handleGenerate}
           disabled={loading}

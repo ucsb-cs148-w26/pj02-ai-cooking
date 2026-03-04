@@ -1,14 +1,12 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import type { Ingredient, Recipe, UserPreferences } from '@/types';
+import { getAllApiKeys, isRateLimitError } from '@/lib/geminiKeys';
 
-const getApiKey = () => {
-  const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_GEMINI_API_KEY;
-  if (!key) {
-    throw new Error('Missing GEMINI_API_KEY');
-  }
-  return key;
-};
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const PRIMARY_MODEL = 'gemini-2.5-flash';
+const DOWNGRADED_MODEL = 'gemini-2.0-flash';
+const KEY_RETRY_DELAY_MS = 1000;
 
 const generateRecipeImage = async (ai: GoogleGenAI, title: string): Promise<string> => {
   try {
@@ -36,9 +34,10 @@ const generateRecipeImage = async (ai: GoogleGenAI, title: string): Promise<stri
 
 export async function POST(request: Request) {
   try {
-    const { ingredients, preferences } = (await request.json()) as {
+    const { ingredients, preferences, useDowngradedModel } = (await request.json()) as {
       ingredients?: Ingredient[];
       preferences?: Partial<UserPreferences>;
+      useDowngradedModel?: boolean;
     };
 
     if (!ingredients || ingredients.length === 0) {
@@ -47,8 +46,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
     const ingredientList = ingredients
       .map((i) => `${i.name} (${i.expiryEstimate || 'N/A'})`)
@@ -107,35 +104,75 @@ export async function POST(request: Request) {
       }
     };
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: schema
-      }
-    });
+    const model = useDowngradedModel ? DOWNGRADED_MODEL : PRIMARY_MODEL;
+    const apiKeys = getAllApiKeys();
+    let lastError: unknown;
+    let rateLimitHit = false;
 
-    if (!response.text) {
-      return NextResponse.json({ recipes: [] as Recipe[] });
+    for (let keyIndex = 0; keyIndex < apiKeys.length; keyIndex++) {
+      const ai = new GoogleGenAI({ apiKey: apiKeys[keyIndex] });
+
+      try {
+        const response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+          config: {
+            responseMimeType: 'application/json',
+            responseSchema: schema
+          }
+        });
+
+        if (!response.text) {
+          return NextResponse.json({ recipes: [] as Recipe[] });
+        }
+
+        const parsed = JSON.parse(response.text) as Recipe[];
+        const recipes: Recipe[] = Array.isArray(parsed) ? parsed : [];
+        const hydrated = await Promise.all(
+          recipes.map(async (recipe, index) => {
+            const id = recipe?.id && String(recipe.id).trim()
+              ? String(recipe.id).trim()
+              : `recipe-${index}-${Date.now()}`;
+            return {
+              ...recipe,
+              id,
+              image: await generateRecipeImage(ai, recipe.title)
+            };
+          })
+        );
+
+        return NextResponse.json({ recipes: hydrated });
+      } catch (err) {
+        lastError = err;
+        if (isRateLimitError(err)) {
+          rateLimitHit = true;
+          if (keyIndex < apiKeys.length - 1) {
+            await sleep(KEY_RETRY_DELAY_MS);
+          }
+          continue;
+        }
+        throw err;
+      }
     }
 
-    const parsed = JSON.parse(response.text) as Recipe[];
-    const recipes: Recipe[] = Array.isArray(parsed) ? parsed : [];
-    const hydrated = await Promise.all(
-      recipes.map(async (recipe, index) => {
-        const id = recipe?.id && String(recipe.id).trim()
-          ? String(recipe.id).trim()
-          : `recipe-${index}-${Date.now()}`;
-        return {
-          ...recipe,
-          id,
-          image: await generateRecipeImage(ai, recipe.title)
-        };
-      })
-    );
+    if (rateLimitHit) {
+      const canRetry = !useDowngradedModel;
+      return NextResponse.json(
+        {
+          error: canRetry
+            ? 'API rate limit reached. We will try again with a fallback model.'
+            : 'API rate limit reached. Please try again in a few minutes.',
+          canRetry
+        },
+        { status: 429 }
+      );
+    }
 
-    return NextResponse.json({ recipes: hydrated });
+    if (lastError !== undefined) {
+      throw lastError;
+    }
+
+    return NextResponse.json({ recipes: [] as Recipe[] });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Recipe generation failed.';
     return NextResponse.json({ error: message }, { status: 500 });
