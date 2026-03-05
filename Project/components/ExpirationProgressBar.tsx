@@ -11,14 +11,12 @@ export function getExpirationStatus(expirationDate: string): {
   dotColor: string;
   barColor: string;
 } {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const expDate = new Date(expirationDate);
-  expDate.setHours(23, 59, 59, 999);
-  const diffTime = expDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const now = Date.now();
+  const expTime = new Date(expirationDate).getTime();
+  const diffMs = expTime - now;
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
-  if (diffDays < 0)
+  if (diffMs <= 0)
     return {
       status: 'expired',
       text: 'Expired',
@@ -26,7 +24,7 @@ export function getExpirationStatus(expirationDate: string): {
       dotColor: 'bg-red-500',
       barColor: 'bg-red-500',
     };
-  if (diffDays <= 3)
+  if (diffMs <= THREE_DAYS_MS)
     return {
       status: 'expiring_soon',
       text: 'Expiring Soon',
