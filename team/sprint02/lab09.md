@@ -10,9 +10,9 @@ Team: Krisha[X], Daniel[X], Yuxi[X], Andy[ ], Mahima[X]
 
 **Add Restrictions and Drop Downs** (#180 - Closed)
 
-This task is done when:
-  -The quantity of items has a reasonable limit
-  -The "what cuisine" section in Recipes has a drop-down of options instead of letting the user type anything
+- This task is done when:
+  - The quantity of items has a reasonable limit
+  - The "what cuisine" section in Recipes has a drop-down of options instead of letting the user type anything
 
 ## Yuxi
 
