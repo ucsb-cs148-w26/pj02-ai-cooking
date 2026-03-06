@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   collection,
   onSnapshot,
@@ -27,6 +27,16 @@ const colors = {
 type RecipeGeneratorProps = {
   ingredients: Ingredient[];
 };
+
+const CUISINE_OPTIONS: string[] = [
+  'Italian', 'Mexican', 'Chinese', 'Japanese', 'Indian', 'Thai',
+  'Mediterranean', 'American', 'French', 'Korean', 'Greek', 'Vietnamese', 'Spanish',
+];
+
+const RESTRICTION_OPTIONS: string[] = [
+  'Vegetarian', 'Vegan', 'Pescatarian', 'Gluten-Free', 'Dairy-Free',
+  'Nut-free', 'Keto', 'Paleo', 'Low-carb', 'Halal', 'Kosher',
+];
 
 const parseAmount = (raw: string): number => {
   const s = raw.trim();
@@ -162,8 +172,25 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   } = useSavedRecipeIds();
   const { handleUseRecipe, usingRecipeId } = useUseRecipe({ setError });
 
-
   const itemsForRecipes = pantryItems.length > 0 ? pantryItems : ingredients;
+  const itemsWithId = useMemo(
+    () =>
+      itemsForRecipes.map((item, i) => ({
+        ...item,
+        id: item.id ?? `ing-${i}`,
+      })),
+    [itemsForRecipes]
+  );
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setSelectedIds(new Set(itemsWithId.map((item) => item.id!)));
+  }, [itemsWithId]);
+
+  const selectedItems = useMemo(
+    () => itemsWithId.filter((item) => selectedIds.has(item.id!)),
+    [itemsWithId, selectedIds]
+  );
   const pantrySummary = buildPantrySummary(itemsForRecipes);
 
   useEffect(() => {
@@ -214,8 +241,12 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   }, [user]);
 
   const handleGenerate = async () => {
-    if (itemsForRecipes.length === 0) {
+    if (itemsWithId.length === 0) {
       setError('Add at least one pantry item first.');
+      return;
+    }
+    if (selectedItems.length === 0) {
+      setError('Select at least one ingredient to generate recipes.');
       return;
     }
 
@@ -228,7 +259,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         cuisine: cuisine.trim() || userPrefs?.cuisinePreferences?.join(', ') || '',
         restrictions: restrictions.trim() || ''
       };
-      const result = await generateRecipes(itemsForRecipes, preferences, (message) => {
+      const result = await generateRecipes(selectedItems, preferences, (message) => {
         setStatusMessage(message);
       });
       const withIds = (result || []).map((r, i) => ({
@@ -282,40 +313,75 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         className="rounded-2xl p-6 space-y-4 border"
         style={{ backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.dustyRose + '40' }}
       >
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-2xl font-bold" style={{ color: colors.olive }}>
             Pantry Items
           </h2>
-          {!pantryLoading && pantrySummary.length > 0 && (
-            <span className="text-sm font-medium" style={{ color: colors.olive, opacity: 0.75 }}>
-              {pantrySummary.length} item{pantrySummary.length !== 1 ? 's' : ''}
-            </span>
+          {!pantryLoading && itemsWithId.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium" style={{ color: colors.olive, opacity: 0.75 }}>
+                {selectedItems.length} of {itemsWithId.length} selected
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set(itemsWithId.map((i) => i.id!)))}
+                className="text-sm font-semibold px-2 py-1 rounded border transition-opacity hover:opacity-90"
+                style={{ borderColor: colors.dustyRose, color: colors.olive }}
+              >
+                Select all
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedIds(new Set())}
+                className="text-sm font-semibold px-2 py-1 rounded border transition-opacity hover:opacity-90"
+                style={{ borderColor: colors.dustyRose, color: colors.olive }}
+              >
+                Clear
+              </button>
+            </div>
           )}
         </div>
         {pantryLoading ? (
           <p style={{ color: colors.olive, opacity: 0.7 }}>Loading pantry items...</p>
-        ) : pantrySummary.length === 0 ? (
+        ) : itemsWithId.length === 0 ? (
           <p style={{ color: colors.olive, opacity: 0.7 }}>No pantry items yet.</p>
         ) : (
           <div className="max-h-52 overflow-y-auto pr-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {pantrySummary.map((item, idx) => (
-                <div
-                  key={`${item}-${idx}`}
-                  className="rounded-xl px-3 py-2 text-sm border flex items-start gap-2"
-                  style={{
-                    borderColor: colors.dustyRose + '50',
-                    backgroundColor: 'rgba(255,255,255,0.85)',
-                    color: colors.olive,
-                  }}
-                >
-                  <span
-                    className="mt-1 h-2 w-2 rounded-full shrink-0"
-                    style={{ backgroundColor: colors.terracotta }}
-                  />
-                  <span className="leading-snug break-words">{item}</span>
-                </div>
-              ))}
+              {itemsWithId.map((item) => {
+                const id = item.id!;
+                const checked = selectedIds.has(id);
+                const label = [item.name, item.quantity, item.category, item.expiryEstimate]
+                  .filter(Boolean)
+                  .join(' · ');
+                return (
+                  <label
+                    key={id}
+                    className="rounded-xl px-3 py-2 text-sm border flex items-start gap-2 cursor-pointer transition-colors"
+                    style={{
+                      borderColor: colors.dustyRose + '50',
+                      backgroundColor: checked ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)',
+                      color: colors.olive,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => {
+                        setSelectedIds((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(id)) next.delete(id);
+                          else next.add(id);
+                          return next;
+                        });
+                      }}
+                      className="mt-1 shrink-0 rounded border-2"
+                      style={{ accentColor: colors.terracotta, borderColor: colors.dustyRose }}
+                    />
+                    <span className="leading-snug break-words">{label}</span>
+                  </label>
+                );
+              })}
             </div>
           </div>
         )}
@@ -329,23 +395,31 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block font-semibold mb-2 text-sm" style={{ color: colors.olive }}>Cuisine</label>
-            <input
+            <select
               value={cuisine}
               onChange={(e) => setCuisine(e.target.value)}
-              placeholder="e.g. Italian"
-              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
               style={inputStyle}
-            />
+            >
+              <option value="">Any cuisine</option>
+              {CUISINE_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block font-semibold mb-2 text-sm" style={{ color: colors.olive }}>Restrictions</label>
-            <input
+            <select
               value={restrictions}
               onChange={(e) => setRestrictions(e.target.value)}
-              placeholder="e.g. vegetarian, no nuts"
-              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
               style={inputStyle}
-            />
+            >
+              <option value="">No restrictions</option>
+              {RESTRICTION_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
         </div>
         {error && <p className="text-sm" style={{ color: colors.terracotta }}>{error}</p>}
