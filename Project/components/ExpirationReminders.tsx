@@ -22,8 +22,11 @@ export function ExpirationReminders({
 
   if (loading) {
     return (
-      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl border-2 border-orange-100 text-gray-900 mb-8">
-        <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-orange-800">
+      <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl border-2 border-rose-100 text-gray-900 mb-8">
+        <h2
+          className="text-xl font-bold mb-4 flex items-center gap-2"
+          style={{ color: '#515B3A' }}
+        >
           ⏰ Expiration Reminders
         </h2>
         <p className="text-gray-600">Loading reminders...</p>
@@ -42,10 +45,16 @@ export function ExpirationReminders({
   }
 
   return (
-    <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl border-2 border-orange-200 text-gray-900 mb-8">
-      <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-orange-800">
+    <div className="bg-white/80 backdrop-blur-lg rounded-2xl p-6 shadow-xl border-2 border-rose-200 text-gray-900 mb-8">
+      <h2
+        className="text-xl font-bold mb-4 flex items-center gap-2"
+        style={{ color: '#515B3A' }}
+      >
         ⏰ Expiration Reminders
-        <span className="ml-2 text-sm font-normal text-orange-600">
+        <span
+          className="ml-2 text-sm font-normal"
+          style={{ color: '#515B3A', opacity: 0.75 }}
+        >
           ({sortedItems.length} item{sortedItems.length !== 1 ? 's' : ''})
         </span>
       </h2>
