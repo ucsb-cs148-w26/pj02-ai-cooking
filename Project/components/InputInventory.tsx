@@ -141,7 +141,8 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       };
 
       setPantryItems((prev) => {
-        const updated = [newItem, ...prev];
+        const withoutDuplicate = prev.filter((p) => p.id !== newItem.id);
+        const updated = [newItem, ...withoutDuplicate];
         updated.sort(
           (a, b) =>
             new Date(a.expiration).getTime() -
