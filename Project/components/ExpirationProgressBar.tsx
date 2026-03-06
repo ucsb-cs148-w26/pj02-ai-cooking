@@ -35,9 +35,9 @@ export function getExpirationStatus(expirationDate: string): {
   return {
     status: 'fresh',
     text: 'Fresh',
-    color: 'bg-blue-50 text-blue-700',
-    dotColor: 'bg-blue-400',
-    barColor: 'bg-blue-400',
+    color: 'bg-green-50 text-green-700',
+    dotColor: 'bg-green-400',
+    barColor: 'bg-green-400',
   };
 }
 
@@ -127,7 +127,7 @@ export function ExpirationProgressBar({ item, onDelete, onEdit }: ExpirationProg
                   ? 'text-rose-700'
                   : status.status === 'expiring_soon'
                     ? 'text-amber-700'
-                    : 'text-gray-700'
+                    : 'text-green-700'
               }`}
             >
               {timeRemaining}
@@ -156,7 +156,7 @@ export function ExpirationProgressBar({ item, onDelete, onEdit }: ExpirationProg
                     alert('Error: Item ID is missing. Cannot delete this item.');
                   }
                 }}
-                className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+                className="px-3 py-1.5 text-sm bg-rose-400 text-white rounded-lg hover:bg-rose-500 transition font-medium"
               >
                 Delete
               </button>
