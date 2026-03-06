@@ -9,6 +9,7 @@
 **Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[], Mahima[X]  
 
 This document summarizes each team member's sprint contributions.
+We all continued working on CONTRIBS.md
 
 ### Yuxi
 
