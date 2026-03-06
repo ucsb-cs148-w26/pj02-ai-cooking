@@ -1,6 +1,0 @@
-- I worked on the Pantry Page
-- I worked on making the UI for the form for users to input inventory, and also allowed pantry items to be stored in firebase
-- I made the pantry items load from firebase to the UI so users could see their items
-- I added edit and delete buttons so users could remove and change their pantry data 
-- I created a sign up page, which allowed users to create their account username and password
-- I made the dashboard page and implemented a new UI, with a cleaner aesthetic and a UI that reflected our app better
