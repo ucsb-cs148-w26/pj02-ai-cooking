@@ -6,6 +6,8 @@ Type of Meeting: Daily Scrum
 
 Team: Krisha[X], Daniel[X], Yuxi[X], Andy[ ], Mahima[X]
 
+We all continued working on CONTRIBS.md
+
 ## Mahima
 
 **Add Restrictions and Drop Downs** (#180 - Closed)
