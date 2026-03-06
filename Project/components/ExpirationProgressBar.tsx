@@ -20,24 +20,24 @@ export function getExpirationStatus(expirationDate: string): {
     return {
       status: 'expired',
       text: 'Expired',
-      color: 'bg-red-100 text-red-800',
-      dotColor: 'bg-red-500',
-      barColor: 'bg-red-500',
+      color: 'bg-rose-50 text-rose-700',
+      dotColor: 'bg-rose-400',
+      barColor: 'bg-rose-400',
     };
   if (diffMs <= THREE_DAYS_MS)
     return {
       status: 'expiring_soon',
       text: 'Expiring Soon',
-      color: 'bg-orange-100 text-orange-800',
-      dotColor: 'bg-orange-500',
-      barColor: 'bg-orange-500',
+      color: 'bg-amber-50 text-amber-700',
+      dotColor: 'bg-amber-400',
+      barColor: 'bg-amber-400',
     };
   return {
     status: 'fresh',
     text: 'Fresh',
-    color: 'bg-green-100 text-green-800',
-    dotColor: 'bg-green-500',
-    barColor: 'bg-blue-500',
+    color: 'bg-green-50 text-green-700',
+    dotColor: 'bg-[#5fa052]',
+    barColor: 'bg-green-400',
   };
 }
 
@@ -124,10 +124,10 @@ export function ExpirationProgressBar({ item, onDelete, onEdit }: ExpirationProg
             <span
               className={`text-sm font-medium ${
                 status.status === 'expired'
-                  ? 'text-red-600'
+                  ? 'text-rose-700'
                   : status.status === 'expiring_soon'
-                    ? 'text-orange-600'
-                    : 'text-gray-700'
+                    ? 'text-amber-700'
+                    : 'text-green-700'
               }`}
             >
               {timeRemaining}
@@ -156,7 +156,7 @@ export function ExpirationProgressBar({ item, onDelete, onEdit }: ExpirationProg
                     alert('Error: Item ID is missing. Cannot delete this item.');
                   }
                 }}
-                className="px-3 py-1.5 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+                className="px-3 py-1.5 text-sm bg-rose-400 text-white rounded-lg hover:bg-rose-500 transition font-medium"
               >
                 Delete
               </button>

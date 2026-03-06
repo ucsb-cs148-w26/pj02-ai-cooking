@@ -28,11 +28,120 @@ type RecipeGeneratorProps = {
   ingredients: Ingredient[];
 };
 
-const formatIngredient = (item: Ingredient) => {
-  const details = [item.quantity, item.category, item.expiryEstimate]
-    .filter(Boolean)
-    .join(' · ');
-  return details ? `${item.name} (${details})` : item.name;
+const parseAmount = (raw: string): number => {
+  const s = raw.trim();
+  if (!s) return NaN;
+
+  const unicodeFractions: Record<string, number> = {
+    '¼': 0.25,
+    '½': 0.5,
+    '¾': 0.75,
+    '⅓': 1 / 3,
+    '⅔': 2 / 3,
+    '⅛': 0.125,
+    '⅜': 0.375,
+    '⅝': 0.625,
+    '⅞': 0.875,
+  };
+
+  const mixedUnicode = s.match(/^(\d+)\s*([¼½¾⅓⅔⅛⅜⅝⅞])$/);
+  if (mixedUnicode) {
+    const whole = parseFloat(mixedUnicode[1]);
+    const frac = unicodeFractions[mixedUnicode[2]] ?? 0;
+    return whole + frac;
+  }
+
+  if (s in unicodeFractions) return unicodeFractions[s];
+
+  const mixed = s.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+  if (mixed) {
+    const whole = parseFloat(mixed[1]);
+    const num = parseFloat(mixed[2]);
+    const den = parseFloat(mixed[3]);
+    if (den === 0) return NaN;
+    return whole + num / den;
+  }
+
+  const frac = s.match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (frac) {
+    const num = parseFloat(frac[1]);
+    const den = parseFloat(frac[2]);
+    if (den === 0) return NaN;
+    return num / den;
+  }
+
+  return parseFloat(s);
+};
+
+const formatQty = (n: number) => {
+  const rounded = Math.round(n * 1000) / 1000;
+  return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+};
+
+const buildPantrySummary = (items: Ingredient[]): string[] => {
+  type Bucket = {
+    displayName: string;
+    totalsByUnit: Map<string, number>;
+    rawParts: string[];
+  };
+
+  const buckets = new Map<string, Bucket>();
+
+  for (const item of items) {
+    const displayName = (item.name || '').trim();
+    if (!displayName) continue;
+
+    const key = displayName.toLowerCase();
+    const bucket =
+      buckets.get(key) ??
+      (() => {
+        const next: Bucket = {
+          displayName,
+          totalsByUnit: new Map(),
+          rawParts: [],
+        };
+        buckets.set(key, next);
+        return next;
+      })();
+
+    // Keep only name + quantity. Do not include category or expiration.
+    const q = (item.quantity || '').trim();
+    if (!q) continue;
+
+    const normalized = q.replace(/\s+/g, ' ').trim();
+    const match = normalized.match(
+      /^(\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+|\d+(?:\.\d+)?|[¼½¾⅓⅔⅛⅜⅝⅞]|\d+[¼½¾⅓⅔⅛⅜⅝⅞])(?:\s+(.+))?$/
+    );
+
+    if (!match) {
+      bucket.rawParts.push(normalized);
+      continue;
+    }
+
+    const amount = parseAmount(match[1]);
+    const unit = (match[2] || '').trim().toLowerCase();
+    if (!isFinite(amount) || isNaN(amount)) {
+      bucket.rawParts.push(normalized);
+      continue;
+    }
+
+    const prev = bucket.totalsByUnit.get(unit) ?? 0;
+    bucket.totalsByUnit.set(unit, prev + amount);
+  }
+
+  return [...buckets.values()].map((bucket) => {
+    const parts: string[] = [];
+
+    for (const [unit, amount] of bucket.totalsByUnit.entries()) {
+      const qty = formatQty(amount);
+      parts.push(unit ? `${qty} ${unit}` : qty);
+    }
+
+    parts.push(...bucket.rawParts);
+
+    if (parts.length === 0) return bucket.displayName;
+    return `${bucket.displayName} (${parts.join(', ')})`;
+  });
 };
 
 export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
@@ -55,7 +164,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
 
 
   const itemsForRecipes = pantryItems.length > 0 ? pantryItems : ingredients;
-  const pantrySummary = itemsForRecipes.map(formatIngredient);
+  const pantrySummary = buildPantrySummary(itemsForRecipes);
 
   useEffect(() => {
     if (!user) {
