@@ -22,13 +22,13 @@ type RecipeGeneratorProps = {
   ingredients: Ingredient[];
 };
 
-const CUISINE_OPTIONS = [
-  '', 'Italian', 'Mexican', 'Chinese', 'Japanese', 'Indian', 'Thai',
+const CUISINE_OPTIONS: string[] = [
+  'Italian', 'Mexican', 'Chinese', 'Japanese', 'Indian', 'Thai',
   'Mediterranean', 'American', 'French', 'Korean', 'Greek', 'Vietnamese', 'Spanish',
 ];
 
-const RESTRICTION_OPTIONS = [
-  '', 'Vegetarian', 'Vegan', 'Pescatarian', 'Gluten-Free', 'Dairy-Free',
+const RESTRICTION_OPTIONS: string[] = [
+  'Vegetarian', 'Vegan', 'Pescatarian', 'Gluten-Free', 'Dairy-Free',
   'Nut-free', 'Keto', 'Paleo', 'Low-carb', 'Halal', 'Kosher',
 ];
 
@@ -229,7 +229,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
               style={inputStyle}
             >
               <option value="">Any cuisine</option>
-              {CUISINE_OPTIONS.filter(Boolean).map((opt) => (
+              {CUISINE_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
@@ -243,7 +243,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
               style={inputStyle}
             >
               <option value="">No restrictions</option>
-              {RESTRICTION_OPTIONS.filter(Boolean).map((opt) => (
+              {RESTRICTION_OPTIONS.map((opt) => (
                 <option key={opt} value={opt}>{opt}</option>
               ))}
             </select>
