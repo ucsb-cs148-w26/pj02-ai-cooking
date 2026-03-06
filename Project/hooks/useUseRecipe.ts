@@ -36,6 +36,59 @@ export function useUseRecipe(options: UseUseRecipeOptions = {}): UseUseRecipeRes
   const { user } = useAuth();
   const [usingRecipeId, setUsingRecipeId] = useState<string | null>(null);
 
+  const parseAmount = (raw: string): number => {
+    const s = raw.trim();
+    if (!s) return NaN;
+
+    const unicodeFractions: Record<string, number> = {
+      '¼': 0.25,
+      '½': 0.5,
+      '¾': 0.75,
+      '⅓': 1 / 3,
+      '⅔': 2 / 3,
+      '⅛': 0.125,
+      '⅜': 0.375,
+      '⅝': 0.625,
+      '⅞': 0.875,
+    };
+
+    // e.g. "2½"
+    const mixedUnicode = s.match(/^(\d+)\s*([¼½¾⅓⅔⅛⅜⅝⅞])$/);
+    if (mixedUnicode) {
+      const whole = parseFloat(mixedUnicode[1]);
+      const frac = unicodeFractions[mixedUnicode[2]] ?? 0;
+      return whole + frac;
+    }
+
+    // e.g. "½"
+    if (s in unicodeFractions) {
+      return unicodeFractions[s];
+    }
+
+    // e.g. "1 1/2"
+    const mixed = s.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+    if (mixed) {
+      const whole = parseFloat(mixed[1]);
+      const num = parseFloat(mixed[2]);
+      const den = parseFloat(mixed[3]);
+      if (den === 0) return NaN;
+      return whole + num / den;
+    }
+
+    // e.g. "1/4"
+    const frac = s.match(/^(\d+)\s*\/\s*(\d+)$/);
+    if (frac) {
+      const num = parseFloat(frac[1]);
+      const den = parseFloat(frac[2]);
+      if (den === 0) return NaN;
+      return num / den;
+    }
+
+    return parseFloat(s);
+  };
+
+  const roundQty = (n: number) => Math.round(n * 1000) / 1000;
+
   const handleUseRecipe = useCallback(
     async (recipe: UseRecipeInput) => {
       if (!user) {
@@ -66,9 +119,15 @@ export function useUseRecipe(options: UseUseRecipeOptions = {}): UseUseRecipeRes
 
         const parsedIngredients: ParsedIngredient[] = recipe.ingredients
           .map((raw) => {
-            const lower = raw.toLowerCase().trim();
+            const lower = raw
+              .toLowerCase()
+              .replace(/[–—-]/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim();
+
+            // Support decimals ("2.5"), fractions ("1/4"), mixed ("1 1/2"), and common unicode ("½", "2½").
             const match = lower.match(
-              /^(\d*\.?\d+)\s*([a-zA-Z]+)?\s+(.*)$/
+              /^(\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+|\d+(?:\.\d+)?|[¼½¾⅓⅔⅛⅜⅝⅞]|\d+[¼½¾⅓⅔⅛⅜⅝⅞])\s*([a-zA-Z]+)?\s+(.*)$/
             );
 
             if (!match) {
@@ -80,10 +139,10 @@ export function useUseRecipe(options: UseUseRecipeOptions = {}): UseUseRecipeRes
               };
             }
 
-            const amount = parseFloat(match[1]);
-            const unit = match[2] || '';
-            const name = match[3].trim();
-            const safeAmount = isNaN(amount) ? 1 : amount;
+            const amount = parseAmount(match[1]);
+            const unit = (match[2] || '').toLowerCase();
+            const name = match[3].trim().replace(/^of\s+/, '');
+            const safeAmount = !isFinite(amount) || isNaN(amount) || amount <= 0 ? 1 : amount;
             return {
               name,
               amount: safeAmount,
@@ -128,7 +187,7 @@ export function useUseRecipe(options: UseUseRecipeOptions = {}): UseUseRecipeRes
 
           if (!ing) return;
 
-          const pantryQty = parseFloat(data.quantity ?? '0');
+          const pantryQty = parseAmount(data.quantity ?? '0');
           const pantryUnit = (data.unit || '').toLowerCase();
           if (isNaN(pantryQty) || pantryQty <= 0) return;
           if (ing.unit && pantryUnit && ing.unit !== pantryUnit) return;
@@ -136,7 +195,7 @@ export function useUseRecipe(options: UseUseRecipeOptions = {}): UseUseRecipeRes
           const maxUsableFromThisItem = Math.min(ing.remainingAmount, pantryQty);
           if (maxUsableFromThisItem <= 0) return;
 
-          const remainingPantryQty = pantryQty - maxUsableFromThisItem;
+          const remainingPantryQty = roundQty(pantryQty - maxUsableFromThisItem);
           ing.remainingAmount -= maxUsableFromThisItem;
 
           const docRef = doc(db, 'pantryItems', docSnap.id);
