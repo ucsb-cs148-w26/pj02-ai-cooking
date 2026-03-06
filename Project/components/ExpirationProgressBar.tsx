@@ -36,7 +36,7 @@ export function getExpirationStatus(expirationDate: string): {
     status: 'fresh',
     text: 'Fresh',
     color: 'bg-green-50 text-green-700',
-    dotColor: 'bg-green-400',
+    dotColor: 'bg-[#5fa052]',
     barColor: 'bg-green-400',
   };
 }
