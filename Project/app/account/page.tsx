@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import { auth, useAuth } from '@/lib/firebase';
-import { getUserPreferences } from '@/services/userPreferencesService';
+import { getUserPreferences, saveUserPreferences } from '@/services/userPreferencesService';
 import { UserPreferences } from '@/types';
 import { ChefHat, Mail, Calendar, LogOut, User, Sparkles } from 'lucide-react';
 
@@ -16,12 +16,24 @@ const colors = {
   steelBlue: '#33658A',
 };
 
+const DEFAULT_PREFS: UserPreferences = {
+  name: '',
+  allergies: [],
+  dietType: 'None',
+  cuisinePreferences: [],
+  cookingSkillLevel: 'Intermediate',
+  onboardingComplete: true,
+};
+
 export default function AccountPage() {
   const router = useRouter();
   const { user: currentUser, loading: authLoading } = useAuth();
   const [userPreferences, setUserPreferences] = useState<UserPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [form, setForm] = useState<UserPreferences>(DEFAULT_PREFS);
 
   useEffect(() => {
     if (!authLoading && !currentUser) {
@@ -32,6 +44,10 @@ export default function AccountPage() {
     if (currentUser) {
       getUserPreferences(currentUser.uid).then(prefs => {
         setUserPreferences(prefs);
+        const next = prefs
+          ? { ...DEFAULT_PREFS, ...prefs, onboardingComplete: prefs.onboardingComplete ?? true }
+          : DEFAULT_PREFS;
+        setForm(next);
         setLoading(false);
       });
     } else if (!authLoading) {
@@ -47,6 +63,33 @@ export default function AccountPage() {
     } catch (error) {
       console.error('Logout error:', error);
       setLoggingOut(false);
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    if (!currentUser) return;
+    setSaving(true);
+    setSaveMessage(null);
+    try {
+      const toSave: UserPreferences = {
+        name: form.name.trim() || '',
+        allergies: form.allergies ?? [],
+        customAllergies: form.customAllergies?.trim() || undefined,
+        dietType: form.dietType || 'None',
+        cuisinePreferences: form.cuisinePreferences ?? [],
+        cookingSkillLevel: form.cookingSkillLevel || 'Intermediate',
+        onboardingComplete: form.onboardingComplete ?? true,
+        cuisine: form.cuisine?.trim() || undefined,
+        restrictions: form.restrictions?.trim() || undefined,
+      };
+      await saveUserPreferences(currentUser.uid, toSave);
+      setUserPreferences(toSave);
+      setSaveMessage({ type: 'success', text: 'Preferences saved.' });
+    } catch (err) {
+      console.error('Save preferences error:', err);
+      setSaveMessage({ type: 'error', text: 'Failed to save. Please try again.' });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -101,17 +144,6 @@ export default function AccountPage() {
             </div>
           </div>
 
-          {/* User ID */}
-          <div className="flex items-start gap-4 p-4 rounded-xl" style={{ backgroundColor: colors.steelBlue + '10' }}>
-            <div className="mt-1">
-              <User style={{ color: colors.steelBlue }} size={24} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold" style={{ color: colors.olive, opacity: 0.7 }}>User ID</p>
-              <p className="text-sm font-mono break-all" style={{ color: colors.olive }}>{currentUser.uid}</p>
-            </div>
-          </div>
-
           {/* Account Created */}
           <div className="flex items-start gap-4 p-4 rounded-xl" style={{ backgroundColor: colors.olive + '10' }}>
             <div className="mt-1">
@@ -131,32 +163,102 @@ export default function AccountPage() {
             </div>
           </div>
 
-          {/* User Preferences */}
-          {userPreferences && (
-            <div className="flex items-start gap-4 p-4 rounded-xl" style={{ backgroundColor: colors.terracotta + '10' }}>
-              <div className="mt-1">
-                <Sparkles style={{ color: colors.terracotta }} size={24} />
+          {/* Editable Preferences */}
+          <div className="space-y-4 p-4 rounded-xl" style={{ backgroundColor: colors.terracotta + '10' }}>
+            <div className="flex items-center gap-2">
+              <Sparkles style={{ color: colors.terracotta }} size={24} />
+              <p className="text-sm font-semibold" style={{ color: colors.olive }}>Preferences</p>
+            </div>
+            <div className="grid gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: colors.olive }}>Display name</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border"
+                  style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
+                  placeholder="Your name"
+                />
               </div>
               <div>
-                <p className="text-sm font-semibold" style={{ color: colors.olive, opacity: 0.7 }}>Dietary Preferences</p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {userPreferences.allergies && userPreferences.allergies.length > 0 ? (
-                    userPreferences.allergies.map((item, index) => (
-                      <span 
-                        key={index}
-                        className="px-3 py-1 rounded-full text-sm font-medium border"
-                        style={{ backgroundColor: 'rgba(255,255,255,0.6)', color: colors.olive, borderColor: colors.dustyRose + '40' }}
-                      >
-                        {item}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-sm" style={{ color: colors.olive, opacity: 0.6 }}>No dietary restrictions set</span>
-                  )}
-                </div>
+                <label className="block text-sm font-medium mb-1" style={{ color: colors.olive }}>Diet type</label>
+                <select
+                  value={form.dietType}
+                  onChange={e => setForm({ ...form, dietType: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border"
+                  style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
+                >
+                  <option value="None">None</option>
+                  <option value="Vegetarian">Vegetarian</option>
+                  <option value="Vegan">Vegan</option>
+                  <option value="Pescatarian">Pescatarian</option>
+                  <option value="Keto">Keto</option>
+                  <option value="Gluten-free">Gluten-free</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: colors.olive }}>Cooking skill level</label>
+                <select
+                  value={form.cookingSkillLevel}
+                  onChange={e => setForm({ ...form, cookingSkillLevel: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border"
+                  style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
+                >
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: colors.olive }}>Allergies (comma-separated)</label>
+                <input
+                  type="text"
+                  value={form.allergies?.join(', ') ?? ''}
+                  onChange={e => setForm({ ...form, allergies: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+                  className="w-full px-3 py-2 rounded-lg border"
+                  style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
+                  placeholder="e.g. nuts, shellfish"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: colors.olive }}>Cuisine preferences (comma-separated)</label>
+                <input
+                  type="text"
+                  value={form.cuisinePreferences?.join(', ') ?? ''}
+                  onChange={e => setForm({ ...form, cuisinePreferences: e.target.value.split(',').map(s => s.trim()).filter(Boolean) })}
+                  className="w-full px-3 py-2 rounded-lg border"
+                  style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
+                  placeholder="e.g. Italian, Mexican"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: colors.olive }}>Recipe restrictions (e.g. vegetarian, no nuts)</label>
+                <input
+                  type="text"
+                  value={form.restrictions ?? ''}
+                  onChange={e => setForm({ ...form, restrictions: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border"
+                  style={{ borderColor: colors.dustyRose + '60', color: colors.olive }}
+                  placeholder="Optional"
+                />
               </div>
             </div>
-          )}
+            {saveMessage && (
+              <p className={`text-sm font-medium ${saveMessage.type === 'success' ? 'text-green-700' : 'text-red-600'}`}>
+                {saveMessage.text}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={handleSavePreferences}
+              disabled={saving}
+              className="px-4 py-2 rounded-lg font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+              style={{ backgroundColor: colors.terracotta }}
+            >
+              {saving ? 'Saving...' : 'Save preferences'}
+            </button>
+          </div>
         </div>
 
         {/* Logout Button */}

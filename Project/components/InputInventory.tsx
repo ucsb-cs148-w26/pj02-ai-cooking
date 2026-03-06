@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { collection, addDoc, query, where, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db, useAuth } from '../lib/firebase';
 import type { PantryItem } from '../types';
@@ -46,6 +46,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
     name: '', category: '', quantity: '', unit: '', expiration: '', storage: '', notes: ''
   });
   const [savingEdit, setSavingEdit] = useState(false);
+  const submittingRef = useRef(false);
 
   // Listen to pantry items in real time (only when user is signed in)
   useEffect(() => {
@@ -73,9 +74,13 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
 
     setIsLoadingItems(true);
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      const seen = new Set<string>();
       const items: PantryItem[] = [];
       snapshot.forEach((d) => {
-        items.push({ id: d.id, ...d.data() } as PantryItem);
+        const id = d.id;
+        if (seen.has(id)) return;
+        seen.add(id);
+        items.push({ id, ...d.data() } as PantryItem);
       });
       items.sort((a, b) => new Date(a.expiration).getTime() - new Date(b.expiration).getTime());
       setPantryItems(items);
@@ -90,6 +95,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
   }, [user, authLoading]);
 
   const handleSubmit = async () => {
+    if (submittingRef.current) return;
     // Name, category, expiration, and storage are required
     if (!food.name || !food.category || !food.expiration || !food.storage) {
       alert('Please fill in all required fields');
@@ -107,6 +113,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
 
     try {
@@ -141,7 +148,8 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       };
 
       setPantryItems((prev) => {
-        const updated = [newItem, ...prev];
+        const withoutDuplicate = prev.filter((p) => p.id !== newItem.id);
+        const updated = [newItem, ...withoutDuplicate];
         updated.sort(
           (a, b) =>
             new Date(a.expiration).getTime() -
@@ -170,6 +178,7 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       console.error('Error adding food to Firestore:', error);
       alert('Failed to add food. Please try again.');
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
