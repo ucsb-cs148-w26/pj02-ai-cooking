@@ -8,6 +8,7 @@ import {
   type SavedRecipeDocument,
   unsaveRecipe,
 } from '@/services/savedRecipesService';
+import { useUseRecipe } from '@/hooks/useUseRecipe';
 
 export default function SavedRecipesPage() {
   const { user, loading } = useAuth();
@@ -17,6 +18,7 @@ export default function SavedRecipesPage() {
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const { handleUseRecipe, usingRecipeId } = useUseRecipe({ setError });
 
   useEffect(() => {
     if (!loading && !user) {
@@ -179,13 +181,21 @@ export default function SavedRecipesPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-row gap-2 md:flex-col md:items-end">
+                    <div className="flex flex-row flex-wrap gap-2 md:flex-col md:items-end">
                       <button
                         type="button"
                         className="rounded-full border border-gray-300 px-4 py-1 text-sm font-medium text-gray-700 hover:bg-gray-50"
                         onClick={() => handleToggleExpand(recipe.id)}
                       >
                         {expandedId === recipe.id ? 'Hide details' : 'View details'}
+                      </button>
+                      <button
+                        type="button"
+                        className="rounded-full border border-gray-300 px-4 py-1 text-sm font-medium text-gray-800 hover:bg-gray-100 disabled:opacity-60"
+                        onClick={() => handleUseRecipe({ id: recipe.id, ingredients: recipe.ingredients })}
+                        disabled={usingRecipeId === recipe.id}
+                      >
+                        {usingRecipeId === recipe.id ? 'Using…' : 'Use Recipe (update pantry)'}
                       </button>
                       <button
                         type="button"
