@@ -101,6 +101,13 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       alert('Please fill in all required fields');
       return;
     }
+    if (food.quantity !== '') {
+      const q = parseInt(food.quantity, 10);
+      if (isNaN(q) || q < 0 || q > 50) {
+        alert('Quantity must be between 0 and 50.');
+        return;
+      }
+    }
     if (!user) {
       alert('Please log in first!');
       return;
@@ -240,6 +247,13 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
       alert('Please fill in all required fields for the item.');
       return;
     }
+    if (editFood.quantity !== '') {
+      const q = parseInt(editFood.quantity, 10);
+      if (isNaN(q) || q < 0 || q > 50) {
+        alert('Quantity must be between 0 and 50.');
+        return;
+      }
+    }
     if (!user) {
       alert('Please log in first!');
       return;
@@ -347,12 +361,21 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
         {/* Quantity & Unit */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Quantity</label>
+            <label className="block font-semibold mb-2 text-sm" style={{ color: '#515B3A' }}>Quantity (0–50)</label>
             <input 
               type="number" 
+              min={0}
+              max={50}
               value={food.quantity}
-              onChange={(e) => update('quantity', e.target.value)}
-              placeholder="1, 2, 5..."
+              onChange={(e) => {
+                const v = e.target.value;
+                if (v === '') update('quantity', '');
+                else {
+                  const n = parseInt(v, 10);
+                  if (!isNaN(n) && n >= 0 && n <= 50) update('quantity', String(n));
+                }
+              }}
+              placeholder="0–50"
               className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
               style={inputStyle}
             />
@@ -512,12 +535,21 @@ export default function AddFood({ onAddFood }: AddFoodProps) {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-semibold mb-1 text-sm" style={{ color: '#515B3A' }}>
-                    Quantity
+                    Quantity (0–50)
                   </label>
                   <input
                     type="number"
+                    min={0}
+                    max={50}
                     value={editFood.quantity}
-                    onChange={(e) => setEditFood({ ...editFood, quantity: e.target.value })}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === '') setEditFood({ ...editFood, quantity: '' });
+                      else {
+                        const n = parseInt(v, 10);
+                        if (!isNaN(n) && n >= 0 && n <= 50) setEditFood({ ...editFood, quantity: String(n) });
+                      }
+                    }}
                     className="w-full px-3 py-2 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
                     style={inputStyle}
                   />

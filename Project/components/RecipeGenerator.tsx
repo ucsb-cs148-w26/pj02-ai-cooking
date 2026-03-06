@@ -28,6 +28,16 @@ type RecipeGeneratorProps = {
   ingredients: Ingredient[];
 };
 
+const CUISINE_OPTIONS: string[] = [
+  'Italian', 'Mexican', 'Chinese', 'Japanese', 'Indian', 'Thai',
+  'Mediterranean', 'American', 'French', 'Korean', 'Greek', 'Vietnamese', 'Spanish',
+];
+
+const RESTRICTION_OPTIONS: string[] = [
+  'Vegetarian', 'Vegan', 'Pescatarian', 'Gluten-Free', 'Dairy-Free',
+  'Nut-free', 'Keto', 'Paleo', 'Low-carb', 'Halal', 'Kosher',
+];
+
 const parseAmount = (raw: string): number => {
   const s = raw.trim();
   if (!s) return NaN;
@@ -329,23 +339,31 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block font-semibold mb-2 text-sm" style={{ color: colors.olive }}>Cuisine</label>
-            <input
+            <select
               value={cuisine}
               onChange={(e) => setCuisine(e.target.value)}
-              placeholder="e.g. Italian"
-              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
               style={inputStyle}
-            />
+            >
+              <option value="">Any cuisine</option>
+              {CUISINE_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block font-semibold mb-2 text-sm" style={{ color: colors.olive }}>Restrictions</label>
-            <input
+            <select
               value={restrictions}
               onChange={(e) => setRestrictions(e.target.value)}
-              placeholder="e.g. vegetarian, no nuts"
-              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none placeholder:opacity-50"
+              className="w-full px-4 py-3 rounded-lg border-2 focus:outline-none"
               style={inputStyle}
-            />
+            >
+              <option value="">No restrictions</option>
+              {RESTRICTION_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>{opt}</option>
+              ))}
+            </select>
           </div>
         </div>
         {error && <p className="text-sm" style={{ color: colors.terracotta }}>{error}</p>}
