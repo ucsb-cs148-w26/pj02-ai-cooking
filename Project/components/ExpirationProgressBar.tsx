@@ -20,24 +20,24 @@ export function getExpirationStatus(expirationDate: string): {
     return {
       status: 'expired',
       text: 'Expired',
-      color: 'bg-red-100 text-red-800',
-      dotColor: 'bg-red-500',
-      barColor: 'bg-red-500',
+      color: 'bg-rose-50 text-rose-700',
+      dotColor: 'bg-rose-400',
+      barColor: 'bg-rose-400',
     };
   if (diffMs <= THREE_DAYS_MS)
     return {
       status: 'expiring_soon',
       text: 'Expiring Soon',
-      color: 'bg-orange-100 text-orange-800',
-      dotColor: 'bg-orange-500',
-      barColor: 'bg-orange-500',
+      color: 'bg-amber-50 text-amber-700',
+      dotColor: 'bg-amber-400',
+      barColor: 'bg-amber-400',
     };
   return {
     status: 'fresh',
     text: 'Fresh',
-    color: 'bg-green-100 text-green-800',
-    dotColor: 'bg-green-500',
-    barColor: 'bg-blue-500',
+    color: 'bg-blue-50 text-blue-700',
+    dotColor: 'bg-blue-400',
+    barColor: 'bg-blue-400',
   };
 }
 
@@ -124,9 +124,9 @@ export function ExpirationProgressBar({ item, onDelete, onEdit }: ExpirationProg
             <span
               className={`text-sm font-medium ${
                 status.status === 'expired'
-                  ? 'text-red-600'
+                  ? 'text-rose-700'
                   : status.status === 'expiring_soon'
-                    ? 'text-orange-600'
+                    ? 'text-amber-700'
                     : 'text-gray-700'
               }`}
             >
