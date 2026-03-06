@@ -1,7 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+} from 'firebase/firestore';
 import { Heart } from 'lucide-react';
 import { db, useAuth } from '@/lib/firebase';
 import type { Ingredient, Recipe, UserPreferences } from '../types';
@@ -9,6 +14,7 @@ import { generateRecipes } from '../services/geminiService';
 import { getUserPreferences } from '../services/userPreferencesService';
 import { saveRecipe, unsaveRecipe } from '../services/savedRecipesService';
 import { useSavedRecipeIds } from '@/hooks/useSavedRecipeIds';
+import { useUseRecipe } from '@/hooks/useUseRecipe';
 
 const colors = {
   terracotta: '#C97064',
@@ -45,6 +51,8 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     loading: savedIdsLoading,
     refetch: refetchSavedIds,
   } = useSavedRecipeIds();
+  const { handleUseRecipe, usingRecipeId } = useUseRecipe({ setError });
+
 
   const itemsForRecipes = pantryItems.length > 0 ? pantryItems : ingredients;
   const pantrySummary = itemsForRecipes.map(formatIngredient);
@@ -76,13 +84,14 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
     setPantryLoading(true);
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items: Ingredient[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
         items.push({
+          id: docSnap.id,
           name: data.name,
           quantity: data.quantity ? `${data.quantity} ${data.unit || ''}`.trim() : undefined,
           category: data.category,
-          expiryEstimate: data.expiration ? `Expires ${data.expiration}` : undefined
+          expiryEstimate: data.expiration ? `Expires ${data.expiration}` : undefined,
         });
       });
       setPantryItems(items);
@@ -156,7 +165,6 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       }
     }
   };
-
   const inputStyle = { borderColor: colors.dustyRose + '60', color: colors.olive };
 
   return (
@@ -323,6 +331,17 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
                     <li key={`${recipeId}-step-${idx}`}>{step}</li>
                   ))}
                 </ol>
+              </div>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => handleUseRecipe({ id: recipeWithId.id, ingredients: recipeWithId.ingredients })}
+                  disabled={usingRecipeId === recipeId}
+                  className="w-full px-4 py-2 rounded-lg text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                  style={{ backgroundColor: colors.terracotta }}
+                >
+                  {usingRecipeId === recipeId ? 'Using...' : 'Use Recipe (update pantry)'}
+                </button>
               </div>
             </div>
             );
