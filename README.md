@@ -56,7 +56,7 @@ This app helps people who do not know how to cook, feel stuck on what to make, o
 <h3>Installation Steps</h3>
 <p>
   Since we’re designing a web App, we will give the user the link that we
-  deployed, so they can access it via the link.
+  deployed, so they can access it via the link. https://pj02-ai-cooking.vercel.app/dashboard
 </p>
 
 <p>Or, Local:</p>
