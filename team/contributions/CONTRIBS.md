@@ -13,6 +13,7 @@ Yuxi was the initial idea person behind PantryPal and contributed across data, U
 - **Onboarding & preferences**: Built the onboarding flow to collect allergies and dietary preferences from new users (Issue #53, PR #81).
 - **Expiration tracking & reminders**: Implemented the expiration progress bar and dashboard reminders, unified scanned data into the expiration model, and fixed same-day expiration status logic (Issues #140, #137, #218; PRs #113, #129, #130, #134, #152, #219).
 - **Saved recipes backend**: Designed the Firestore collection and service layer for per-user saved recipes, including save/unsave logic, a hook to load saved IDs, and Firestore rules that restrict access by userId (Issues #183, #211; PRs #185, #186, #188).
+- **Recipe ingredient selection & pantry sort**: Added UI to select which pantry items to use for recipe generation (checkboxes, Select all/Clear, generate using only selected items) and sorted pantry items by expiration (soonest first) on the Recipes tab (Issues #225, #240; PRs #239, #241).
 - **Saved recipes UI & navigation**: Built the My Saved Recipes page, including list, details, unsave actions, navigation entry, and Back to Dashboard button (Issues #156, #212, #215; PRs #197, #198, #199, #201, #213, #206).
 - **Bug fixes**: Fixed duplicate pantry items being created when adding to the pantry (Issue #221; PRs #222, #223).
 - **Documentation & retrospectives**: Created the user manual (MANUAL.md, PR #210) and led the second team retrospective, documenting process changes and outcomes (Issue #147, RETRO_02.md).
