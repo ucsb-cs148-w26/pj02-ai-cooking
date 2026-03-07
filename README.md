@@ -1,4 +1,4 @@
-<h1 style="color:green">AI Cooking App</h1>
+<h1 style="color:green">Pantry Pal</h1>
 
 **Description:**
 
