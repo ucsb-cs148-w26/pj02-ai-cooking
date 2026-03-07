@@ -10,7 +10,7 @@ Team: Krisha[ ], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
 
 ---
 
-##Scribed Discussion:
+## Scribed Discussion:
 
 We further discussed the feedback other teams provided for our MVP, and we decided what to do for each of us for the upcoming week.
 
