@@ -31,3 +31,4 @@ Daniel was an active contributor on frontend UI, AI-powered expiration features,
 - **Design & documentation**: Authored and maintained DESIGN.md and made multiple improvements to the README so the project documentation stayed accurate (PRs #193, #168, #86, #52, #50, #49).
 - **Sprint & process management**: Maintained sprint planning documents and scrum logs across sprints, and led the first retrospective, facilitating the team discussion and documenting outcomes (PRs #124, #110, #108, #69, #63, #56, #26, #25, #23, #20, #19, #18, #17, #62, #65; Subissue #51).
 
+## PLaceholer for other team members
