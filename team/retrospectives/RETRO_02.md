@@ -1,4 +1,4 @@
-# SPRINT RETRO: Feb 18, 2026
+# SPRINT RETRO 2: Feb 18, 2026
 
 * Led by: Yuxi Ji
 * Present: Yuxi Ji, Daniel Du, Krisha Soneji, Mahima Chaudhary, Andy Wang
