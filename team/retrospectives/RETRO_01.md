@@ -1,4 +1,4 @@
-# SPRINT RETRO: January 23, 2026
+# SPRINT RETRO 1: January 23, 2026
 
 * Led by: Daniel 
 * Present: Krisha, Mahima, Yuxi, Andy
