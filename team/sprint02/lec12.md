@@ -1,4 +1,4 @@
-Project: AI Cooking App
+# Lect12 Scrum Project: AI Cooking App
 
 Mentor: Self Mentored
 
@@ -7,6 +7,8 @@ Meeting Time: lect12
 Type of Meeting: Daily Scrum
 
 Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
+
+---
 
 - During Lecture 12, our team worked together on the **PantryPal design document** linked at `./docs/DESIGN.md`:
   - Reviewed our existing code (landing page, dashboard, pantry/scan/recipes, expiration calendar, preferences service, Firebase setup).
