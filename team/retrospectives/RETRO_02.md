@@ -1,4 +1,4 @@
-# Retrospective 18, Feb 2026
+# Sprint Retro: Feb 18, 2026
 
 * Led by: Yuxi Ji
 * Present: Yuxi Ji, Daniel Du, Krisha Soneji, Mahima Chaudhary, Andy Wang
