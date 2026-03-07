@@ -38,6 +38,14 @@ const RESTRICTION_OPTIONS: string[] = [
   'Nut-free', 'Keto', 'Paleo', 'Low-carb', 'Halal', 'Kosher',
 ];
 
+const parseExpirationTime = (expiryEstimate?: string): number => {
+  if (!expiryEstimate?.trim()) return Infinity;
+  const match = expiryEstimate.match(/Expires\s+(\d{4}-\d{2}-\d{2})/i) ?? expiryEstimate.match(/(\d{4}-\d{2}-\d{2})/);
+  if (!match) return Infinity;
+  const t = new Date(match[1]).getTime();
+  return Number.isNaN(t) ? Infinity : t;
+};
+
 const parseAmount = (raw: string): number => {
   const s = raw.trim();
   if (!s) return NaN;
@@ -229,6 +237,11 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
           category: data.category,
           expiryEstimate: data.expiration ? `Expires ${data.expiration}` : undefined,
         });
+      });
+      items.sort((a, b) => {
+        const timeA = parseExpirationTime(a.expiryEstimate);
+        const timeB = parseExpirationTime(b.expiryEstimate);
+        return timeA - timeB;
       });
       setPantryItems(items);
       setPantryLoading(false);
