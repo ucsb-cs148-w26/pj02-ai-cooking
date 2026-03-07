@@ -1,4 +1,4 @@
-SPRINT RETRO
+# SPRINT RETRO
 # Date of Retrospective: 01/23/26
 
 * Led by: Daniel 
