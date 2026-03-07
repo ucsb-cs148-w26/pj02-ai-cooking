@@ -1,7 +1,7 @@
 # Lab 06 Scrum Project: AI Cooking App
 
 **Mentor:** Self Mentored  
-**Meeting Time:** Lab 06  
+**Meeting Time:** Lab06  
 **Type of Meeting:** Retrospective 02  
 **Team:** Krisha [X], Daniel [X], Yuxi [X], Andy [X], Mahima [X]
 
