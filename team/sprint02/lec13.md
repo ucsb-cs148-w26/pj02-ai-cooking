@@ -1,4 +1,4 @@
-Project: AI Cooking App
+# Lect12 Scrum Project: AI Cooking App
 
 Mentor: Self Mentored
 
@@ -8,7 +8,9 @@ Type of Meeting: Daily Scrum
 
 Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
 
-Scribed Discussion:
+---
+
+## Scribed Discussion:
 
 Cross-Team Project Evaluation
 
