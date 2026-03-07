@@ -1,8 +1,8 @@
-# Lect12 Scrum Project: AI Cooking App
+# Lect13 Scrum Project: AI Cooking App
 
 Mentor: Self Mentored
 
-Meeting Time: lect12
+Meeting Time: lect13
 
 Type of Meeting: Daily Scrum
 
