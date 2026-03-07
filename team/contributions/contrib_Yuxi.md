@@ -2,7 +2,7 @@
 
 ## Overview
 
-I am the **initial idea person** behind PantryPal. I proposed the concept and have been deeply involved in turning it from an idea into a working product. I enjoy the process of breaking down the vision into concrete sub-issues, defining acceptance criteria, and seeing each piece implemented step by step. My contributions span data persistence, onboarding, recipe UX, expiration tracking, saved recipes (including Firestore backend and UI), bug fixes, and team process leadership (second retrospective). Below is a detailed breakdown of the sub-issues I owned and the pull requests that implemented them.
+I am the **initial idea person** behind PantryPal. I proposed the concept and have been deeply involved in turning it from an idea into a working product. I enjoy the process of breaking down the vision into concrete sub-issues, defining acceptance criteria, and seeing each piece implemented step by step. My contributions span data persistence, onboarding, recipe UX (including selecting which pantry items to use for generation and sorting them by expiration), expiration tracking, saved recipes (including Firestore backend and UI), bug fixes, and team process leadership (second retrospective). Below is a detailed breakdown of the sub-issues I owned and the pull requests that implemented them.
 
 ---
 
@@ -33,6 +33,18 @@ I am the **initial idea person** behind PantryPal. I proposed the concept and ha
 **Task:** Replace the "Preferences" section in Recipes with the friendlier prompt "What kind of food do you want today?"
 
 - **PR #121, #122** — *task by yuxi* — Updated the Recipes UI copy and section label as specified.
+
+### Allow selecting which pantry items to use for recipe generation — Issue #225
+
+**Acceptance criteria:** On the Recipes tab, the pantry section shows each pantry item with a way to select/deselect it (e.g. checkbox or toggle); "Select all" selects every pantry item and "Clear" / "Deselect all" deselects every item; generating recipes uses only the currently selected items (if none are selected, the user sees an error and no API call is made); when the pantry list first loads or updates, all items are selected by default; existing behavior (cuisine, restrictions, save recipe, etc.) still works when using a subset of ingredients.
+
+- **PR #239** — *Allow selecting which pantry items to use for recipe generation* — Implemented checkboxes and Select all/Clear in RecipeGenerator; generate uses only selected items.
+
+### Sort pantry items by expiration (soonest first) on Recipes tab — Issue #240
+
+**Acceptance criteria:** On the Recipes tab, pantry items are displayed in order of expiration date: soonest to expire first; items with no expiration or unparseable expiry are listed after items with valid expiration dates; sorting is done in application code only (no Firestore Console or schema changes).
+
+- **PR #241** — *Sort pantry items by expiration (soonest first) on Recipes tab* — Added sort by expiration in RecipeGenerator onSnapshot callback with a parseExpirationTime helper.
 
 ---
 
