@@ -13,7 +13,7 @@ class RequestError extends Error {
   }
 }
 
-const requestJson = async <T>(url: string, body: unknown): Promise<T> => {
+const requestJson = async <T>(url: string, body: Record<string, unknown>): Promise<T> => {
   const response = await fetch(url, {
     method: "POST",
     headers: {
@@ -38,7 +38,7 @@ const requestJson = async <T>(url: string, body: unknown): Promise<T> => {
 
 const requestJsonStreaming = async <T>(
   url: string,
-  body: unknown,
+  body: Record<string, unknown>,
   onProgress: (message: string) => void,
   resultKey: 'items' | 'recipes'
 ): Promise<T> => {
