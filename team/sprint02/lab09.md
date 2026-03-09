@@ -1,4 +1,4 @@
-# Lab09 Scrum Project: AI Cooking App
+# Lab09 Scrum Project: Pantry Pal
 
 **Mentor:** Self Mentored  
 
