@@ -1,22 +1,23 @@
-Lab04 Scrum
-Project: AI Cooking App
+# Lab04 Scrum Project: Pantry Pal
 
-Mentor: Self Mentored
+**Mentor:** Self Mentored  
 
-Meeting Time: lab04
+**Meeting Time:** Lab04
 
-Type of Meeting: Daily Scrum
+**Type of Meeting:** Daily Scrum  
 
-Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
+**Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]  
 
-Scribed Discussion:
+---
 
-Mahima is working on the backend of the applciation
+## Scribed Discussion
 
-Daniel is working on adding AI expiration dates
+- Mahima is working on the backend of the applciation
 
-Yuxi is working on the onboarding form
+- Daniel is working on adding AI expiration dates
 
-Krisha is working on the pantry and adding items to pantry manually
+- Yuxi is working on the onboarding form
 
-Andy is working on making the APIs work for recipe generation and photo recognition
+- Krisha is working on the pantry and adding items to pantry manually
+
+- Andy is working on making the APIs work for recipe generation and photo recognition
