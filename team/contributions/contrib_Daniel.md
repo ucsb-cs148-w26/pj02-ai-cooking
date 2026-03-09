@@ -10,7 +10,7 @@ I was an active contributor throughout the project, with involvement spanning fr
 
 ### UI / Account Features
 
-- **PR #PLaceholder** — Subissue #232: *Center the navigation bar*
+- **PR #245, #246** — Subissue #232: *Center the navigation bar*
 
 - **PR #220, #244** — Subissue #175: *Edit Account Page* — Hidden the userID from the visible account UI and made user preferences editable. This improved both privacy and usability of the account management flow.
 
