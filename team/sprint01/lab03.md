@@ -1,27 +1,29 @@
-Project: AI Cooking App
+# Lab03 Scrum Project: Pantry Pal
 
-Mentor: Self Mentored
+**Mentor:** Self Mentored  
 
-Meeting Time: lab02
+**Meeting Time:** Lab03  
 
-Type of Meeting: Sprint Planning
+**Type of Meeting:** Daily Scrum  
 
-Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X*], Mahima[X]
+**Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[X*], Mahima[X]  
 
-Scribed Discussion:
+---
 
-*Andy joined via phone call because he was recovering from a surgery.
+## Scribed Discussion
 
-We finalized what we need to get done before the MVP video is due. 
+- *Andy joined via phone call because he was recovering from a surgery.
 
-Krisha needs to finish the Pantry form and updating the pantry with ingredients.
+- We finalized what we need to get done before the MVP video is due. 
 
-Mahima needs to finish implementing the database through Firebase.
+- Krisha needs to finish the Pantry form and updating the pantry with ingredients.
 
-Daniel needs to finish creating the automated expiration dates for produce.
+- Mahima needs to finish implementing the database through Firebase.
 
-Yuxi needs to finish the onboarding form.
+- Daniel needs to finish creating the automated expiration dates for produce.
 
-Andy needs to finsih the image scanner aspect and recipe generation.
+- Yuxi needs to finish the onboarding form.
 
-We will all continue working on these tasks for the MVP.
+- Andy needs to finsih the image scanner aspect and recipe generation.
+
+- We will all continue working on these tasks for the MVP.
