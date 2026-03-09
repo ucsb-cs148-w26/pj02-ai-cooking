@@ -62,3 +62,7 @@ Daniel was an active contributor on frontend UI, AI-powered expiration features,
 - I fixed the recipe generation to take into account user onboarding data, as before the recipes wouldn’t take any restrictions/allergies into consideration
 - I added drop down options and restrictions for user inputs
 - As scrum master, I also consistently led and maintained many scrum meetings
+
+---
+
+## Andy Wang
