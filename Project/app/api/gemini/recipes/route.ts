@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import type { Ingredient, Recipe, UserPreferences } from '@/types';
-import { getAllApiKeys, isRateLimitError } from '@/lib/geminiKeys';
+import { getAllApiKeys, isRateLimitError, isUnavailableError } from '@/lib/geminiKeys';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const PRIMARY_MODEL = 'gemini-3.1-flash-lite-preview';
@@ -108,64 +108,74 @@ export async function POST(request: Request) {
       }
     };
 
-    const model = useDowngradedModel ? DOWNGRADED_MODEL : PRIMARY_MODEL;
+    const modelsToTry = useDowngradedModel
+      ? [DOWNGRADED_MODEL]
+      : [PRIMARY_MODEL, DOWNGRADED_MODEL];
     const apiKeys = getAllApiKeys();
     let lastError: unknown;
-    let rateLimitHit = false;
+    let retryableHit = false;
 
     for (let keyIndex = 0; keyIndex < apiKeys.length; keyIndex++) {
       const ai = new GoogleGenAI({ apiKey: apiKeys[keyIndex] });
 
-      try {
-        const response = await ai.models.generateContent({
-          model,
-          contents: prompt,
-          config: {
-            responseMimeType: 'application/json',
-            responseSchema: schema
+      for (let m = 0; m < modelsToTry.length; m++) {
+        try {
+          const response = await ai.models.generateContent({
+            model: modelsToTry[m],
+            contents: prompt,
+            config: {
+              responseMimeType: 'application/json',
+              responseSchema: schema
+            }
+          });
+
+          if (!response.text) {
+            return NextResponse.json({ recipes: [] as Recipe[] });
           }
-        });
 
-        if (!response.text) {
-          return NextResponse.json({ recipes: [] as Recipe[] });
-        }
+          const parsed = JSON.parse(response.text) as Recipe[];
+          const recipes: Recipe[] = Array.isArray(parsed) ? parsed : [];
+          const hydrated = await Promise.all(
+            recipes.map(async (recipe, index) => {
+              const id = recipe?.id && String(recipe.id).trim()
+                ? String(recipe.id).trim()
+                : `recipe-${index}-${Date.now()}`;
+              return {
+                ...recipe,
+                id,
+                image: await generateRecipeImage(ai, recipe.title)
+              };
+            })
+          );
 
-        const parsed = JSON.parse(response.text) as Recipe[];
-        const recipes: Recipe[] = Array.isArray(parsed) ? parsed : [];
-        const hydrated = await Promise.all(
-          recipes.map(async (recipe, index) => {
-            const id = recipe?.id && String(recipe.id).trim()
-              ? String(recipe.id).trim()
-              : `recipe-${index}-${Date.now()}`;
-            return {
-              ...recipe,
-              id,
-              image: await generateRecipeImage(ai, recipe.title)
-            };
-          })
-        );
+          return NextResponse.json({ recipes: hydrated });
+        } catch (err) {
+          lastError = err;
 
-        return NextResponse.json({ recipes: hydrated });
-      } catch (err) {
-        lastError = err;
-        if (isRateLimitError(err)) {
-          rateLimitHit = true;
-          if (keyIndex < apiKeys.length - 1) {
-            await sleep(KEY_RETRY_DELAY_MS);
+          if (isUnavailableError(err) && m < modelsToTry.length - 1) {
+            continue;
           }
-          continue;
+
+          if (isRateLimitError(err) || isUnavailableError(err)) {
+            retryableHit = true;
+            if (keyIndex < apiKeys.length - 1) {
+              await sleep(KEY_RETRY_DELAY_MS);
+            }
+            break;
+          }
+
+          throw err;
         }
-        throw err;
       }
     }
 
-    if (rateLimitHit) {
+    if (retryableHit) {
       const canRetry = !useDowngradedModel;
       return NextResponse.json(
         {
           error: canRetry
-            ? 'API rate limit reached. We will try again with a fallback model.'
-            : 'API rate limit reached. Please try again in a few minutes.',
+            ? 'Model temporarily unavailable. We will try again with a fallback model.'
+            : 'Model temporarily unavailable. Please try again in a few minutes.',
           canRetry
         },
         { status: 429 }

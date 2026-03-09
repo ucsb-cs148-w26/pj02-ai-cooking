@@ -61,3 +61,14 @@ export const isRateLimitError = (error: unknown): boolean => {
     lower.includes('quota')
   );
 };
+
+export const isUnavailableError = (error: unknown): boolean => {
+  const msg = error instanceof Error ? error.message : String(error);
+  const lower = msg.toLowerCase();
+  return (
+    lower.includes('503') ||
+    lower.includes('unavailable') ||
+    lower.includes('high demand') ||
+    lower.includes('overloaded')
+  );
+};
