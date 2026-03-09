@@ -1,8 +1,8 @@
-# Lect15 Scrum Project: Pantry Pal
+# Lect16 Scrum Project: Pantry Pal
 
 Mentor: Self Mentored
 
-Meeting Time: lect15
+Meeting Time: lect16
 
 Type of Meeting: Daily Scrum
 
