@@ -1,25 +1,27 @@
-Project: AI Cooking App
+# Lect06 Scrum Project: Pantry Pal
 
-Mentor: Self Mentored
+**Mentor:** Self Mentored  
 
-Meeting Time: lect06
+**Meeting Time:** Lect06
 
-Type of Meeting: Daily Scrum
+**Type of Meeting:** Daily Scrum  
 
-Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
+**Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]  
 
-Scribed Discussion:
+---
 
-We discussed our MVP, and everyone contributed their ideas.
+## Scribed Discussion
 
-Mahima has been working on creating the Firebase database for the app.
+- We discussed our MVP, and everyone contributed their ideas.
 
-Krisha has been working on making pantry items visible and finished the Input Inventory form.
+- Mahima has been working on creating the Firebase database for the app.
 
-Daniel finished creating the automated expiration date aspect.
+- Krisha has been working on making pantry items visible and finished the Input Inventory form.
 
-Yuxi has finished the onboarding form.
+- Daniel finished creating the automated expiration date aspect.
 
-Andy has been working on finishing the image scanner aspect and recipe generation.
+- Yuxi has finished the onboarding form.
 
-Everyone will continue working on their tasks for the MVP.
+- Andy has been working on finishing the image scanner aspect and recipe generation.
+
+- Everyone will continue working on their tasks for the MVP.
