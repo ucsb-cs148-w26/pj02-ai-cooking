@@ -6,7 +6,7 @@
 
 **Type of Meeting:** Daily Scrum  
 
-**Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]  
+**Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[], Mahima[X]  
 
 ---
 
