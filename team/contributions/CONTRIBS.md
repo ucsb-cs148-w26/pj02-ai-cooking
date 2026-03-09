@@ -3,6 +3,19 @@
 This document summarizes each team member's code and process contributions. For more detail, see the individual files in this folder (e.g. contrib_Yuxi.md, contrib_Daniel.md).
 
 ---
+## Mahima Chaudhary
+
+- When starting out, our code was disorganized and we didn’t have any of the config files so it wasn’t deploying. I reorganized the files and added the config files so we could get the initial deployment working
+- I created the log in page
+- I worked on navigation through the website and linked the landing page to the login/signup/onboarding pages
+- I created the Firestore database to store user onboarding data and inventory data
+- I implemented user authentication via Firebase
+- I fixed user state to ensure the pantry items persist after page reloads
+- When we would scan items, they wouldn’t show up in pantry, so I fixed that issue
+- As UX/UI coordinator, I improved the UI throughout the website and ensured everything looks cohesive and uniform throughout
+- I fixed the recipe generation to take into account user onboarding data, as before the recipes wouldn’t take any restrictions/allergies into consideration
+- I added drop down options and restrictions for user inputs
+- As scrum master, I also consistently led and maintained many scrum meetings
 
 ## Yuxi Ji
 
