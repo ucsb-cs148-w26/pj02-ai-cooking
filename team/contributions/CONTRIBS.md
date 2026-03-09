@@ -49,4 +49,11 @@ Daniel was an active contributor on frontend UI, AI-powered expiration features,
 
 - **Sprint & process management**: Maintained sprint planning documents and scrum logs across sprints, and led the first retrospective, facilitating the team discussion and documenting outcomes (PRs #124, #110, #108, #69, #63, #56, #26, #25, #23, #20, #19, #18, #17, #62, #65; Subissue #51).
 
-## PLaceholer for other team members
+## Krisha Soneji
+
+- I worked on the Pantry Page
+- I worked on making the UI for the form for users to input inventory, and also allowed pantry items to be stored in firebase
+- I made the pantry items load from firebase to the UI so users could see their items
+- I added edit and delete buttons so users could remove and change their pantry data
+- I created a sign up page, which allowed users to create their account username and password
+- I made the dashboard page and implemented a new UI, with a cleaner aesthetic and a UI that reflected our app better
