@@ -1,4 +1,4 @@
-# Lab 06 Scrum Project: AI Cooking App
+# Lab 06 Scrum Project: Pantry Pal
 
 **Mentor:** Self Mentored  
 **Meeting Time:** Lab06  
