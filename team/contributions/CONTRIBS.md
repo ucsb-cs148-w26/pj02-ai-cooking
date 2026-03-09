@@ -3,19 +3,6 @@
 This document summarizes each team member's code and process contributions. For more detail, see the individual files in this folder (e.g. contrib_Yuxi.md, contrib_Daniel.md).
 
 ---
-## Mahima Chaudhary
-
-- When starting out, our code was disorganized and we didn’t have any of the config files so it wasn’t deploying. I reorganized the files and added the config files so we could get the initial deployment working
-- I created the log in page
-- I worked on navigation through the website and linked the landing page to the login/signup/onboarding pages
-- I created the Firestore database to store user onboarding data and inventory data
-- I implemented user authentication via Firebase
-- I fixed user state to ensure the pantry items persist after page reloads
-- When we would scan items, they wouldn’t show up in pantry, so I fixed that issue
-- As UX/UI coordinator, I improved the UI throughout the website and ensured everything looks cohesive and uniform throughout
-- I fixed the recipe generation to take into account user onboarding data, as before the recipes wouldn’t take any restrictions/allergies into consideration
-- I added drop down options and restrictions for user inputs
-- As scrum master, I also consistently led and maintained many scrum meetings
 
 ## Yuxi Ji
 
@@ -49,6 +36,8 @@ Daniel was an active contributor on frontend UI, AI-powered expiration features,
 
 - **Sprint & process management**: Maintained sprint planning documents and scrum logs across sprints, and led the first retrospective, facilitating the team discussion and documenting outcomes (PRs #124, #110, #108, #69, #63, #56, #26, #25, #23, #20, #19, #18, #17, #62, #65; Subissue #51).
 
+---
+
 ## Krisha Soneji
 
 - I worked on the Pantry Page
@@ -57,3 +46,19 @@ Daniel was an active contributor on frontend UI, AI-powered expiration features,
 - I added edit and delete buttons so users could remove and change their pantry data
 - I created a sign up page, which allowed users to create their account username and password
 - I made the dashboard page and implemented a new UI, with a cleaner aesthetic and a UI that reflected our app better
+
+---
+
+## Mahima Chaudhary
+
+- When starting out, our code was disorganized and we didn’t have any of the config files so it wasn’t deploying. I reorganized the files and added the config files so we could get the initial deployment working
+- I created the log in page
+- I worked on navigation through the website and linked the landing page to the login/signup/onboarding pages
+- I created the Firestore database to store user onboarding data and inventory data
+- I implemented user authentication via Firebase
+- I fixed user state to ensure the pantry items persist after page reloads
+- When we would scan items, they wouldn’t show up in pantry, so I fixed that issue
+- As UX/UI coordinator, I improved the UI throughout the website and ensured everything looks cohesive and uniform throughout
+- I fixed the recipe generation to take into account user onboarding data, as before the recipes wouldn’t take any restrictions/allergies into consideration
+- I added drop down options and restrictions for user inputs
+- As scrum master, I also consistently led and maintained many scrum meetings
