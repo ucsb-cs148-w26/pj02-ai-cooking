@@ -1,22 +1,24 @@
-Project: AI Cooking App
+# Lect02 Scrum Project: Pantry Pal
 
-Mentor: Self Mentored
+**Mentor:** Self Mentored  
 
-Meeting Time: lect 02
+**Meeting Time:** Lect02
 
-Type of Meeting: Daily Scrum
+**Type of Meeting:** Daily Scrum  
 
-Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
+**Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]  
 
-Scribed Discussion:
+---
 
-We spent time with our larger group deciding how to split the team, which delayed our scrum meeting so Prof Kate has given us until Friday to complete today's work.
+## Scribed Discussion
 
-Andy is unable to come to class so he joined via Discord.
+- We spent time with our larger group deciding how to split the team, which delayed our scrum meeting so Prof Kate has given us until Friday to complete today's work.
 
-Daniel and Yuxi are having merge conflicts with their .md files that they are currently working on. 
+- Andy is unable to come to class so he joined via Discord.
 
-Everyone is still working on lab1 and getting ready for the Friday submission.
+- Daniel and Yuxi are having merge conflicts with their .md files that they are currently working on. 
+
+- Everyone is still working on lab1 and getting ready for the Friday submission.
 
 
 
