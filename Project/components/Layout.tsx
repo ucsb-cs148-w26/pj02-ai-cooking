@@ -70,15 +70,20 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
 
       {/* Desktop Header */}
       <header
-        className="hidden md:flex fixed top-0 w-full h-16 px-8 items-center justify-between z-50 border-b relative"
+        className="hidden md:flex fixed top-0 w-full h-16 px-8 items-center justify-center z-50 border-b relative"
         style={{ backgroundColor: colors.olive, borderColor: colors.dustyRose + '40' }}
       >
-        <div className="flex items-center gap-3 font-bold text-xl tracking-tight" style={{ fontFamily: 'var(--font-playfair)', color: colors.cream }}>
+        {/* Logo (left) */}
+        <div
+          className="absolute left-8 flex items-center gap-3 font-bold text-xl tracking-tight"
+          style={{ fontFamily: 'var(--font-playfair)', color: colors.cream }}
+        >
           <ChefHat size={30} style={{ color: colors.dustyRose }} />
           PantryPal
         </div>
 
-        <nav className="flex gap-2 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        {/* Centered main nav */}
+        <nav className="flex gap-2">
           {navItems.map(({ key, label, Icon }) => (
             <button
               key={key}
@@ -98,7 +103,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* Right-side actions */}
+        <div className="absolute right-8 flex items-center gap-3">
           <button
             type="button"
             onClick={() => setCalendarOpen(true)}
