@@ -24,11 +24,16 @@ Yuxi was the initial idea person behind PantryPal and contributed across data, U
 
 Daniel was an active contributor on frontend UI, AI-powered expiration features, core pages, design docs, and agile process artifacts.
 
-- **Account & UI features**: Created and iterated on the account page, edited account information, and improved the color scheme for better usability and accessibility (Subissues #175, #104, #115; PRs #220, #133, #132, #131, #127, #119).
+- **Account & UI features**: Created and iterated on the account page, improved UI layout, and refined the color scheme for better usability and accessibility. This included centering the main navigation bar so the **Scan**, **Pantry**, and **Recipes** buttons appear centered at the top of the interface (Subissues #232, #175, #104, #115; PRs #245, #246, #220, #133, #132, #131, #127, #119).
+
 - **Recipe features**: Implemented save/unsave buttons and state on recipe cards so users can bookmark recipes (Subissue #155; PRs #192, #191).
+
 - **Expiration & AI integration**: Built the expiration calendar and wired AI APIs to generate expiration dates for produce (Subissues #138, #48; PRs #153, #80, #77).
+
 - **Home page & MVP polish**: Designed and built the initial home page and handled several MVP follow-up fixes and polish items (Subissue #33; PRs #71, #58, #117).
+
 - **Design & documentation**: Authored and maintained DESIGN.md and made multiple improvements to the README so the project documentation stayed accurate (PRs #193, #168, #86, #52, #50, #49).
+
 - **Sprint & process management**: Maintained sprint planning documents and scrum logs across sprints, and led the first retrospective, facilitating the team discussion and documenting outcomes (PRs #124, #110, #108, #69, #63, #56, #26, #25, #23, #20, #19, #18, #17, #62, #65; Subissue #51).
 
 ## PLaceholer for other team members
