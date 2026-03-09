@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import type { Ingredient } from '@/types';
-import { getAllApiKeys, isRateLimitError } from '@/lib/geminiKeys';
+import { getAllApiKeys, isRateLimitError, isUnavailableError } from '@/lib/geminiKeys';
 
 const getImagePayload = (rawImage: string): { data: string; mimeType: string } => {
   const [prefix, data] = rawImage.split(',', 2);
@@ -63,55 +63,65 @@ export async function POST(request: Request) {
     };
 
     const imagePayload = getImagePayload(base64Image);
-    const model = useDowngradedModel ? DOWNGRADED_MODEL : PRIMARY_MODEL;
+    const modelsToTry = useDowngradedModel
+      ? [DOWNGRADED_MODEL]
+      : [PRIMARY_MODEL, DOWNGRADED_MODEL];
     const apiKeys = getAllApiKeys();
     let lastError: unknown;
-    let rateLimitHit = false;
+    let retryableHit = false;
 
     for (let keyIndex = 0; keyIndex < apiKeys.length; keyIndex++) {
       const ai = new GoogleGenAI({ apiKey: apiKeys[keyIndex] });
-      try {
-        const response = await ai.models.generateContent({
-          model,
-          contents: {
-            parts: [
-              { inlineData: imagePayload },
-              { text: prompt }
-            ]
-          },
-          config: {
-            responseMimeType: 'application/json',
-            responseSchema: schema
-          }
-        });
 
-        if (!response.text) {
-          return NextResponse.json({ items: [] as Ingredient[] });
-        }
+      for (let m = 0; m < modelsToTry.length; m++) {
+        try {
+          const response = await ai.models.generateContent({
+            model: modelsToTry[m],
+            contents: {
+              parts: [
+                { inlineData: imagePayload },
+                { text: prompt }
+              ]
+            },
+            config: {
+              responseMimeType: 'application/json',
+              responseSchema: schema
+            }
+          });
 
-        const parsed = JSON.parse(response.text);
-        return NextResponse.json({ items: parsed.ingredients || [] });
-      } catch (err) {
-        lastError = err;
-        if (isRateLimitError(err)) {
-          rateLimitHit = true;
-          if (keyIndex < apiKeys.length - 1) {
-            await sleep(KEY_RETRY_DELAY_MS);
+          if (!response.text) {
+            return NextResponse.json({ items: [] as Ingredient[] });
           }
-          continue;
-        } else {
+
+          const parsed = JSON.parse(response.text);
+          return NextResponse.json({ items: parsed.ingredients || [] });
+        } catch (err) {
+          lastError = err;
+
+          if (isUnavailableError(err) && m < modelsToTry.length - 1) {
+            continue;
+          }
+
+          if (isRateLimitError(err) || isUnavailableError(err)) {
+            retryableHit = true;
+            if (keyIndex < apiKeys.length - 1) {
+              await sleep(KEY_RETRY_DELAY_MS);
+            }
+            break;
+          }
+
           throw err;
         }
       }
     }
 
-    if (rateLimitHit) {
+    if (retryableHit) {
       const canRetry = !useDowngradedModel;
       return NextResponse.json(
         {
           error: canRetry
-            ? 'API rate limit reached. We will try again with a fallback model.'
-            : 'API rate limit reached. Please try again in a few minutes.',
+            ? 'Model temporarily unavailable. We will try again with a fallback model.'
+            : 'Model temporarily unavailable. Please try again in a few minutes.',
           canRetry
         },
         { status: 429 }
