@@ -24,9 +24,14 @@ const KEY_RETRY_DELAY_MS = 4000;
 
 const PROGRESS_ROTATING = 'Primary model busy, trying fallback model...';
 const PROGRESS_NEXT_KEY = 'Trying next API key...';
+const getScanMeta = (modelUsed: string, startedAt: number) => ({
+  modelUsed,
+  durationMs: Date.now() - startedAt
+});
 
 export async function POST(request: Request) {
   try {
+    const startedAt = Date.now();
     const { base64Image, useDowngradedModel, streamProgress } = (await request.json()) as {
       base64Image?: string;
       useDowngradedModel?: boolean;
@@ -100,11 +105,14 @@ export async function POST(request: Request) {
                     }
                   });
                   if (!response.text) {
-                    enqueue({ items: [] });
+                    enqueue({ items: [], meta: getScanMeta(modelsToTry[m], startedAt) });
                     return;
                   }
                   const parsed = JSON.parse(response.text);
-                  enqueue({ items: parsed.ingredients || [] });
+                  enqueue({
+                    items: parsed.ingredients || [],
+                    meta: getScanMeta(modelsToTry[m], startedAt)
+                  });
                   return;
                 } catch (err) {
                   lastError = err;
@@ -179,11 +187,17 @@ export async function POST(request: Request) {
           });
 
           if (!response.text) {
-            return NextResponse.json({ items: [] as Ingredient[] });
+            return NextResponse.json({
+              items: [] as Ingredient[],
+              meta: getScanMeta(modelsToTry[m], startedAt)
+            });
           }
 
           const parsed = JSON.parse(response.text);
-          return NextResponse.json({ items: parsed.ingredients || [] });
+          return NextResponse.json({
+            items: parsed.ingredients || [],
+            meta: getScanMeta(modelsToTry[m], startedAt)
+          });
         } catch (err) {
           lastError = err;
 

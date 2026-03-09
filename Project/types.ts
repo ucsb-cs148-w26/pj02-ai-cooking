@@ -6,6 +6,16 @@ export interface Ingredient {
   expiryEstimate?: string;
 }
 
+export interface ScanAnalysisMeta {
+  modelUsed: string;
+  durationMs: number;
+}
+
+export interface ScanAnalysisResult {
+  items: Ingredient[];
+  meta?: ScanAnalysisMeta;
+}
+
 export interface PantryItem {
   id: string;
   name: string;

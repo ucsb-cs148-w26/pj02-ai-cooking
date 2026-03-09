@@ -70,6 +70,18 @@ const formatIngredient = (item: Ingredient) => {
   return details ? `${item.name} (${details})` : item.name;
 };
 
+const formatDuration = (durationMs?: number) => {
+  if (typeof durationMs !== 'number' || Number.isNaN(durationMs)) {
+    return 'unknown time';
+  }
+
+  if (durationMs < 1000) {
+    return `${durationMs}ms`;
+  }
+
+  return `${(durationMs / 1000).toFixed(2)}s`;
+};
+
 type ScanAnalyzerProps = {
   onAddItems?: (items: Ingredient[]) => void;
 };
@@ -132,10 +144,12 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
       const result = await analyzeImage(imageData, (message) => {
         setStatusMessage(message);
       });
-      setItems(result);
-      setStatusMessage(null);
-      if (result.length > 0) {
-        onAddItems?.(result);
+      setItems(result.items);
+      setStatusMessage(
+        `Finished analyzing in ${formatDuration(result.meta?.durationMs)} using ${result.meta?.modelUsed ?? 'an unknown model'}.`
+      );
+      if (result.items.length > 0) {
+        onAddItems?.(result.items);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Analysis failed.');
@@ -239,7 +253,7 @@ export default function ScanAnalyzer({ onAddItems }: ScanAnalyzerProps) {
         >
           {preparingImage ? 'Preparing image...' : loading ? 'Analyzing...' : 'Analyze Image'}
         </button>
-        {loading && statusMessage && (
+        {statusMessage && (
           <p className="text-sm" style={{ color: colors.olive, opacity: 0.85 }}>
             {statusMessage}
           </p>

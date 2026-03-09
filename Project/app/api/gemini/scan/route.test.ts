@@ -68,6 +68,12 @@ describe('POST /api/gemini/scan - 503 model downgrade', () => {
     expect(res.status).toBe(200);
     expect(data.items).toHaveLength(1);
     expect(data.items[0].name).toBe('apple');
+    expect(data.meta).toEqual(
+      expect.objectContaining({
+        modelUsed: DOWNGRADED_MODEL,
+        durationMs: expect.any(Number)
+      })
+    );
 
     const primaryCalls = generateContentMock.mock.calls.filter((c) => c[0]?.model === PRIMARY_MODEL);
     const downgradedCalls = generateContentMock.mock.calls.filter(

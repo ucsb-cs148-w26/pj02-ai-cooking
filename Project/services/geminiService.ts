@@ -1,6 +1,11 @@
-import { Ingredient, Recipe, UserPreferences } from "../types";
+import { Ingredient, Recipe, ScanAnalysisMeta, ScanAnalysisResult, UserPreferences } from "../types";
 
 const RETRY_STATUS_MESSAGE = "Rate limited. Retrying with a different model...";
+
+type StreamResult<T> = {
+  value: T;
+  meta?: ScanAnalysisMeta;
+};
 
 class RequestError extends Error {
   status: number;
@@ -41,7 +46,7 @@ const requestJsonStreaming = async <T>(
   body: Record<string, unknown>,
   onProgress: (message: string) => void,
   resultKey: 'items' | 'recipes'
-): Promise<T> => {
+): Promise<StreamResult<T>> => {
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -66,7 +71,7 @@ const requestJsonStreaming = async <T>(
 
   const decoder = new TextDecoder();
   let buffer = "";
-  let result: T | null = null;
+  let result: StreamResult<T> | null = null;
 
   while (true) {
     const { done, value } = await reader.read();
@@ -86,7 +91,10 @@ const requestJsonStreaming = async <T>(
           const canRetry = data.status === 429 && Boolean(data.canRetry);
           throw new RequestError(msg, (data.status as number) ?? 500, canRetry);
         } else if (resultKey in data) {
-          result = data[resultKey] as T;
+          result = {
+            value: data[resultKey] as T,
+            meta: data.meta as ScanAnalysisMeta | undefined
+          };
         }
       } catch (e) {
         if (e instanceof RequestError) throw e;
@@ -104,7 +112,10 @@ const requestJsonStreaming = async <T>(
         const canRetry = data.status === 429 && Boolean(data.canRetry);
         throw new RequestError(msg, (data.status as number) ?? 500, canRetry);
       } else if (resultKey in data) {
-        result = data[resultKey] as T;
+        result = {
+          value: data[resultKey] as T,
+          meta: data.meta as ScanAnalysisMeta | undefined
+        };
       }
     } catch (e) {
       if (e instanceof RequestError) throw e;
@@ -124,39 +135,53 @@ const requestJsonStreaming = async <T>(
 export const analyzeImage = async (
   base64Image: string,
   onStatus?: (msg: string) => void
-): Promise<Ingredient[]> => {
-  const doRequest = onStatus
-    ? () =>
-        requestJsonStreaming<Ingredient[]>(
+): Promise<ScanAnalysisResult> => {
+  if (onStatus) {
+    try {
+      const result = await requestJsonStreaming<Ingredient[]>(
+        '/api/gemini/scan',
+        { base64Image },
+        onStatus,
+        'items'
+      );
+      return {
+        items: result.value,
+        meta: result.meta
+      };
+    } catch (error) {
+      if (error instanceof RequestError && error.status === 429 && error.canRetry) {
+        onStatus(RETRY_STATUS_MESSAGE);
+        const retryResult = await requestJsonStreaming<Ingredient[]>(
           '/api/gemini/scan',
-          { base64Image },
+          { base64Image, useDowngradedModel: true },
           onStatus,
           'items'
-        )
-    : () =>
-        requestJson<{ items: Ingredient[] }>('/api/gemini/scan', { base64Image }).then(
-          (d) => d.items ?? []
         );
+        return {
+          items: retryResult.value,
+          meta: retryResult.meta
+        };
+      }
+      throw error;
+    }
+  }
 
   try {
-    return await doRequest();
+    const result = await requestJson<ScanAnalysisResult>('/api/gemini/scan', { base64Image });
+    return {
+      items: result.items ?? [],
+      meta: result.meta
+    };
   } catch (error) {
     if (error instanceof RequestError && error.status === 429 && error.canRetry) {
-      onStatus?.(RETRY_STATUS_MESSAGE);
-      const retryDo = onStatus
-        ? () =>
-            requestJsonStreaming<Ingredient[]>(
-              '/api/gemini/scan',
-              { base64Image, useDowngradedModel: true },
-              onStatus,
-              'items'
-            )
-        : () =>
-            requestJson<{ items: Ingredient[] }>('/api/gemini/scan', {
-              base64Image,
-              useDowngradedModel: true
-            }).then((d) => d.items ?? []);
-      return retryDo();
+      const retryResult = await requestJson<ScanAnalysisResult>('/api/gemini/scan', {
+        base64Image,
+        useDowngradedModel: true
+      });
+      return {
+        items: retryResult.items ?? [],
+        meta: retryResult.meta
+      };
     }
     throw error;
   }
@@ -176,7 +201,7 @@ export const generateRecipes = async (
           body,
           onStatus,
           'recipes'
-        )
+        ).then((result) => result.value)
     : () =>
         requestJson<{ recipes: Recipe[] }>('/api/gemini/recipes', body).then(
           (d) => d.recipes ?? []
@@ -194,7 +219,7 @@ export const generateRecipes = async (
               retryBody,
               onStatus,
               'recipes'
-            )
+            ).then((result) => result.value)
         : () =>
             requestJson<{ recipes: Recipe[] }>('/api/gemini/recipes', retryBody).then(
               (d) => d.recipes ?? []
