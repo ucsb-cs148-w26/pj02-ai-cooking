@@ -4,14 +4,18 @@ import type { Ingredient, Recipe, UserPreferences } from '@/types';
 import { getAllApiKeys, isRateLimitError } from '@/lib/geminiKeys';
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-const PRIMARY_MODEL = 'gemini-2.5-flash';
-const DOWNGRADED_MODEL = 'gemini-2.0-flash';
-const KEY_RETRY_DELAY_MS = 1000;
+const PRIMARY_MODEL = 'gemini-3.1-flash-lite-preview';
+
+// Fallback to a stable, older model if the preview endpoint fails
+const DOWNGRADED_MODEL = 'gemini-2.5-flash';
+
+// 4000ms aligns perfectly with the 15 RPM free tier limit (1 request / 4 seconds)
+const KEY_RETRY_DELAY_MS = 4000;
 
 const generateRecipeImage = async (ai: GoogleGenAI, title: string): Promise<string> => {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
+      model: 'gemini-3.1-flash-image-preview',
       contents: {
         parts: [{ text: `Professional food photography of ${title}, appetizing, realistic, high quality, 4k.` }]
       },
