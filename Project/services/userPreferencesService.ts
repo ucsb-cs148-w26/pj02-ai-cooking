@@ -8,7 +8,7 @@ const ONBOARDING_KEY = 'pantrypal_onboarding_complete'; // Kept for potential fa
 export async function saveUserPreferences(userId: string, preferences: UserPreferences): Promise<void> {
   if (!userId) {
     console.error("Cannot save preferences: User ID is missing.");
-    return;
+    throw new Error("Cannot save preferences: User ID is missing.");
   }
 
   try {
@@ -16,6 +16,7 @@ export async function saveUserPreferences(userId: string, preferences: UserPrefe
     await setDoc(userDocRef, preferences, { merge: true });
   } catch (error) {
     console.error('Error saving user preferences to Firestore:', error);
+     throw error;
   }
 }
 

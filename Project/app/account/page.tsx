@@ -71,7 +71,7 @@ export default function AccountPage() {
     setSaving(true);
     setSaveMessage(null);
     try {
-      const toSave: UserPreferences = {
+      const toSaveRaw: UserPreferences = {
         name: form.name.trim() || '',
         allergies: form.allergies ?? [],
         customAllergies: form.customAllergies?.trim() || undefined,
@@ -82,6 +82,9 @@ export default function AccountPage() {
         cuisine: form.cuisine?.trim() || undefined,
         restrictions: form.restrictions?.trim() || undefined,
       };
+      const toSave = Object.fromEntries(
+        Object.entries(toSaveRaw).filter(([, value]) => value !== undefined)
+      ) as UserPreferences;
       await saveUserPreferences(currentUser.uid, toSave);
       setUserPreferences(toSave);
       setSaveMessage({ type: 'success', text: 'Preferences saved.' });
