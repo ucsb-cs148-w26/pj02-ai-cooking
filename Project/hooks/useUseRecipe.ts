@@ -36,6 +36,15 @@ export function useUseRecipe(options: UseUseRecipeOptions = {}): UseUseRecipeRes
   const { user } = useAuth();
   const [usingRecipeId, setUsingRecipeId] = useState<string | null>(null);
 
+  const normalizeUnit = (raw: string): string => {
+    const unit = raw.trim().toLowerCase();
+    if (!unit) return '';
+    if (unit.endsWith('ies') && unit.length > 4) return `${unit.slice(0, -3)}y`;
+    if (unit.endsWith('oes') && unit.length > 4) return unit.slice(0, -2);
+    if (unit.endsWith('s') && unit.length > 2 && !unit.endsWith('ss')) return unit.slice(0, -1);
+    return unit;
+  };
+
   const parseAmount = (raw: string): number => {
     const s = raw.trim();
     if (!s) return NaN;
@@ -140,7 +149,7 @@ export function useUseRecipe(options: UseUseRecipeOptions = {}): UseUseRecipeRes
             }
 
             const amount = parseAmount(match[1]);
-            const unit = (match[2] || '').toLowerCase();
+            const unit = normalizeUnit(match[2] || '');
             const name = match[3].trim().replace(/^of\s+/, '');
             const safeAmount = !isFinite(amount) || isNaN(amount) || amount <= 0 ? 1 : amount;
             return {
@@ -188,7 +197,7 @@ export function useUseRecipe(options: UseUseRecipeOptions = {}): UseUseRecipeRes
           if (!ing) return;
 
           const pantryQty = parseAmount(data.quantity ?? '0');
-          const pantryUnit = (data.unit || '').toLowerCase();
+          const pantryUnit = normalizeUnit(data.unit || '');
           if (isNaN(pantryQty) || pantryQty <= 0) return;
           if (ing.unit && pantryUnit && ing.unit !== pantryUnit) return;
 

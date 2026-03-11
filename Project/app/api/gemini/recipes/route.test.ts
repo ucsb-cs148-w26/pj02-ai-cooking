@@ -12,7 +12,13 @@ const mockRecipes = [
     description: 'A test',
     time: '10 min',
     difficulty: 'Easy' as const,
-    ingredients: ['egg'],
+    ingredients: [
+      {
+        quantityText: '2',
+        name: 'eggs',
+        source: 'pantry' as const
+      }
+    ],
     instructions: ['Cook it']
   }
 ];
@@ -78,6 +84,7 @@ describe('POST /api/gemini/recipes - 503 model downgrade', () => {
     expect(res.status).toBe(200);
     expect(data.recipes).toHaveLength(1);
     expect(data.recipes[0].title).toBe('Test Recipe');
+    expect(data.recipes[0].ingredients).toEqual(['2 eggs']);
 
     const primaryCalls = generateContentMock.mock.calls.filter((c) => c[0]?.model === PRIMARY_MODEL);
     const downgradedCalls = generateContentMock.mock.calls.filter(
@@ -107,6 +114,57 @@ describe('POST /api/gemini/recipes - 503 model downgrade', () => {
     expect(res.status).toBe(429);
     expect(data.error).toContain('temporarily unavailable');
     expect(data.canRetry).toBe(true);
+  });
+
+  it('falls back when primary returns a non-pantry ingredient', async () => {
+    const invalidPrimaryRecipes = [
+      {
+        ...mockRecipes[0],
+        ingredients: [
+          {
+            quantityText: '1 can',
+            name: 'coconut milk',
+            source: 'pantry' as const
+          }
+        ]
+      }
+    ];
+
+    generateContentMock.mockImplementation(async (args: { model?: string }) => {
+      if (args.model === PRIMARY_MODEL) {
+        return { text: JSON.stringify(invalidPrimaryRecipes) };
+      }
+      if (args.model === DOWNGRADED_MODEL) {
+        return { text: JSON.stringify(mockRecipes) };
+      }
+      if (args.model === IMAGE_MODEL) {
+        return { candidates: [{ content: { parts: [] } }] };
+      }
+      throw new Error(`Unexpected model: ${args.model}`);
+    });
+
+    const req = new Request('http://test/api/recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ingredients: [{ name: 'egg', quantity: '6', expiryEstimate: '3 days' }],
+        useDowngradedModel: false
+      })
+    });
+
+    const res = await POST(req);
+    const data = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(data.recipes).toHaveLength(1);
+    expect(data.recipes[0].ingredients).toEqual(['2 eggs']);
+
+    const primaryCalls = generateContentMock.mock.calls.filter((c) => c[0]?.model === PRIMARY_MODEL);
+    const downgradedCalls = generateContentMock.mock.calls.filter(
+      (c) => c[0]?.model === DOWNGRADED_MODEL
+    );
+    expect(primaryCalls).toHaveLength(1);
+    expect(downgradedCalls).toHaveLength(1);
   });
 
   it('returns 429 without canRetry when already using downgraded model and it 503s', async () => {
