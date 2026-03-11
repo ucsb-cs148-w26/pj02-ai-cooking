@@ -41,7 +41,7 @@ const BASIC_ASSUMED_SPICES = [
   'curry powder'
 ] as const;
 
-const QUANTITY_TEXT_RE = /^(\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+|\d+(?:\.\d+)?|[¼½¾⅓⅔⅛⅜⅝⅞]|\d+[¼½¾⅓⅔⅛⅜⅝⅞])(?:\s+[a-zA-Z]+)?$/;
+const QUANTITY_TEXT_RE = /^(\d+\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+|\d+(?:\.\d+)?|[¼½¾⅓⅔⅛⅜⅝⅞]|\d+[¼½¾⅓⅔⅛⅜⅝⅞])(?:\s+[a-zA-Z]+(?:\s+[a-zA-Z]+)*)?$/;
 
 type GeneratedIngredient = {
   quantityText: string;
@@ -96,62 +96,86 @@ const formatPantryItem = (ingredient: Ingredient) => {
   return `- ${name}${details.length > 0 ? ` (${details.join(', ')})` : ''}`;
 };
 
-const toRecipeList = (generatedRecipes: GeneratedRecipe[], pantryIngredients: Ingredient[]): Recipe[] => {
-  const pantryNames = new Set(
-    pantryIngredients
-      .map((ingredient) => normalizeIngredientName(ingredient.name))
-      .filter(Boolean)
-  );
-  const allowedSpices = new Set(
-    BASIC_ASSUMED_SPICES.map((spice) => normalizeIngredientName(spice))
+const fuzzyMatchesList = (normalizedName: string, names: string[]) =>
+  names.some(
+    (entry) => normalizedName.includes(entry) || entry.includes(normalizedName)
   );
 
-  return generatedRecipes.map((recipe, recipeIndex) => {
-    const recipeLabel = recipe.title?.trim() || `Recipe ${recipeIndex + 1}`;
+const validateRecipe = (
+  recipe: GeneratedRecipe,
+  recipeIndex: number,
+  pantryNames: string[],
+  allowedSpiceNames: string[]
+): Recipe => {
+  const recipeLabel = recipe.title?.trim() || `Recipe ${recipeIndex + 1}`;
 
-    if (!Array.isArray(recipe.ingredients)) {
-      throw new RecipeValidationError(`${recipeLabel} returned an invalid ingredient list.`);
+  if (!Array.isArray(recipe.ingredients) || recipe.ingredients.length === 0) {
+    throw new RecipeValidationError(`${recipeLabel} returned an invalid ingredient list.`);
+  }
+
+  const ingredients = recipe.ingredients.map((ingredient, ingredientIndex) => {
+    const quantityText = ingredient?.quantityText?.trim();
+    const name = ingredient?.name?.trim();
+    const source = ingredient?.source;
+    const label = `${recipeLabel} ingredient ${ingredientIndex + 1}`;
+
+    if (!quantityText || !QUANTITY_TEXT_RE.test(quantityText)) {
+      throw new RecipeValidationError(`${label} ("${quantityText}") is missing a valid quantity or unit/count.`);
     }
 
-    const ingredients = recipe.ingredients.map((ingredient, ingredientIndex) => {
-      const quantityText = ingredient?.quantityText?.trim();
-      const name = ingredient?.name?.trim();
-      const source = ingredient?.source;
-      const label = `${recipeLabel} ingredient ${ingredientIndex + 1}`;
+    if (!name) {
+      throw new RecipeValidationError(`${label} is missing an ingredient name.`);
+    }
 
-      if (!quantityText || !QUANTITY_TEXT_RE.test(quantityText)) {
-        throw new RecipeValidationError(`${label} is missing a valid quantity or unit/count.`);
+    const normalizedName = normalizeIngredientName(name);
+    if (!normalizedName) {
+      throw new RecipeValidationError(`${label} is empty after normalization.`);
+    }
+
+    if (source === 'pantry') {
+      if (!fuzzyMatchesList(normalizedName, pantryNames)) {
+        throw new RecipeValidationError(`${recipeLabel} used non-pantry ingredient "${name}".`);
       }
-
-      if (!name) {
-        throw new RecipeValidationError(`${label} is missing an ingredient name.`);
+    } else if (source === 'assumed_spice') {
+      if (!fuzzyMatchesList(normalizedName, allowedSpiceNames)) {
+        throw new RecipeValidationError(`${recipeLabel} assumed non-spice ingredient "${name}".`);
       }
+    } else {
+      throw new RecipeValidationError(`${label} has an invalid source "${source}".`);
+    }
 
-      const normalizedName = normalizeIngredientName(name);
-      if (!normalizedName) {
-        throw new RecipeValidationError(`${label} is empty after normalization.`);
-      }
-
-      if (source === 'pantry') {
-        if (!pantryNames.has(normalizedName)) {
-          throw new RecipeValidationError(`${recipeLabel} used non-pantry ingredient "${name}".`);
-        }
-      } else if (source === 'assumed_spice') {
-        if (!allowedSpices.has(normalizedName)) {
-          throw new RecipeValidationError(`${recipeLabel} assumed non-spice ingredient "${name}".`);
-        }
-      } else {
-        throw new RecipeValidationError(`${label} has an invalid source.`);
-      }
-
-      return `${quantityText} ${name}`.replace(/\s+/g, ' ').trim();
-    });
-
-    return {
-      ...recipe,
-      ingredients
-    };
+    return `${quantityText} ${name}`.replace(/\s+/g, ' ').trim();
   });
+
+  return { ...recipe, ingredients };
+};
+
+const toRecipeList = (generatedRecipes: GeneratedRecipe[], pantryIngredients: Ingredient[]): Recipe[] => {
+  const pantryNames = pantryIngredients
+    .map((ingredient) => normalizeIngredientName(ingredient.name))
+    .filter(Boolean);
+  const allowedSpiceNames = BASIC_ASSUMED_SPICES.map((spice) => normalizeIngredientName(spice));
+
+  const valid: Recipe[] = [];
+  const errors: string[] = [];
+
+  for (let i = 0; i < generatedRecipes.length; i++) {
+    try {
+      valid.push(validateRecipe(generatedRecipes[i], i, pantryNames, allowedSpiceNames));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      errors.push(msg);
+      console.warn(`Skipping recipe ${i + 1}: ${msg}`);
+    }
+  }
+
+  if (valid.length === 0) {
+    throw new RecipeValidationError(
+      `All recipes failed validation. ${errors[0] ?? ''}`
+    );
+  }
+
+  return valid;
 };
 
 const parseGeneratedRecipes = (responseText: string, pantryIngredients: Ingredient[]) => {
@@ -244,18 +268,17 @@ export async function POST(request: Request) {
       Available pantry items:
       ${ingredientList}
       ${constraints.length > 0 ? `Constraints: ${constraints.join('. ')}.` : ''}
-      Suggest 3 practical, delicious recipes that respect all dietary restrictions and allergies.
+      You MUST return exactly 3 practical, delicious recipes that respect all dietary restrictions and allergies. Each recipe should use a variety of the available pantry items, not just one.
       Rules:
-      - Use pantry ingredients for every non-spice ingredient.
+      - Use pantry ingredients for every non-spice ingredient. Combine multiple pantry items in each recipe.
       - You may assume only basic spices or dried seasonings in small amounts: ${BASIC_ASSUMED_SPICES.join(', ')}.
       - Do not assume any other ingredient unless it appears in the pantry list above. This includes coconut milk, broth, butter, oil, cheese, onions, garlic cloves, sauces, produce, canned goods, or other pantry staples not listed.
       - If the pantry is sparse, keep the recipe simple instead of inventing extra ingredients.
       - Do not use more of a pantry ingredient than the listed quantity reasonably supports.
       - Every ingredient must include an explicit leading quantity. Never output an ingredient without a quantity.
       - quantityText must contain only the amount/unit part, such as "2", "1 can", "1/2 tsp", or "200 g".
-      - name must contain only the ingredient name, such as "eggs", "coconut milk", or "salt".
+      - name must use the EXACT ingredient name from the pantry list above. For example, if the pantry lists "Milk", use "Milk", not "whole milk" or "dairy milk". If the pantry lists "Chicken", use "Chicken", not "chicken breast" or "chicken thigh".
       - source must be "pantry" for pantry ingredients and "assumed_spice" only for the allowed spices above.
-      - Keep pantry ingredient names aligned with the pantry items above so they can be matched back to the pantry.
       - Instructions must not mention ingredients that are missing from the ingredient list.
     `;
 
