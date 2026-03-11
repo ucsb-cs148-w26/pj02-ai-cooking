@@ -71,5 +71,3 @@ I worked on the **Gemini API system** that powers PantryPal's AI features: image
 Some of my contributions may not be fully reflected in the GitHub Contributors graph if commits were made under different account configurations, or if pair programming sessions were committed by another team member. The work described above represents my personal contributions to the Gemini API system and can be verified through the code in `Project/app/api/gemini/`, `Project/services/geminiService.ts`, `Project/lib/geminiKeys.ts`, and `Project/components/ScanAnalyzer.tsx`.
 
 ---
-
-*This draft was written by Andy Wang for inclusion in `team/contributions/CONTRIBS.md`.*
