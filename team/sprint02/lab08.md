@@ -1,4 +1,4 @@
-# Lab08 Scrum Project: AI Cooking App
+# Lab08 Scrum Project: Pantry Pal
 
 **Mentor:** Self Mentored  
 

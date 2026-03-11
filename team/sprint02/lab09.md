@@ -1,4 +1,4 @@
-# Lab09 Scrum Project: AI Cooking App
+# Lab09 Scrum Project: Pantry Pal
 
 **Mentor:** Self Mentored  
 
@@ -37,7 +37,7 @@ We all continued working on CONTRIBS.md
 **Add restrictions and drop-downs** (#180)
 
 - Added a reasonable limit on the quantity of items.
-- Replaced the "what cuisine" free-text field in Recipes with a drop-down of options.
+- Replaced the free-text fields in Recipes with a drop-down of options.
 
 ### Krisha
 

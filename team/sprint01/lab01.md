@@ -1,15 +1,12 @@
-Project: AI Cooking App
+# Lab 01 Scrum Project: Pantry Pal
 
-Mentor: Self Mentored
+**Mentor:** Self Mentored  
+**Meeting Time:** Lab01  
+**Type of Meeting:** Retrospective 01  
+**Team:** Krisha [X], Daniel [X], Yuxi [X], Andy [X], Mahima [X]
 
-Meeting Time: lab01
+---
 
-Type of Meeting: Daily Scrum
+- Each member made a pull request on github to add our individual files for lab01.
 
-Team: Krisha[X], Daniel[X], Yuxi[X], Andy[X], Mahima[X]
-
-Scribed Discussion:
-
-Each member made a pull request on github to add our individual files for lab01.
-
-Each member will continue working on lab01.
+- Each member will continue working on lab01.

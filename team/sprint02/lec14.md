@@ -1,4 +1,4 @@
-# Lect14 Scrum Project: AI Cooking App
+# Lect14 Scrum Project: Pantry Pal
 
 Mentor: Self Mentored
 

@@ -16,21 +16,16 @@ const colors = {
 };
 
 const bgIcons = [
-  // Top row
   { Icon: UtensilsCrossed, top: '5%', left: '6%', size: 40, color: colors.dustyRose },
   { Icon: Apple, top: '4%', left: '30%', size: 38, color: colors.terracotta },
   { Icon: Wheat, top: '6%', right: '30%', size: 36, color: colors.steelBlue },
   { Icon: Cherry, top: '3%', right: '6%', size: 40, color: colors.olive },
-  // Upper-mid
   { Icon: Coffee, top: '22%', left: '3%', size: 32, color: colors.olive },
   { Icon: Leaf, top: '20%', right: '4%', size: 34, color: colors.terracotta },
-  // Mid
   { Icon: Carrot, top: '40%', left: '5%', size: 36, color: colors.steelBlue },
   { Icon: UtensilsCrossed, top: '42%', right: '3%', size: 34, color: colors.dustyRose },
-  // Lower-mid
   { Icon: Apple, top: '60%', left: '4%', size: 34, color: colors.dustyRose },
   { Icon: Wheat, top: '62%', right: '5%', size: 36, color: colors.olive },
-  // Bottom row
   { Icon: Leaf, bottom: '6%', left: '6%', size: 38, color: colors.terracotta },
   { Icon: Carrot, bottom: '5%', left: '30%', size: 36, color: colors.olive },
   { Icon: Coffee, bottom: '7%', right: '30%', size: 34, color: colors.steelBlue },
@@ -70,88 +65,93 @@ export const Layout: React.FC<LayoutProps> = ({ children, activeTab, onTabChange
 
       {/* Desktop Header */}
       <header
-        className="hidden md:flex fixed top-0 w-full h-16 px-8 items-center justify-center z-50 border-b relative"
+        className="hidden md:flex fixed top-0 w-full h-16 px-8 z-50 border-b"
         style={{ backgroundColor: colors.olive, borderColor: colors.dustyRose + '40' }}
       >
-        {/* Logo (left) */}
-        <div
-          className="absolute left-8 flex items-center gap-3 font-bold text-xl tracking-tight"
-          style={{ fontFamily: 'var(--font-playfair)', color: colors.cream }}
-        >
-          <ChefHat size={30} style={{ color: colors.dustyRose }} />
-          PantryPal
-        </div>
+        {/* 3-column grid: logo | nav | actions */}
+        <div className="w-full grid grid-cols-3 items-center">
 
-        {/* Centered main nav */}
-        <nav className="flex gap-2">
-          {navItems.map(({ key, label, Icon }) => (
-            <button
-              key={key}
-              onClick={() => onTabChange(key)}
-              className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
-              style={
-                activeTab === key
-                  ? { backgroundColor: colors.terracotta, color: '#fff' }
-                  : { color: colors.cream + 'cc', backgroundColor: 'transparent' }
-              }
-              onMouseEnter={(e) => { if (activeTab !== key) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)'; }}
-              onMouseLeave={(e) => { if (activeTab !== key) e.currentTarget.style.backgroundColor = 'transparent'; }}
-            >
-              <Icon size={18} />
-              {label}
-            </button>
-          ))}
-        </nav>
-
-        {/* Right-side actions */}
-        <div className="absolute right-8 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setCalendarOpen(true)}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
-            style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
-            title="Expiration Calendar"
+          {/* Left: Logo */}
+          <div
+            className="flex items-center gap-3 font-bold text-xl tracking-tight"
+            style={{ fontFamily: 'var(--font-playfair)', color: colors.cream }}
           >
-            <Calendar size={20} />
-          </button>
-          {currentUser ? (
-            <>
-              <Link
-                href="/saved-recipes"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
-                title="My Saved Recipes"
-              >
-                <Heart size={18} />
-                <span className="hidden lg:inline">My Saved Recipes</span>
-              </Link>
-              <Link
-                href="/account"
-                className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
-                style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
-                title="Account"
-              >
-                <User size={20} />
-              </Link>
-            </>
-          ) : (
-            <>
+            <ChefHat size={30} style={{ color: colors.dustyRose }} />
+            PantryPal
+          </div>
+
+          {/* Center: Nav */}
+          <nav className="flex gap-2 justify-center">
+            {navItems.map(({ key, label, Icon }) => (
               <button
-                onClick={handleLogin}
-                className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
-                style={{ color: colors.cream, border: `1px solid ${colors.cream}40` }}
+                key={key}
+                onClick={() => onTabChange(key)}
+                className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                style={
+                  activeTab === key
+                    ? { backgroundColor: colors.terracotta, color: '#fff' }
+                    : { color: colors.cream + 'cc', backgroundColor: 'transparent' }
+                }
+                onMouseEnter={(e) => { if (activeTab !== key) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.12)'; }}
+                onMouseLeave={(e) => { if (activeTab !== key) e.currentTarget.style.backgroundColor = 'transparent'; }}
               >
-                Log In
+                <Icon size={18} />
+                {label}
               </button>
-              <button
-                onClick={handleSignUp}
-                className="px-5 py-2 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
-                style={{ backgroundColor: colors.terracotta, color: '#fff' }}
-              >
-                Sign Up
-              </button>
-            </>
-          )}
+            ))}
+          </nav>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-3 justify-end">
+            <button
+              type="button"
+              onClick={() => setCalendarOpen(true)}
+              className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+              style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
+              title="Expiration Calendar"
+            >
+              <Calendar size={20} />
+            </button>
+            {currentUser ? (
+              <>
+                <Link
+                  href="/saved-recipes"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
+                  title="My Saved Recipes"
+                >
+                  <Heart size={18} />
+                  <span className="hidden lg:inline">My Saved Recipes</span>
+                </Link>
+                <Link
+                  href="/account"
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: colors.cream }}
+                  title="Account"
+                >
+                  <User size={20} />
+                </Link>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleLogin}
+                  className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+                  style={{ color: colors.cream, border: `1px solid ${colors.cream}40` }}
+                >
+                  Log In
+                </button>
+                <button
+                  onClick={handleSignUp}
+                  className="px-5 py-2 text-sm font-semibold rounded-lg transition-opacity hover:opacity-90"
+                  style={{ backgroundColor: colors.terracotta, color: '#fff' }}
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
+          </div>
+
         </div>
       </header>
 

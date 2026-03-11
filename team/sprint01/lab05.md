@@ -1,23 +1,24 @@
-Lab05 Scrum
-Project: AI Cooking App
+# Lab05 Scrum Project: Pantry Pal
 
-Mentor: Self Mentored
+**Mentor:** Self Mentored  
 
-Meeting Time: Lab05
+**Meeting Time:** Lab05 
 
-Type of Meeting: Daily Scrum
+**Type of Meeting:** Daily Scrum  
 
-Team: Krisha[X], Daniel[X], Yuxi[X], Andy[ ], Mahima[ ]
+**Team:** Krisha[X], Daniel[X], Yuxi[X], Andy[], Mahima[]  
 
-Scribed Discussion:
+---
 
-Krisha is working on completing the pantry deletion feature
+## Scribed Discussion
 
-Daniel is working on fixing the layout and colors of the app
+- Krisha is working on completing the pantry deletion feature
 
-Yuxi is working on making the onboarding form shorter
+- Daniel is working on fixing the layout and colors of the app
 
-Mahima communicated via text that she is working on making pantry items persist after a page reload and adding scanned items to the pantry.
+- Yuxi is working on making the onboarding form shorter
 
-Andy communicated via text that he is helping with implementing unit testing
+- Mahima communicated via text that she is working on making pantry items persist after a page reload and adding scanned items to the pantry.
+
+- Andy communicated via text that he is helping with implementing unit testing
 
