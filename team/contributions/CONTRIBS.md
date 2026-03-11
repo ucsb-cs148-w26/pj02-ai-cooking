@@ -1,6 +1,6 @@
 ## Team Contributions — PantryPal
 
-This document summarizes each team member's code and process contributions. For more detail, see the individual files in this folder (e.g. contrib_Yuxi.md, contrib_Daniel.md).
+This document summarizes each team member's code and process contributions. For more detail, see the individual files in this folder (e.g. contrib_Yuxi.md, contrib_Daniel.md, contrib_Andy.md).
 
 ---
 
@@ -66,3 +66,13 @@ Daniel was an active contributor on frontend UI, AI-powered expiration features,
 ---
 
 ## Andy Wang
+
+Andy worked on the Gemini API system that powers image detection (scanning) and recipe generation.
+
+- **Image detection (scan)**: Implemented the `/api/gemini/scan` endpoint and `analyzeImage` service for detecting ingredients from photos. Added model fallback (primary → downgraded) when the primary model returns 503, multi-key rotation for rate limits, and streaming progress updates. Introduced `ScanAnalysisMeta` (model used, duration) and updated `ScanAnalyzer` to display analysis results with timing and model info.
+
+- **Recipe generation**: Implemented the `/api/gemini/recipes` endpoint and `generateRecipes` service. Same fallback and retry logic as scan; supports streaming progress. Each recipe includes an AI-generated food image via Gemini's image model.
+
+- **Error handling & streaming**: Added `isUnavailableError` in `geminiKeys.ts` to detect 503/overloaded errors. Built `requestJsonStreaming` and NDJSON streaming for real-time progress messages. Returns `canRetry` on 429 so the frontend can offer retry with the downgraded model.
+
+- **Tests**: Added Vitest tests for 503 model-downgrade flows (scan and recipes) and for `isUnavailableError`.
