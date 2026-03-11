@@ -187,11 +187,16 @@ export const analyzeImage = async (
   }
 };
 
+export type GenerateRecipesResult = {
+  recipes: Recipe[];
+  meta?: ScanAnalysisMeta;
+};
+
 export const generateRecipes = async (
   ingredients: Ingredient[],
   preferences: Partial<UserPreferences>,
   onStatus?: (msg: string) => void
-): Promise<Recipe[]> => {
+): Promise<GenerateRecipesResult> => {
   const body = { ingredients, preferences };
   const retryBody = { ingredients, preferences, useDowngradedModel: true };
   const doRequest = onStatus
@@ -201,10 +206,10 @@ export const generateRecipes = async (
           body,
           onStatus,
           'recipes'
-        ).then((result) => result.value)
+        ).then((result) => ({ recipes: result.value, meta: result.meta }))
     : () =>
-        requestJson<{ recipes: Recipe[] }>('/api/gemini/recipes', body).then(
-          (d) => d.recipes ?? []
+        requestJson<{ recipes: Recipe[]; meta?: ScanAnalysisMeta }>('/api/gemini/recipes', body).then(
+          (d) => ({ recipes: d.recipes ?? [], meta: d.meta })
         );
 
   try {
@@ -219,10 +224,10 @@ export const generateRecipes = async (
               retryBody,
               onStatus,
               'recipes'
-            ).then((result) => result.value)
+            ).then((result) => ({ recipes: result.value, meta: result.meta }))
         : () =>
-            requestJson<{ recipes: Recipe[] }>('/api/gemini/recipes', retryBody).then(
-              (d) => d.recipes ?? []
+            requestJson<{ recipes: Recipe[]; meta?: ScanAnalysisMeta }>('/api/gemini/recipes', retryBody).then(
+              (d) => ({ recipes: d.recipes ?? [], meta: d.meta })
             );
       return retryDo();
     }

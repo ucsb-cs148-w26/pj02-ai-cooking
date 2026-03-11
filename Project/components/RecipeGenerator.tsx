@@ -167,6 +167,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
   const [cuisine, setCuisine] = useState('');
   const [restrictions, setRestrictions] = useState('');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [modelUsed, setModelUsed] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -275,11 +276,12 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       const result = await generateRecipes(selectedItems, preferences, (message) => {
         setStatusMessage(message);
       });
-      const withIds = (result || []).map((r, i) => ({
+      const withIds = (result.recipes || []).map((r, i) => ({
         ...r,
         id: r?.id?.trim() || `recipe-${i}-${Date.now()}`,
       }));
       setRecipes(withIds);
+      setModelUsed(result.meta?.modelUsed ?? null);
       setStatusMessage(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Recipe generation failed.');
@@ -452,7 +454,13 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
       </div>
 
       {recipes.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          {modelUsed && (
+            <p className="text-sm" style={{ color: colors.olive, opacity: 0.8 }}>
+              Generated with <span className="font-medium">{modelUsed}</span>
+            </p>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {recipes.map((recipe, index) => {
             const recipeId = recipe?.id?.trim() || `recipe-${recipe?.title ?? 'unknown'}-${index}`;
             const recipeWithId = { ...recipe, id: recipeId };
@@ -542,6 +550,7 @@ export default function RecipeGenerator({ ingredients }: RecipeGeneratorProps) {
             </div>
             );
           })}
+          </div>
         </div>
       )}
     </div>

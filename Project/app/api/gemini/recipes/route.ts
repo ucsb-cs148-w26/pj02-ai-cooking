@@ -39,8 +39,14 @@ const generateRecipeImage = async (ai: GoogleGenAI, title: string): Promise<stri
   return '';
 };
 
+const getRecipeMeta = (modelUsed: string, startedAt: number) => ({
+  modelUsed,
+  durationMs: Date.now() - startedAt
+});
+
 export async function POST(request: Request) {
   try {
+    const startedAt = Date.now();
     const { ingredients, preferences, useDowngradedModel, streamProgress } = (await request.json()) as {
       ingredients?: Ingredient[];
       preferences?: Partial<UserPreferences>;
@@ -157,7 +163,7 @@ export async function POST(request: Request) {
                       };
                     })
                   );
-                  enqueue({ recipes: hydrated });
+                  enqueue({ recipes: hydrated, meta: getRecipeMeta(modelsToTry[m], startedAt) });
                   return;
                 } catch (err) {
                   lastError = err;
@@ -245,7 +251,7 @@ export async function POST(request: Request) {
             })
           );
 
-          return NextResponse.json({ recipes: hydrated });
+          return NextResponse.json({ recipes: hydrated, meta: getRecipeMeta(modelsToTry[m], startedAt) });
         } catch (err) {
           lastError = err;
 
